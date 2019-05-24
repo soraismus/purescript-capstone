@@ -26,6 +26,7 @@ import Type.Row
   , class Union
   , Cons
   , Nil
+  , RProxy(RProxy)
   , kind RowList
   )
 
@@ -111,10 +112,8 @@ instance gSmartDecodeJsonCons_Plus_1
     case lookup fieldName object of
       Just jsonVal -> do
         (val :: f v) <- decodeJson jsonVal
-        --Right $ insert sProxy val {}
         Right $ createSingletonRecord sProxy val
       Nothing ->
-        --Right $ insert sProxy empty {}
         Right $ createSingletonRecord sProxy (empty :: f v)
 
 
@@ -134,7 +133,6 @@ else instance gSmartDecodeJsonCons_nonPlus_1
     case lookup fieldName object of
       Just jsonVal -> do
         (val :: v) <- decodeJson jsonVal
-        --Right $ insert sProxy val {}
         Right $ createSingletonRecord sProxy val
       Nothing ->
         Left $ getMissingFieldErrorMessage fieldName
@@ -145,21 +143,20 @@ instance gSmartDecodeJsonCons_Plus
   :: ( Cons s (f v) r1' r1
      , Cons s (f v) r2' r2
      , DecodeJson (f v)
-     --, GSmartDecodeJson r0 l0 r1' l1' r2' l2'
      , GSmartDecodeJson r0 l0 r1' l1' r2' (Cons s2' v2' l2'')
      , IsSymbol s
      , Lacks s r1'
      , Lacks s r2'
      , Plus f
+     , TypeEquals (RLProxy l1) (RLProxy (Cons s v l1'))
      , Union r0 r1 r2
      , Union r0 r1' r2'
      )
-  -- => GSmartDecodeJson r0 l0 r1 (Cons s (f v) l1') r2 (Cons s (f v) l2')
   => GSmartDecodeJson
         r0
         l0
         r1
-        (Cons s (f v) l1')
+        l1
         r2
         (Cons s (f v) (Cons s2' v2' l2''))
   where
@@ -173,7 +170,6 @@ instance gSmartDecodeJsonCons_Plus
               object
               (RLProxy :: RLProxy l0)
               (RLProxy :: RLProxy l1')
-              --(RLProxy :: RLProxy l2')
               (RLProxy :: RLProxy (Cons s2' v2' l2''))
     case lookup fieldName object of
       Just jsonVal -> do
@@ -186,14 +182,21 @@ else instance gSmartDecodeJsonCons_nonPlus
   :: ( Cons s v r0' r0
      , Cons s v r2' r2
      , DecodeJson v
-     , GSmartDecodeJson r0' l0' r1 l1 r2' l2'
+     , GSmartDecodeJson r0' l0' r1 l1 r2' (Cons s2' v2' l2'')
      , IsSymbol s
      , Lacks s r0'
      , Lacks s r2'
+     , TypeEquals (RLProxy l0) (RLProxy (Cons s v l0'))
      , Union r0  r1 r2
      , Union r0' r1 r2'
      )
-  => GSmartDecodeJson r0 (Cons s v l0') r1 l1 r2 (Cons s v l2')
+  => GSmartDecodeJson
+        r0
+        l0
+        r1
+        l1
+        r2
+        (Cons s v (Cons s2' v2' l2''))
   where
   gSmartDecodeJson object _ _ _ = do
     let
@@ -205,7 +208,7 @@ else instance gSmartDecodeJsonCons_nonPlus
               object
               (RLProxy :: RLProxy l0')
               (RLProxy :: RLProxy l1)
-              (RLProxy :: RLProxy l2')
+              (RLProxy :: RLProxy (Cons s2' v2' l2''))
     case lookup fieldName object of
       Just jsonVal -> do
         val <- decodeJson jsonVal
