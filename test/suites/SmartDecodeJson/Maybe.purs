@@ -14,6 +14,6 @@ suitex :: TestSuite
 suitex =
   suite "Maybe" do
     test "{ a0: 1 }" do
-      let value = { a0: 1 }
+      let value = { a0: 100 }
       let result = smartDecodeJson $ encodeJson value
       assertEquivalence result value
