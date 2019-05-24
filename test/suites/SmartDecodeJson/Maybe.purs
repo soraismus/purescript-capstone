@@ -4,6 +4,7 @@ module Test.Suites.SmartDecodeJson.Maybe
 
 import Prelude
 
+import Control.Alt (class Alt)
 import Control.MonadZero (empty)
 import Control.Plus (class Plus)
 import Data.Argonaut.Core (isNull, jsonNull)
@@ -15,7 +16,7 @@ import Data.Generic.Rep (class Generic)
 import Data.List (List(Nil), (:))
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Maybe.First (First(First))
-import Data.String.CodePoints (CodePoint, codePointFromChar)
+import Data.String.CodePoints (codePointFromChar)
 import Data.Tuple (Tuple(Tuple))
 import Test.Unit (TestSuite, suite, test)
 import Test.Utils (assertEquivalence)
@@ -31,6 +32,8 @@ newtype First' a = First' (First a)
 derive instance genericFirst' :: Generic a x => Generic (First' a) _
 derive instance eqFirst' :: Eq a => Eq (First' a)
 derive newtype instance showFirst' :: Show a => Show (First' a)
+derive newtype instance functorFirst' :: Functor First'
+derive newtype instance altFirst' :: Alt First'
 derive newtype instance plusFirst' :: Plus First'
 instance decodeJsonFirst' :: DecodeJson a => DecodeJson (First' a) where
   decodeJson j
