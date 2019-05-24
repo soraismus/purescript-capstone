@@ -137,8 +137,6 @@ else instance gSmartDecodeJsonCons_nonPlus_1
       Nothing ->
         Left $ getMissingFieldErrorMessage fieldName
 
-else
-
 instance gSmartDecodeJsonCons_Plus
   :: ( Cons s (f v) r1' r1
      , Cons s (f v) r2' r2
