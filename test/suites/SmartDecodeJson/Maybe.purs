@@ -2,14 +2,11 @@ module Test.Suites.SmartDecodeJson.Maybe
   ( suitex
   ) where
 
-import Effect.Console (log)
-import Effect.Class (liftEffect)
-
 import Prelude
-import Data.Argonaut.Core (isNull, jsonNull, stringify)
 
 import Control.MonadZero (empty)
 import Control.Plus (class Plus)
+import Data.Argonaut.Core (isNull, jsonNull)
 import Data.Argonaut.Decode (class DecodeJson, decodeJson)
 import Data.Argonaut.Decode.Smart (smartDecodeJson)
 import Data.Argonaut.Encode (class EncodeJson, encodeJson)
@@ -296,9 +293,106 @@ suitex =
     suite "Record -- with records having absent fields" do
       test "#0" do
         let x = encodeJson { a0: {} }
-        liftEffect $ log $ stringify x
         let
           result :: Either String { a0 :: { b0 :: Maybe Int } }
           result = smartDecodeJson $ encodeJson { a0: {} }
-        liftEffect $ log $ show result
         assertEquivalence result { a0: { b0: Nothing } }
+
+      test "#1" do
+        let
+          result
+            :: Either
+                  String
+                  { a00 :: Maybe String
+                  , a01 :: Maybe String
+                  , a02 :: Id String
+                  , a03 :: String
+                  , a04 :: Id Int
+                  , a05 :: Array Int
+                  , a06 :: Array Int
+                  , a07 :: Int
+                  , a08 :: Boolean
+                  , a09 :: List Boolean
+                  , a10 :: List Boolean
+                  , a11 :: Id Boolean
+                  , a12 :: Array (List Int)
+                  , a13 :: Id (Array (List Int))
+                  , a14 :: First' (Array (List Int))
+                  , a15 :: First' (Array (List Int))
+                  , a16 :: { b00 :: Maybe Int
+                           , b01 :: Maybe Int
+                           , b02 :: Int
+                           , b03 :: Id Int
+                           }
+                  , a17 :: { b00 :: { c00 :: First' Int
+                                    , c01 :: First' Int
+                                    , c02 :: Int
+                                    , c03 :: Id Int
+                                    }
+                           , b01 :: { d00 :: Array Int
+                                    , d01 :: Array Int
+                                    , d02 :: Int
+                                    , d03 :: Id Int
+                                    , d04 :: { e00 :: Maybe Int }
+                                    }
+                           }
+                  }
+          result =
+            smartDecodeJson
+              $ encodeJson
+                  { a01: Nothing :: Maybe String
+                  , a02: Id "2"
+                  , a03: "3"
+                  , a04: Id 4
+                  , a05: [] :: Array Int
+                  , a07: 7
+                  , a08: true
+                  , a10: Nil :: List Boolean
+                  , a11: Id true
+                  , a12: [Nil, (0 : Nil), (0 : 1 : Nil)]
+                  , a13: Id [Nil, (0 : Nil), (0 : 1 : Nil)]
+                  , a14: empty :: First' (Array (List Int))
+                  , a16: { b00: Nothing :: Maybe Int, b02: 2, b03: Id 3 }
+                  , a17: { b00: { c01: Nothing :: Maybe Int
+                                , c02: 2
+                                , c03: Id 3
+                                }
+                         , b01: { d00: [] :: Array Int
+                                , d02: 2
+                                , d03: Id 3
+                                , d04: {}
+                                }
+                         }
+                  }
+        assertEquivalence
+          result
+          { a00: empty
+          , a01: Nothing
+          , a02: Id "2"
+          , a03: "3"
+          , a04: Id 4
+          , a05: []
+          , a06: empty
+          , a07: 7
+          , a08: true
+          , a09: empty
+          , a10: Nil
+          , a11: Id true
+          , a12: [Nil, (0 : Nil), (0 : 1 : Nil)]
+          , a13: Id [Nil, (0 : Nil), (0 : 1 : Nil)]
+          , a14: empty
+          , a15: empty
+          , a16: { b00: Nothing, b01: Nothing, b02: 2, b03: Id 3 }
+          , a17: { b00: { c00: empty
+                        , c01: empty
+                        , c02: 2
+                        , c03: Id 3
+                        }
+                 , b01: { d00: []
+                        , d01: []
+                        , d02: 2
+                        , d03: Id 3
+                        , d04: { e00: Nothing }
+                        }
+                 }
+          }
