@@ -96,7 +96,7 @@ instance gSmartDecodeJsonNil :: GSmartDecodeJson r0 l0 r1 l1 () Nil
   gSmartDecodeJson _ _ _ _ = Right {}
 
 instance gSmartDecodeJsonCons_Plus_1
-  :: ( DecodeJson (f v)
+  :: ( SmartDecodeJson (f v)
      , IsSymbol s
      , ListToRow (Cons s (f v) Nil) r2
      , Plus f
@@ -111,14 +111,14 @@ instance gSmartDecodeJsonCons_Plus_1
       fieldName = reflectSymbol sProxy
     case lookup fieldName object of
       Just jsonVal -> do
-        (val :: f v) <- decodeJson jsonVal
+        (val :: f v) <- smartDecodeJson jsonVal
         Right $ createSingletonRecord sProxy val
       Nothing ->
         Right $ createSingletonRecord sProxy (empty :: f v)
 
 
 else instance gSmartDecodeJsonCons_nonPlus_1
-  :: ( DecodeJson v
+  :: ( SmartDecodeJson v
      , IsSymbol s
      , ListToRow (Cons s v Nil) r2
      )
@@ -132,7 +132,7 @@ else instance gSmartDecodeJsonCons_nonPlus_1
       fieldName = reflectSymbol sProxy
     case lookup fieldName object of
       Just jsonVal -> do
-        (val :: v) <- decodeJson jsonVal
+        (val :: v) <- smartDecodeJson jsonVal
         Right $ createSingletonRecord sProxy val
       Nothing ->
         Left $ getMissingFieldErrorMessage fieldName
@@ -140,7 +140,7 @@ else instance gSmartDecodeJsonCons_nonPlus_1
 instance gSmartDecodeJsonCons_Plus
   :: ( Cons s (f v) r1' r1
      , Cons s (f v) r2' r2
-     , DecodeJson (f v)
+     , SmartDecodeJson (f v)
      , GSmartDecodeJson r0 l0 r1' l1' r2' (Cons s2' v2' l2'')
      , IsSymbol s
 --      , Lacks s r1'
@@ -171,7 +171,7 @@ instance gSmartDecodeJsonCons_Plus
               (RLProxy :: RLProxy (Cons s2' v2' l2''))
     case lookup fieldName object of
       Just jsonVal -> do
-        (val :: f v) <- decodeJson jsonVal
+        (val :: f v) <- smartDecodeJson jsonVal
         Right $ insert sProxy val rest
       Nothing ->
         Right $ insert sProxy empty rest
@@ -179,7 +179,7 @@ instance gSmartDecodeJsonCons_Plus
 else instance gSmartDecodeJsonCons_nonPlus
   :: ( Cons s v r0' r0
      , Cons s v r2' r2
-     , DecodeJson v
+     , SmartDecodeJson v
      , GSmartDecodeJson r0' l0' r1 l1 r2' (Cons s2' v2' l2'')
      , IsSymbol s
 --      , Lacks s r0'
@@ -209,7 +209,7 @@ else instance gSmartDecodeJsonCons_nonPlus
               (RLProxy :: RLProxy (Cons s2' v2' l2''))
     case lookup fieldName object of
       Just jsonVal -> do
-        (val :: v) <- decodeJson jsonVal
+        (val :: v) <- smartDecodeJson jsonVal
         Right $ insert sProxy val rest
       Nothing ->
         Left $ getMissingFieldErrorMessage fieldName
