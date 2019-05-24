@@ -166,14 +166,14 @@ instance gSmartDecodeJsonCons_Plus
       sProxy = SProxy
       fieldName :: String
       fieldName = reflectSymbol sProxy
-    rest <- gSmartDecodeJson
+    (rest :: Record r2') <- gSmartDecodeJson
               object
               (RLProxy :: RLProxy l0)
               (RLProxy :: RLProxy l1')
               (RLProxy :: RLProxy (Cons s2' v2' l2''))
     case lookup fieldName object of
       Just jsonVal -> do
-        val <- decodeJson jsonVal
+        (val :: v) <- decodeJson jsonVal
         Right $ insert sProxy val rest
       Nothing ->
         Right $ insert sProxy empty rest
@@ -204,14 +204,14 @@ else instance gSmartDecodeJsonCons_nonPlus
       sProxy = SProxy
       fieldName :: String
       fieldName = reflectSymbol sProxy
-    rest <- gSmartDecodeJson
+    (rest :: Record r2') <- gSmartDecodeJson
               object
               (RLProxy :: RLProxy l0')
               (RLProxy :: RLProxy l1)
               (RLProxy :: RLProxy (Cons s2' v2' l2''))
     case lookup fieldName object of
       Just jsonVal -> do
-        val <- decodeJson jsonVal
+        (val :: v) <- decodeJson jsonVal
         Right $ insert sProxy val rest
       Nothing ->
         Left $ getMissingFieldErrorMessage fieldName
