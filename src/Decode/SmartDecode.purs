@@ -173,7 +173,7 @@ instance gSmartDecodeJsonCons_Plus
               (RLProxy :: RLProxy (Cons s2' v2' l2''))
     case lookup fieldName object of
       Just jsonVal -> do
-        (val :: v) <- decodeJson jsonVal
+        (val :: f v) <- decodeJson jsonVal
         Right $ insert sProxy val rest
       Nothing ->
         Right $ insert sProxy empty rest
