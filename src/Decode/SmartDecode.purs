@@ -143,7 +143,7 @@ instance gSmartDecodeJsonCons_Plus
      , DecodeJson (f v)
      , GSmartDecodeJson r0 l0 r1' l1' r2' (Cons s2' v2' l2'')
      , IsSymbol s
-     , Lacks s r1'
+--      , Lacks s r1'
      , Lacks s r2'
      , Plus f
      , TypeEquals (RLProxy l1) (RLProxy (Cons s v l1'))
@@ -182,7 +182,7 @@ else instance gSmartDecodeJsonCons_nonPlus
      , DecodeJson v
      , GSmartDecodeJson r0' l0' r1 l1 r2' (Cons s2' v2' l2'')
      , IsSymbol s
-     , Lacks s r0'
+--      , Lacks s r0'
      , Lacks s r2'
      , TypeEquals (RLProxy l0) (RLProxy (Cons s v l0'))
      , Union r0  r1 r2
