@@ -2,7 +2,7 @@ module Test.Main
   ( main
   ) where
 
-import Prelude (Unit, discard)
+import Prelude (Unit)
 
 import Effect (Effect)
 import Test.Suites.SmartDecodeJson (suitex) as SmartDecodeJson

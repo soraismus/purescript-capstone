@@ -1,4 +1,4 @@
-module Data.Argonaut.Decode.Smart where
+module Data.Argonaut.Decode.Smart.Class where
 
 import Prelude (bind, ($))
 

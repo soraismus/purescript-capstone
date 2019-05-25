@@ -9,6 +9,13 @@ module Data.Argonaut.Decode.Smart.Combinators
 
 import Prelude
 
+import Data.Argonaut.Core (Json, isNull)
+import Data.Argonaut.Decode.Smart.Class (class SmartDecodeJson, smartDecodeJson)
+import Data.Bifunctor (lmap)
+import Data.Either (Either(Left))
+import Data.Maybe (Maybe(Just, Nothing), maybe)
+import Foreign.Object (Object, lookup)
+
 -- | Attempt to get the value for a given key on an `Object Json`.
 -- |
 -- | Use this accessor if the key and value *must* be present in your object.
@@ -16,14 +23,14 @@ import Prelude
 getFieldTolerantly
   :: forall a
    . SmartDecodeJson a
-  => FO.Object Json
+  => Object Json
   -> String
   -> Either String a
 getFieldTolerantly o s =
   maybe
     (Left $ "Expected field " <> show s)
     (elaborateFailure s <<< smartDecodeJson)
-    (FO.lookup s o)
+    (lookup s o)
 
 infix 7 getFieldTolerantly as .::
 
@@ -36,15 +43,15 @@ infix 7 getFieldTolerantly as .::
 -- | If the key and value are mandatory, use `getFieldTolerantly` (`.::`) instead.
 getFieldOptionalTolerantly'
   :: forall a
-   . DecodeJson a
-  => FO.Object Json
+   . SmartDecodeJson a
+  => Object Json
   -> String
   -> Either String (Maybe a)
 getFieldOptionalTolerantly' o s =
   maybe
     (pure Nothing)
     decode
-    (FO.lookup s o)
+    (lookup s o)
   where
     decode json =
       if isNull json
@@ -63,16 +70,22 @@ infix 7 getFieldOptionalTolerantly' as .::?
 -- | `getFieldOptionalTolerantly'` (`.::?`) instead.
 getFieldOptionalTolerantly
   :: forall a
-   . DecodeJson a
-  => FO.Object Json
+   . SmartDecodeJson a
+  => Object Json
   -> String
   -> Either String (Maybe a)
 getFieldOptionalTolerantly o s =
   maybe
     (pure Nothing)
     decode
-    (FO.lookup s o)
+    (lookup s o)
   where
     decode json = Just <$> (elaborateFailure s <<< smartDecodeJson) json
 
 infix 7 getFieldOptionalTolerantly as .::!
+
+elaborateFailure :: ∀ a. String -> Either String a -> Either String a
+elaborateFailure s e =
+  lmap msg e
+  where
+    msg m = "Failed to decode key '" <> s <> "': " <> m
