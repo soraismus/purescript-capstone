@@ -22,7 +22,7 @@ module Test.Utils
 
 import Prelude (class Eq, class Show, show, (==), (<>), ($))
 
-import Data.Status.Class (class Status, isError, summarize)
+import Data.Status (class Status, isError, summarize)
 import Data.Tuple (Tuple(Tuple), uncurry)
 import Test.Unit (Test)
 import Test.Unit.Assert as Assert

@@ -11,7 +11,7 @@ import Prelude
 
 import Data.Argonaut.Core (Json, isNull)
 import Data.Argonaut.Decode.Tolerant.Class (class DecodeJson, decodeJson)
-import Data.Bifunctor (lmap)
+import Data.Argonaut.Utils (elaborateFailure)
 import Data.Either (Either(Left))
 import Data.Maybe (Maybe(Just, Nothing), maybe)
 import Foreign.Object (Object, lookup)
@@ -78,9 +78,3 @@ getFieldOptional o s =
     decode json = Just <$> (elaborateFailure s <<< decodeJson) json
 
 infix 7 getFieldOptional as .::!
-
-elaborateFailure :: ∀ a. String -> Either String a -> Either String a
-elaborateFailure s e =
-  lmap msg e
-  where
-    msg m = "Failed to decode key '" <> s <> "': " <> m

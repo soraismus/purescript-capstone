@@ -1,5 +1,6 @@
 module Data.Argonaut.Utils
-  ( getMissingFieldErrorMessage
+  ( elaborateFailure
+  , getMissingFieldErrorMessage
   , reportJson
   , reportObject
   ) where
@@ -8,19 +9,26 @@ import Prelude
 
 import Data.Argonaut.Core (Json, toObject)
 import Data.Argonaut.Decode.Class (class GDecodeJson, gDecodeJson)
+import Data.Bifunctor (lmap)
 import Data.Either (Either(Left, Right))
 import Data.Maybe (Maybe(Just, Nothing))
-import Data.Status.Class (class Status, report, reportError)
+import Data.Status (class Status, report, reportError)
 import Foreign.Object (Object)
 import Type.Data.RowList (RLProxy) -- Argonaut dependency
 import Type.Row (class RowToList)
 
-notObjectErrorMessage :: String
-notObjectErrorMessage = "Could not convert JSON to object"
+elaborateFailure :: ∀ a. String -> Either String a -> Either String a
+elaborateFailure s e =
+  lmap msg e
+  where
+    msg m = "Failed to decode key '" <> s <> "': " <> m
 
 getMissingFieldErrorMessage :: String -> String
 getMissingFieldErrorMessage fieldName =
   "JSON was missing expected field: " <> fieldName
+
+notObjectErrorMessage :: String
+notObjectErrorMessage = "Could not convert JSON to object"
 
 reportJson
   :: forall f r
