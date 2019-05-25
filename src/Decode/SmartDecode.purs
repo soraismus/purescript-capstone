@@ -6,9 +6,8 @@ import Control.Plus (class Plus, empty)
 import Data.Argonaut.Core (Json, toObject)
 import Data.Argonaut.Decode.Class
   ( class DecodeJson
-  --, class GDecodeJson
+  , class GDecodeJson
   , decodeJson
-  --, gDecodeJson
   )
 import Data.Argonaut.Utils (getMissingFieldErrorMessage)
 import Data.Either (Either(Left, Right))
@@ -23,10 +22,8 @@ import Type.Row
   ( class Cons
   , class Lacks
   , class RowToList
-  , class Union
   , Cons
   , Nil
-  , RProxy(RProxy)
   , kind RowList
   )
 
@@ -43,15 +40,12 @@ createSingletonRecord
 createSingletonRecord sProxy value =
   unsafeCreate (reflectSymbol sProxy) value
 
-class SmartDecodeJson a where
+class DecodeJson a <= SmartDecodeJson a where
   smartDecodeJson :: Json -> Either String a
 
 instance smartDecodeRecord
   :: ( GSmartDecodeJson r0 l0 r1 l1 r2 l2
-     --, RowToList r0 l0
-     --, RowToList r1 l1
      , RowToList r2 l2
-     --, Union r0 r1 r2
      )
   => SmartDecodeJson (Record r2)
   where
@@ -72,7 +66,7 @@ else instance smartDecodeDecodeJson
   where
   smartDecodeJson = decodeJson
 
-class GSmartDecodeJson
+class GDecodeJson r2 l2 <= GSmartDecodeJson
   (r0 :: # Type)
   (l0 :: RowList)
   (r1 :: # Type)
@@ -96,10 +90,12 @@ instance gSmartDecodeJsonNil :: GSmartDecodeJson r0 l0 r1 l1 () Nil
   gSmartDecodeJson _ _ _ _ = Right {}
 
 instance gSmartDecodeJsonCons_Plus_1
-  :: ( SmartDecodeJson (f v)
+  :: ( Cons s (f v) () r2
      , IsSymbol s
+     , Lacks s ()
      , ListToRow (Cons s (f v) Nil) r2
      , Plus f
+     , SmartDecodeJson (f v)
      )
   => GSmartDecodeJson r0 l0 r1 l1 r2 (Cons s (f v) Nil)
   where
@@ -118,9 +114,11 @@ instance gSmartDecodeJsonCons_Plus_1
 
 
 else instance gSmartDecodeJsonCons_nonPlus_1
-  :: ( SmartDecodeJson v
+  :: ( Cons s v () r2
      , IsSymbol s
+     , Lacks s ()
      , ListToRow (Cons s v Nil) r2
+     , SmartDecodeJson v
      )
   => GSmartDecodeJson r0 l0 r1 l1 r2 (Cons s v Nil)
   where
@@ -140,15 +138,17 @@ else instance gSmartDecodeJsonCons_nonPlus_1
 instance gSmartDecodeJsonCons_Plus
   :: ( Cons s (f v) r1' r1
      , Cons s (f v) r2' r2
-     , SmartDecodeJson (f v)
+     , Cons s2' v2' r2'' r2'
+     , DecodeJson v2'
+     , GDecodeJson r2'' l2''
      , GSmartDecodeJson r0 l0 r1' l1' r2' (Cons s2' v2' l2'')
      , IsSymbol s
---      , Lacks s r1'
+     , IsSymbol s2'
      , Lacks s r2'
+     , Lacks s2' r2''
      , Plus f
+     , SmartDecodeJson (f v)
      , TypeEquals (RLProxy l1) (RLProxy (Cons s v l1'))
---      , Union r0 r1 r2
---      , Union r0 r1' r2'
      )
   => GSmartDecodeJson
         r0
@@ -179,14 +179,16 @@ instance gSmartDecodeJsonCons_Plus
 else instance gSmartDecodeJsonCons_nonPlus
   :: ( Cons s v r0' r0
      , Cons s v r2' r2
-     , SmartDecodeJson v
+     , Cons s2' v2' r2'' r2'
+     , DecodeJson v2'
+     , GDecodeJson r2'' l2''
      , GSmartDecodeJson r0' l0' r1 l1 r2' (Cons s2' v2' l2'')
      , IsSymbol s
---      , Lacks s r0'
+     , IsSymbol s2'
      , Lacks s r2'
+     , Lacks s2' r2''
+     , SmartDecodeJson v
      , TypeEquals (RLProxy l0) (RLProxy (Cons s v l0'))
---      , Union r0  r1 r2
---      , Union r0' r1 r2'
      )
   => GSmartDecodeJson
         r0
