@@ -5,9 +5,9 @@ module Test.Main
 import Prelude (Unit)
 
 import Effect (Effect)
-import Test.Suites.SmartDecodeJson (suitex) as SmartDecodeJson
+import Test.Suites.DecodeJson (suitex) as DecodeJson
 import Test.Unit.Main (runTest)
 
 main :: Effect Unit
 main = runTest do
-  SmartDecodeJson.suitex
+  DecodeJson.suitex

@@ -27,31 +27,10 @@ import Data.Tuple (Tuple(Tuple), uncurry)
 import Test.Unit (Test)
 import Test.Unit.Assert as Assert
 
--- import Record.Extra (class MapRecord, mapRecordBuilder)
--- import Data.Argonaut.Encode (class EncodeJson, encodeJson)
---
--- import Data.Array (fromFoldable)
--- import Data.Function.Uncurried (Fn2, runFn2)
--- import Data.List (List, (:))
--- import Data.Tuple (Tuple(..))
--- import Prim.Row as Row
--- import Prim.RowList as RL
--- import Record (get) as R
--- import Record.Builder (Builder)
--- import Record.Builder as Builder
--- import Type.Prelude (class IsSymbol, RProxy(RProxy), RLProxy(RLProxy), SProxy(SProxy), reflectSymbol)
-
 assert :: Tuple String Boolean -> Test
 assert = uncurry Assert.assert
 
-assertEquivalence
-  :: forall f a b
-   . Status f
-  => Eq a
-  => Show a
-  => f a
-  -> a
-  -> Test
+assertEquivalence :: forall f a. Status f => Eq a => Show a => f a -> a -> Test
 assertEquivalence result value =
   assert $ checkEquivalence result value
 
@@ -86,7 +65,7 @@ check'
 check' result predicate _ msg = check result msg predicate
 
 checkEquivalence
-  :: forall f a b
+  :: forall f a
    . Status f
   => Eq a
   => Show a
@@ -147,26 +126,3 @@ successful = "successful test"
 
 withErrorMsg :: String
 withErrorMsg = doesntMeetExpectations
-
-
-
--- encodeRecordFields
---   :: forall row xs b row'
---    . RL.RowToList row xs
---   => MapRecord xs row (forall a. EncodeJson a => a) b () row'
---   => Record row
---   -> Record row'
--- encodeRecordFields r = Builder.build builder {}
---   where
---   builder = mapRecordBuilder (RLProxy :: RLProxy xs) encodeJson r
-
--- encodeRecordFields
---   :: forall row xs a b row'
---    . RL.RowToList row xs
---   => EncodeJson a
---   => MapRecord xs row a b () row'
---   => Record row
---   -> Record row'
--- encodeRecordFields r = Builder.build builder {}
---   where
---   builder = mapRecordBuilder (RLProxy :: RLProxy xs) encodeJson r

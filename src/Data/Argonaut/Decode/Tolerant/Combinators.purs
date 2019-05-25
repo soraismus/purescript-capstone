@@ -1,7 +1,7 @@
-module Data.Argonaut.Decode.Smart.Combinators
-  ( getFieldTolerantly
-  , getFieldOptionalTolerantly
-  , getFieldOptionalTolerantly'
+module Data.Argonaut.Decode.Tolerant.Combinators
+  ( getField
+  , getFieldOptional
+  , getFieldOptional'
   , (.::)
   , (.::!)
   , (.::?)
@@ -10,7 +10,7 @@ module Data.Argonaut.Decode.Smart.Combinators
 import Prelude
 
 import Data.Argonaut.Core (Json, isNull)
-import Data.Argonaut.Decode.Smart.Class (class SmartDecodeJson, smartDecodeJson)
+import Data.Argonaut.Decode.Tolerant.Class (class DecodeJson, decodeJson)
 import Data.Bifunctor (lmap)
 import Data.Either (Either(Left))
 import Data.Maybe (Maybe(Just, Nothing), maybe)
@@ -19,20 +19,15 @@ import Foreign.Object (Object, lookup)
 -- | Attempt to get the value for a given key on an `Object Json`.
 -- |
 -- | Use this accessor if the key and value *must* be present in your object.
--- | If the key and value are optional, use `getFieldOptionalTolerantly'` (`.::?`) instead.
-getFieldTolerantly
-  :: forall a
-   . SmartDecodeJson a
-  => Object Json
-  -> String
-  -> Either String a
-getFieldTolerantly o s =
+-- | If the key and value are optional, use `getFieldOptional'` (`.::?`) instead.
+getField :: forall a. DecodeJson a => Object Json -> String -> Either String a
+getField o s =
   maybe
     (Left $ "Expected field " <> show s)
-    (elaborateFailure s <<< smartDecodeJson)
+    (elaborateFailure s <<< decodeJson)
     (lookup s o)
 
-infix 7 getFieldTolerantly as .::
+infix 7 getField as .::
 
 -- | Attempt to get the value for a given key on an `Object Json`.
 -- |
@@ -40,14 +35,14 @@ infix 7 getFieldTolerantly as .::
 -- | or if the key is present and the value is `null`.
 -- |
 -- | Use this accessor if the key and value are optional in your object.
--- | If the key and value are mandatory, use `getFieldTolerantly` (`.::`) instead.
-getFieldOptionalTolerantly'
+-- | If the key and value are mandatory, use `getField` (`.::`) instead.
+getFieldOptional'
   :: forall a
-   . SmartDecodeJson a
+   . DecodeJson a
   => Object Json
   -> String
   -> Either String (Maybe a)
-getFieldOptionalTolerantly' o s =
+getFieldOptional' o s =
   maybe
     (pure Nothing)
     decode
@@ -56,9 +51,9 @@ getFieldOptionalTolerantly' o s =
     decode json =
       if isNull json
         then pure Nothing
-        else Just <$> (elaborateFailure s <<< smartDecodeJson) json
+        else Just <$> (elaborateFailure s <<< decodeJson) json
 
-infix 7 getFieldOptionalTolerantly' as .::?
+infix 7 getFieldOptional' as .::?
 
 -- | Attempt to get the value for a given key on an `Object Json`.
 -- |
@@ -67,22 +62,22 @@ infix 7 getFieldOptionalTolerantly' as .::?
 -- |
 -- | This function will treat `null` as a value and attempt to decode it into your desired type.
 -- | If you would like to treat `null` values the same as absent values, use
--- | `getFieldOptionalTolerantly'` (`.::?`) instead.
-getFieldOptionalTolerantly
+-- | `getFieldOptional'` (`.::?`) instead.
+getFieldOptional
   :: forall a
-   . SmartDecodeJson a
+   . DecodeJson a
   => Object Json
   -> String
   -> Either String (Maybe a)
-getFieldOptionalTolerantly o s =
+getFieldOptional o s =
   maybe
     (pure Nothing)
     decode
     (lookup s o)
   where
-    decode json = Just <$> (elaborateFailure s <<< smartDecodeJson) json
+    decode json = Just <$> (elaborateFailure s <<< decodeJson) json
 
-infix 7 getFieldOptionalTolerantly as .::!
+infix 7 getFieldOptional as .::!
 
 elaborateFailure :: ∀ a. String -> Either String a -> Either String a
 elaborateFailure s e =
