@@ -84,7 +84,6 @@ class GDecodeJson r2 l2 <= GSmartDecodeJson
     -> RLProxy l2
     -> Either String (Record r2)
 
---instance gSmartDecodeJsonNil :: GSmartDecodeJson () Nil () Nil () Nil
 instance gSmartDecodeJsonNil :: GSmartDecodeJson r0 l0 r1 l1 () Nil
   where
   gSmartDecodeJson _ _ _ _ = Right {}
@@ -139,7 +138,6 @@ instance gSmartDecodeJsonCons_Plus
   :: ( Cons s (f v) r1' r1
      , Cons s (f v) r2' r2
      , Cons s2' v2' r2'' r2'
-     , DecodeJson v2'
      , GDecodeJson r2'' l2''
      , GSmartDecodeJson r0 l0 r1' l1' r2' (Cons s2' v2' l2'')
      , IsSymbol s
@@ -148,6 +146,7 @@ instance gSmartDecodeJsonCons_Plus
      , Lacks s2' r2''
      , Plus f
      , SmartDecodeJson (f v)
+     , SmartDecodeJson v2'
      , TypeEquals (RLProxy l1) (RLProxy (Cons s v l1'))
      )
   => GSmartDecodeJson
@@ -180,7 +179,6 @@ else instance gSmartDecodeJsonCons_nonPlus
   :: ( Cons s v r0' r0
      , Cons s v r2' r2
      , Cons s2' v2' r2'' r2'
-     , DecodeJson v2'
      , GDecodeJson r2'' l2''
      , GSmartDecodeJson r0' l0' r1 l1 r2' (Cons s2' v2' l2'')
      , IsSymbol s
@@ -188,6 +186,7 @@ else instance gSmartDecodeJsonCons_nonPlus
      , Lacks s r2'
      , Lacks s2' r2''
      , SmartDecodeJson v
+     , SmartDecodeJson v2'
      , TypeEquals (RLProxy l0) (RLProxy (Cons s v l0'))
      )
   => GSmartDecodeJson
