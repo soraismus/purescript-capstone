@@ -1,0 +1,14 @@
+/bower_components/
+/node_modules/
+/notes/
+/secrets/
+/.pulp-cache/
+/output/
+/generated-docs/
+/.psc-package/
+/.psc*
+/.purs*
+/.psa*
+/.spago
+/*.note
+/*.secret
