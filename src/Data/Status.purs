@@ -1,4 +1,4 @@
-module Data.Status.Class
+module Data.Status
   ( class Status
   , isError
   , report
