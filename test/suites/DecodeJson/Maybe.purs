@@ -9,7 +9,7 @@ import Control.MonadZero (empty)
 import Control.Plus (class Plus)
 import Data.Argonaut.Core (isNull, jsonNull)
 import Data.Argonaut.Decode (class DecodeJson, decodeJson) as D
-import Data.Argonaut.Decode.Tolerant.Class (decodeJson)
+import Data.Argonaut.Decode.Record.Tolerant.Class (decodeJson)
 import Data.Argonaut.Encode (class EncodeJson, encodeJson)
 import Data.Either (Either(Left, Right))
 import Data.Generic.Rep (class Generic)

@@ -1,4 +1,4 @@
-module Data.Argonaut.Decode.Override.Class
+module Data.Argonaut.Decode.Record.Cross.Class
   ( class DecodeJsonWith
   , decodeJsonWith
   ) where
@@ -6,8 +6,8 @@ module Data.Argonaut.Decode.Override.Class
 import Prelude (class Bind, bind, ($))
 
 import Data.Argonaut.Core (Json)
-import Data.Argonaut.Decode.Cases (class Cases)
-import Data.Argonaut.Utils (getMissingFieldErrorMessage)
+import Data.Argonaut.Decode.Record.Utils (getMissingFieldErrorMessage)
+import Data.Cases1 (class Cases1)
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Status (class Status, report, reportError)
 import Data.Symbol (class IsSymbol, SProxy(SProxy), reflectSymbol)
@@ -31,26 +31,27 @@ class DecodeJsonWith
   (r1 :: # Type)
   (l0 :: RowList)
   (r0 :: # Type)
-  | l1 -> r1 l0 r0 where
+  a
+  | l1 -> r1 l0 r0 a where
   decodeJsonWith
     :: RLProxy l0
     -> RLProxy l1
     -> Record r1
     -> Object Json
+    -> a
     -> f (Record r0)
 
-instance decodeJsonWithNil
+instance __xDecodeJsonWithNil
   :: Status f
-  => DecodeJsonWith f Nil () Nil () where
-  decodeJsonWith _ _ _ _ = report {}
+  => DecodeJsonWith f Nil () Nil () a where
+  decodeJsonWith _ _ _ _ _ = report {}
 
-instance decodeJsonWithCons
+instance __xDecodeJsonWithCons
   :: ( Bind f
-     , Cases dl r
-     , Cases dl' r'
+     , Cases1 f dl r a
+     , Cases1 f dl' r' a
      , Cons s v r' r
      , Cons s dv dr' dr
-     , DecodeJsonWith f dl' dr' l' r'
      , IsSymbol s
      , Lacks s r'
      , Lacks s dr'
@@ -59,11 +60,12 @@ instance decodeJsonWithCons
      , RowToList dr dl
      , RowToList dr' dl'
      , Status f
-     , TypeEquals dv (Json -> f v)
+     , TypeEquals dv (Json -> a -> f v)
+     , DecodeJsonWith f dl' dr' l' r' a
      )
-  => DecodeJsonWith f (Cons s dv dl') dr (Cons s v l') r
+  => DecodeJsonWith f (Cons s dv dl') dr (Cons s v l') r a
   where
-  decodeJsonWith _ _ decoderRecord object = do
+  decodeJsonWith _ _ decoderRecord object x = do
     let
       sProxy :: SProxy s
       sProxy = SProxy
@@ -71,7 +73,7 @@ instance decodeJsonWithCons
       fieldName :: String
       fieldName = reflectSymbol sProxy
 
-      decoder :: Json -> f v
+      decoder :: Json -> a -> f v
       decoder = to $ get sProxy decoderRecord
 
       -- To prevent unnecessary creation of intermediate decoder records,
@@ -86,10 +88,11 @@ instance decodeJsonWithCons
         (RLProxy :: RLProxy dl')
         decoderRecord'
         object
+        x
 
     case lookup fieldName object of
       Just jsonVal -> do
-        val <- decoder jsonVal
+        val <- decoder jsonVal x
         report $ insert sProxy val rest
       Nothing ->
         reportError $ getMissingFieldErrorMessage fieldName

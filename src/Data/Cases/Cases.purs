@@ -1,4 +1,4 @@
-module Data.Argonaut.Decode.Cases
+module Data.Cases
   ( class Cases
   ) where
 

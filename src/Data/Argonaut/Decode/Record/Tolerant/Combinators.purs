@@ -1,4 +1,4 @@
-module Data.Argonaut.Decode.Tolerant.Combinators
+module Data.Argonaut.Decode.Record.Tolerant.Combinators
   ( getField
   , getFieldOptional
   , getFieldOptional'
@@ -10,8 +10,8 @@ module Data.Argonaut.Decode.Tolerant.Combinators
 import Prelude
 
 import Data.Argonaut.Core (Json, isNull)
-import Data.Argonaut.Decode.Tolerant.Class (class DecodeJson, decodeJson)
-import Data.Argonaut.Utils (elaborateFailure)
+import Data.Argonaut.Decode.Record.Tolerant.Class (class DecodeJson, decodeJson)
+import Data.Argonaut.Decode.Record.Utils (elaborateFailure)
 import Data.Either (Either(Left))
 import Data.Maybe (Maybe(Just, Nothing), maybe)
 import Foreign.Object (Object, lookup)

@@ -1,4 +1,4 @@
-module Data.Argonaut.Decode.Tolerant.Class
+module Data.Argonaut.Decode.Record.Tolerant.Class
   ( class DecodeJson
   , class GDecodeJson
   , decodeJson
@@ -14,7 +14,7 @@ import Data.Argonaut.Decode.Class
   , class GDecodeJson
   , decodeJson
   ) as D
-import Data.Argonaut.Utils (getMissingFieldErrorMessage)
+import Data.Argonaut.Decode.Record.Utils (getMissingFieldErrorMessage)
 import Data.Either (Either(Left, Right))
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Symbol (class IsSymbol, SProxy(SProxy), reflectSymbol)

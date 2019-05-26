@@ -1,4 +1,4 @@
-module Data.Argonaut.Utils
+module Data.Argonaut.Decode.Record.Utils
   ( elaborateFailure
   , getMissingFieldErrorMessage
   , reportJson
