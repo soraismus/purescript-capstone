@@ -3,6 +3,7 @@ module Data.Argonaut.Decode.Record.Utils
   , getMissingFieldErrorMessage
   , reportJson
   , reportObject
+  , singleton
   ) where
 
 import Prelude
@@ -13,9 +14,16 @@ import Data.Bifunctor (lmap)
 import Data.Either (Either(Left, Right))
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Status (class Status, report, reportError)
+import Data.Symbol (class IsSymbol, SProxy, reflectSymbol)
 import Foreign.Object (Object)
 import Type.Data.RowList (RLProxy) -- Argonaut dependency
-import Type.Row (class RowToList)
+import Type.Equality (class TypeEquals)
+import Type.Prelude (class ListToRow)
+import Type.Row
+  ( class RowToList
+  , Cons
+  , Nil
+  )
 
 elaborateFailure :: ∀ a. String -> Either String a -> Either String a
 elaborateFailure s e =
@@ -53,3 +61,16 @@ reportObject object rlProxy =
   case gDecodeJson object rlProxy of
     Left errorStr -> reportError errorStr
     Right record -> report record
+
+foreign import unsafeSingleton :: forall r0 a. String -> a -> Record r0
+
+singleton
+  :: forall l r s v
+   . IsSymbol s
+  => ListToRow l r
+  => TypeEquals (RLProxy l) (RLProxy (Cons s v Nil))
+  => SProxy s
+  -> v
+  -> Record r
+singleton sProxy value =
+  unsafeSingleton (reflectSymbol sProxy) value

@@ -14,7 +14,10 @@ import Data.Argonaut.Decode.Class
   , class GDecodeJson
   , decodeJson
   ) as D
-import Data.Argonaut.Decode.Record.Utils (getMissingFieldErrorMessage)
+import Data.Argonaut.Decode.Record.Utils
+  ( getMissingFieldErrorMessage
+  , singleton
+  )
 import Data.Either (Either(Left, Right))
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Symbol (class IsSymbol, SProxy(SProxy), reflectSymbol)
@@ -31,19 +34,6 @@ import Type.Row
   , Nil
   , kind RowList
   )
-
-foreign import unsafeSingleton :: forall r0 a. String -> a -> Record r0
-
-singleton
-  :: forall l r s v
-   . IsSymbol s
-  => ListToRow l r
-  => TypeEquals (RLProxy l) (RLProxy (Cons s v Nil))
-  => SProxy s
-  -> v
-  -> Record r
-singleton sProxy value =
-  unsafeSingleton (reflectSymbol sProxy) value
 
 class D.DecodeJson a <= DecodeJson a where
   decodeJson :: Json -> Either String a

@@ -6,8 +6,11 @@ module Data.Argonaut.Decode.Record.Cross2.Class
 import Prelude (class Bind, bind, ($))
 
 import Data.Argonaut.Core (Json)
-import Data.Argonaut.Decode.Record.Utils (getMissingFieldErrorMessage)
-import Data.Cases1 (class Cases1)
+import Data.Argonaut.Decode.Record.Utils
+  ( getMissingFieldErrorMessage
+  , singleton
+  )
+import Data.SameSize1 (class SameSize1)
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Status (class Status, report, reportError)
 import Data.Symbol (class IsSymbol, SProxy(SProxy), reflectSymbol)
@@ -47,10 +50,52 @@ instance decodeJsonWithNil
   => DecodeJsonWith f Nil () Nil () a where
   decodeJsonWith _ _ _ _ _ = report {}
 
+instance decodeJsonWithCons_1
+  :: ( Bind f
+     -- , SameSize1 f dl r a
+     -- , SameSize1 f Nil () a
+     , Cons s v () r
+     , Cons ds dv () dr
+     -- , DecodeJsonWith f Nil () Nil () a
+     , IsSymbol s
+     , IsSymbol ds
+     -- , Lacks s ()
+     -- , Lacks ds ()
+     , RowToList r l
+     -- , RowToList () Nil
+     , RowToList dr dl
+     -- , RowToList () Nil
+     , Status f
+     , TypeEquals dv (Json -> a -> f (Tuple v (SProxy s)))
+     )
+  -- => DecodeJsonWith f (Cons ds dv dl') dr (Cons s v l') r a
+  => DecodeJsonWith f (Cons ds dv Nil) dr (Cons s v Nil) r a
+  where
+  decodeJsonWith _ _ decoderRecord object x = do
+    let
+      oldSProxy :: SProxy ds
+      oldSProxy = SProxy
+
+      newSProxy :: SProxy s
+      newSProxy = SProxy
+
+      oldFieldName :: String
+      oldFieldName = reflectSymbol oldSProxy
+
+      decoder :: Json -> a -> f (Tuple v (SProxy s))
+      decoder = to $ get oldSProxy decoderRecord
+
+    case lookup oldFieldName object of
+      Just jsonVal -> do
+        Tuple val _ <- decoder jsonVal x
+        report $ singleton newSProxy val
+      Nothing ->
+        reportError $ getMissingFieldErrorMessage oldFieldName
+
 instance decodeJsonWithCons
   :: ( Bind f
-     , Cases1 f dl r a
-     , Cases1 f dl' r' a
+     , SameSize1 f dl r a
+     , SameSize1 f dl' r' a
      , Cons s v r' r
      , Cons ds dv dr' dr
      , DecodeJsonWith f dl' dr' l' r' a
@@ -65,7 +110,8 @@ instance decodeJsonWithCons
      , Status f
      , TypeEquals dv (Json -> a -> f (Tuple v (SProxy s)))
      )
-  => DecodeJsonWith f (Cons ds dv dl') dr (Cons s v l') r a
+  -- => DecodeJsonWith f (Cons ds dv dl') dr (Cons s v l') r a
+  => DecodeJsonWith f (Cons ds dv (Cons ds' dv' dl'')) dr (Cons s v (Cons s' v' l'')) r a
   where
   decodeJsonWith _ _ decoderRecord object x = do
     let
