@@ -7,21 +7,18 @@ import Prelude (class Bind, bind, ($))
 
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode.Cases1 (class Cases1)
-import Data.Argonaut.Decode.Class (class GDecodeJson)
 import Data.Argonaut.Utils (getMissingFieldErrorMessage)
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Status (class Status, report, reportError)
 import Data.Symbol (class IsSymbol, SProxy(SProxy), reflectSymbol)
 import Foreign.Object (Object, lookup)
-import Record (get, insert, merge, union)
+import Record (get, insert)
 import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency
 import Type.Equality (class TypeEquals, to)
 import Type.Row
   ( class Cons
   , class Lacks
-  , class Nub
   , class RowToList
-  , class Union
   , Cons
   , Nil
   , kind RowList
