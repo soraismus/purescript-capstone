@@ -6,7 +6,8 @@ import Type.Row (kind RowList, Cons, Nil, class Cons)
 
 class SameValues1 (l :: RowList) (r :: # Type) a | l -> r
 
-instance sameValues1Nil :: SameValues1 Nil () a
+-- instance sameValues1Nil :: SameValues1 Nil () a
+instance sameValues1Nil :: SameValues1 Nil r a
 
 instance sameValues1Cons
   :: ( Cons s0 v r' r

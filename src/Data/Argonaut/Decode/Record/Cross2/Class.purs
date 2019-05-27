@@ -11,16 +11,14 @@ import Data.Argonaut.Decode.Record.Utils
   ( getMissingFieldErrorMessage
   , singleton
   )
-import Data.SameSize1 (class SameSize1)
 import Data.Maybe (Maybe(Just, Nothing))
+import Data.SameSize1 (class SameSize1)
 import Data.Status (class Status, report, reportError)
 import Data.Symbol (class IsSymbol, SProxy(SProxy), reflectSymbol)
-import Data.Tuple (Tuple(Tuple))
 import Foreign.Object (Object, lookup)
 import Record (get, insert)
 import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency
 import Type.Equality (class TypeEquals, to)
-import Type.Prelude (class ListToRow)
 import Type.Row
   ( class Cons
   , class Lacks
@@ -104,8 +102,8 @@ instance decodeJsonWithCons_1
 
 instance decodeJsonWithCons
   :: ( Bind f
-     , SameSize1 f dl r a
-     , SameSize1 f dl' r' a
+     , SameSize1 dl r a
+     , SameSize1 dl' r' a
      , Cons s v r' r
      , Cons ds dv dr' dr
      , DecodeJsonWith f dl' dr' l' r' a

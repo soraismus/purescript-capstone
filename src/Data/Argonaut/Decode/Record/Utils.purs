@@ -1,6 +1,7 @@
 module Data.Argonaut.Decode.Record.Utils
   ( elaborateFailure
   , getMissingFieldErrorMessage
+  , getSubRecord
   , reportJson
   , reportObject
   , singleton
@@ -10,10 +11,17 @@ import Prelude
 
 import Data.Argonaut.Core (Json, toObject)
 import Data.Argonaut.Decode.Class (class GDecodeJson, gDecodeJson)
+import Data.Argonaut.Decode.Record.Instantiate.Class
+  ( class Instantiate
+  , instantiate
+  )
 import Data.Bifunctor (lmap)
 import Data.Either (Either(Left, Right))
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Status (class Status, report, reportError)
+import Data.SameKeys (class SameKeys)
+import Data.SameSize (class SameSize)
+import Data.SubFields (class SubFields)
 import Data.Symbol (class IsSymbol, SProxy, reflectSymbol)
 import Foreign.Object (Object)
 import Type.Data.RowList (RLProxy) -- Argonaut dependency
@@ -34,6 +42,19 @@ elaborateFailure s e =
 getMissingFieldErrorMessage :: String -> String
 getMissingFieldErrorMessage fieldName =
   "JSON was missing expected field: " <> fieldName
+
+getSubRecord
+  :: forall l0 l2 r0 r1 r2
+   . Instantiate l0 r0
+  => RowToList r2 l2
+  => SameKeys l0 r2
+  => SameSize l0 r2
+  => SubFields l2 r1
+  => RLProxy l0
+  -> Record r1
+  -> Record r2
+getSubRecord rlProxy =
+  unsafeGetSubRecord (instantiate rlProxy)
 
 notObjectErrorMessage :: String
 notObjectErrorMessage = "Could not convert JSON to object"
@@ -73,4 +94,10 @@ singleton
 singleton sProxy value =
   unsafeSingleton (reflectSymbol sProxy) value
 
-foreign import unsafeSingleton :: forall r0 a. String -> a -> Record r0
+foreign import unsafeGetSubRecord
+  :: forall r0 r1 r2
+   . Record r0
+  -> Record r1
+  -> Record r2
+
+foreign import unsafeSingleton :: forall r a. String -> a -> Record r

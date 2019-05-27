@@ -7,8 +7,8 @@ import Prelude (class Bind, bind, ($))
 
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode.Record.Utils (getMissingFieldErrorMessage)
-import Data.Cases (class Cases)
 import Data.Maybe (Maybe(Just, Nothing))
+import Data.SameKeys (class SameKeys)
 import Data.Status (class Status, report, reportError)
 import Data.Symbol (class IsSymbol, SProxy(SProxy), reflectSymbol)
 import Data.Tuple (Tuple(Tuple))
@@ -47,8 +47,8 @@ instance decodeJsonWithNil
 
 instance decodeJsonWithCons
   :: ( Bind f
-     , Cases dl r
-     , Cases dl' r'
+     , SameKeys dl r
+     , SameKeys dl' r'
      , Cons s v r' r
      , Cons ds dv dr' dr
      , DecodeJsonWith f dl' dr' l' r'
