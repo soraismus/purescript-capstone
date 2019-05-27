@@ -9,7 +9,7 @@ import Control.MonadZero (empty)
 import Control.Plus (class Plus)
 import Data.Argonaut.Core (isNull, jsonNull)
 import Data.Argonaut.Decode (class DecodeJson, decodeJson) as D
-import Data.Argonaut.Decode.Record.Tolerant.Class (decodeJson)
+import Data.Argonaut.Decode.Record.Tolerant (decodeJson)
 import Data.Argonaut.Encode (class EncodeJson, encodeJson)
 import Data.Either (Either(Left, Right))
 import Data.Generic.Rep (class Generic)
@@ -38,7 +38,7 @@ instance encodeJsonFirst' :: EncodeJson a => EncodeJson (First' a) where
 
 suitex :: TestSuite
 suitex =
-  suite "Maybe" do
+  suite "Tolerant" do
     suite "Maybe" do
       test "Just 0" do
         let value = Just 0

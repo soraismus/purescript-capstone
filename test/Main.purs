@@ -2,12 +2,16 @@ module Test.Main
   ( main
   ) where
 
-import Prelude (Unit)
+import Prelude (Unit, discard)
 
 import Effect (Effect)
-import Test.Suites.DecodeJson (suitex) as DecodeJson
+import Test.Suites.Cross (suitex) as Cross
+import Test.Suites.DecodeJson (suitex) as Tolerant
+import Test.Suites.Override (suitex) as Override
 import Test.Unit.Main (runTest)
 
 main :: Effect Unit
 main = runTest do
-  DecodeJson.suitex
+  Cross.suitex
+  Override.suitex
+  Tolerant.suitex
