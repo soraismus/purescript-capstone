@@ -1,4 +1,4 @@
-module Test.Suites.DecodeJson.Maybe
+module Test.Suites.Tolerant
   ( suitex
   ) where
 
@@ -7,7 +7,7 @@ import Prelude
 import Control.Alt (class Alt)
 import Control.MonadZero (empty)
 import Control.Plus (class Plus)
-import Data.Argonaut.Core (isNull, jsonNull)
+import Data.Argonaut.Core (Json, isNull, jsonNull)
 import Data.Argonaut.Decode (class DecodeJson, decodeJson) as D
 import Data.Argonaut.Decode.Record.Tolerant (decodeJson)
 import Data.Argonaut.Encode (class EncodeJson, encodeJson)
@@ -16,10 +16,12 @@ import Data.Generic.Rep (class Generic)
 import Data.List (List(Nil), (:))
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Maybe.First (First(First))
+import Data.NonEmpty (NonEmpty(NonEmpty))
 import Data.String.CodePoints (codePointFromChar)
 import Data.Tuple (Tuple(Tuple))
+import Foreign.Object (Object)
 import Test.Unit (TestSuite, suite, test)
-import Test.Utils (assertEquivalence)
+import Test.Utils (assert, assertEquivalence, check, withErrorMsg)
 
 newtype First' a = First' (First a)
 derive instance genericFirst' :: Generic a x => Generic (First' a) _
@@ -36,109 +38,12 @@ instance encodeJsonFirst' :: EncodeJson a => EncodeJson (First' a) where
   encodeJson (First' (First Nothing)) = jsonNull
   encodeJson (First' (First (Just a))) = encodeJson a
 
+foreign import jsonValue :: Json
+foreign import objectValue :: Object Json
+
 suitex :: TestSuite
 suitex =
   suite "Tolerant" do
-    suite "Maybe" do
-      test "Just 0" do
-        let value = Just 0
-        let result = decodeJson $ encodeJson value
-        assertEquivalence result value
-      test "Nothing :: Maybe Int" do
-        let value = Nothing :: Maybe Int
-        let result = decodeJson $ encodeJson value
-        assertEquivalence result value
-    suite "Tuple" do
-      test "Tuple 0 \"hello\"" do
-        let value = Tuple 0 "hello"
-        let result = decodeJson $ encodeJson value
-        assertEquivalence result value
-    suite "Either" do
-      test "Left 0 :: Either Int String" do
-        let value = Left 0 :: Either Int String
-        let result = decodeJson $ encodeJson value
-        assertEquivalence result value
-      test "Right \"hello\" :: Either Int String" do
-        let value = Right "hello" :: Either Int String
-        let result = decodeJson $ encodeJson value
-        assertEquivalence result value
-    suite "Unit" do
-      test "Unit" do
-        let value = unit
-        let result = decodeJson $ encodeJson value
-        assertEquivalence result value
-    suite "Boolean" do
-      test "true" do
-        let value = true
-        let result = decodeJson $ encodeJson value
-        assertEquivalence result value
-      test "false" do
-        let value = false
-        let result = decodeJson $ encodeJson value
-        assertEquivalence result value
-    suite "Number" do
-      test "0.35" do
-        let value = 0.35 :: Number
-        let result = decodeJson $ encodeJson value
-        assertEquivalence result value
-    suite "Int" do
-      test "1" do
-        let value = 1 :: Int
-        let result = decodeJson $ encodeJson value
-        assertEquivalence result value
-    suite "String" do
-      test "\"hello\"" do
-        let value = "hello"
-        let result = decodeJson $ encodeJson value
-        assertEquivalence result value
---   suite "Json" do
---   suite "NonEmptyArray" do
---   suite "NonEmptyList" do
---   suite "ForeignObject" do
-    suite "CodePoint" do
-      test "codePointFromChar 'a'" do
-        let value = codePointFromChar 'a'
-        let result = decodeJson $ encodeJson value
-        assertEquivalence result value
-    suite "Array" do
-      test "[] :: Array Int" do
-        let value = [] :: Array Int
-        let result = decodeJson $ encodeJson value
-        assertEquivalence result value
-      test "[0]" do
-        let value = [0]
-        let result = decodeJson $ encodeJson value
-        assertEquivalence result value
-      test "[0, 1, 2, 3]" do
-        let value = [0, 1, 2, 3]
-        let result = decodeJson $ encodeJson value
-        assertEquivalence result value
-      test "[[], [0], [1, 2]]" do
-        let value = [[], [0], [1, 2]]
-        let result = decodeJson $ encodeJson value
-        assertEquivalence result value
-      test "[[[]], [[0], [1, 2]]]" do
-        let value = [[[]], [[0], [1, 2]]]
-        let result = decodeJson $ encodeJson value
-        assertEquivalence result value
-    suite "List" do
-      test "Nil :: List Int" do
-        let value = Nil :: List Int
-        let result = decodeJson $ encodeJson value
-        assertEquivalence result value
-      test "0 : Nil" do
-        let value = 0 : Nil
-        let result = decodeJson $ encodeJson value
-        assertEquivalence result value
-      test "0 : 1 : 2 : Nil" do
-        let value = 0 : 1 : 2 : 3 : Nil
-        let result = decodeJson $ encodeJson value
-        assertEquivalence result value
-      test "((Nil) : (0 : Nil) : (1 : 2 : Nil) : Nil)" do
-        let value = ((Nil) : (0 : Nil) : (1 : 2 : Nil) : Nil)
-        let result = decodeJson $ encodeJson value
-        assertEquivalence result value
-
     suite "Record -- no absent fields" do
       test "#0" do
         let value = {}
@@ -168,8 +73,7 @@ suitex =
         let value = { a0: 0, a1: Just 1, a2: "2", a3: Just "3" }
         let result = decodeJson $ encodeJson value
         assertEquivalence result value
-
-      test "#X" do
+      test "#7" do
         let value =
                 { a1: Just 1
                 , a2: 2
@@ -182,7 +86,6 @@ suitex =
                 }
         let result = decodeJson $ encodeJson value
         assertEquivalence result value
-
     suite "Record -- with absent fields" do
       test "#0" do
         let
@@ -267,3 +170,126 @@ suitex =
           , a14: empty
           , a15: empty
           }
+    suite "Maybe" do
+      test "Just 0" do
+        let value = Just 0
+        let result = decodeJson $ encodeJson value
+        assertEquivalence result value
+      test "Nothing :: Maybe Int" do
+        let value = Nothing :: Maybe Int
+        let result = decodeJson $ encodeJson value
+        assertEquivalence result value
+    suite "Tuple" do
+      test "Tuple 0 \"hello\"" do
+        let value = Tuple 0 "hello"
+        let result = decodeJson $ encodeJson value
+        assertEquivalence result value
+    suite "Either" do
+      test "Left 0 :: Either Int String" do
+        let value = Left 0 :: Either Int String
+        let result = decodeJson $ encodeJson value
+        assertEquivalence result value
+      test "Right \"hello\" :: Either Int String" do
+        let value = Right "hello" :: Either Int String
+        let result = decodeJson $ encodeJson value
+        assertEquivalence result value
+    suite "Unit" do
+      test "Unit" do
+        let value = unit
+        let result = decodeJson $ encodeJson value
+        assertEquivalence result value
+    suite "Boolean" do
+      test "true" do
+        let value = true
+        let result = decodeJson $ encodeJson value
+        assertEquivalence result value
+      test "false" do
+        let value = false
+        let result = decodeJson $ encodeJson value
+        assertEquivalence result value
+    suite "Number" do
+      test "0.35" do
+        let value = 0.35 :: Number
+        let result = decodeJson $ encodeJson value
+        assertEquivalence result value
+    suite "Int" do
+      test "1" do
+        let value = 1 :: Int
+        let result = decodeJson $ encodeJson value
+        assertEquivalence result value
+    suite "String" do
+      test "\"hello\"" do
+        let value = "hello"
+        let result = decodeJson $ encodeJson value
+        assertEquivalence result value
+    suite "CodePoint" do
+      test "codePointFromChar 'a'" do
+        let value = codePointFromChar 'a'
+        let result = decodeJson $ encodeJson value
+        assertEquivalence result value
+    suite "Array" do
+      test "[] :: Array Int" do
+        let value = [] :: Array Int
+        let result = decodeJson $ encodeJson value
+        assertEquivalence result value
+      test "[0]" do
+        let value = [0]
+        let result = decodeJson $ encodeJson value
+        assertEquivalence result value
+      test "[0, 1, 2, 3]" do
+        let value = [0, 1, 2, 3]
+        let result = decodeJson $ encodeJson value
+        assertEquivalence result value
+      test "[[], [0], [1, 2]]" do
+        let value = [[], [0], [1, 2]]
+        let result = decodeJson $ encodeJson value
+        assertEquivalence result value
+      test "[[[]], [[0], [1, 2]]]" do
+        let value = [[[]], [[0], [1, 2]]]
+        let result = decodeJson $ encodeJson value
+        assertEquivalence result value
+    suite "List" do
+      test "Nil :: List Int" do
+        let value = Nil :: List Int
+        let result = decodeJson $ encodeJson value
+        assertEquivalence result value
+      test "0 : Nil" do
+        let value = 0 : Nil
+        let result = decodeJson $ encodeJson value
+        assertEquivalence result value
+      test "0 : 1 : 2 : Nil" do
+        let value = 0 : 1 : 2 : 3 : Nil
+        let result = decodeJson $ encodeJson value
+        assertEquivalence result value
+      test "((Nil) : (0 : Nil) : (1 : 2 : Nil) : Nil)" do
+        let value = ((Nil) : (0 : Nil) : (1 : 2 : Nil) : Nil)
+        let result = decodeJson $ encodeJson value
+        assertEquivalence result value
+    suite "Json" do
+      test "jsonValue" do
+        let value = jsonValue
+        let result = decodeJson $ encodeJson value
+        assert $ check result withErrorMsg (_ == value)
+    suite "Object Json" do
+      test "objectValue" do
+        let value = objectValue
+        let result = decodeJson $ encodeJson value
+        assert $ check result withErrorMsg (_ == value)
+    suite "NonEmpty Array Int" do
+      test "NonEmpty 0 []" do
+        let value = NonEmpty 0 []
+        let result = decodeJson $ encodeJson value
+        assertEquivalence result value
+      test "NonEmpty 0 [1, 2, 3]" do
+        let value = NonEmpty 0 [1, 2, 3]
+        let result = decodeJson $ encodeJson value
+        assertEquivalence result value
+    suite "NonEmpty List Int" do
+      test "NonEmpty 0 Nil" do
+        let value = NonEmpty 0 Nil
+        let result = decodeJson $ encodeJson value
+        assertEquivalence result value
+      test "NonEmpty 0 (1 : 2 : 3 : Nil)" do
+        let value = NonEmpty 0 (1 : 2 : 3 : Nil)
+        let result = decodeJson $ encodeJson value
+        assertEquivalence result value

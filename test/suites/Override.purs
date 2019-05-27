@@ -4,13 +4,12 @@ module Test.Suites.Override
 
 import Prelude
 
-import Data.Argonaut.Decode (decodeJson) as D
 import Data.Argonaut.Decode.Record.Override (decodeJsonWith)
 import Data.Argonaut.Encode (encodeJson)
 import Data.Either (Either(Left, Right))
 import Data.Maybe (Maybe(Just))
 import Test.Unit (TestSuite, suite, test)
-import Test.Utils (assert, assertEquivalence, check, fails, withErrorMsg)
+import Test.Utils (assert, check, fails, withErrorMsg)
 
 suitex :: TestSuite
 suitex =

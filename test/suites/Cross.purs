@@ -9,7 +9,6 @@ import Data.Argonaut.Encode (encodeJson)
 import Data.Either (Either(Right))
 import Data.Maybe (Maybe(Just))
 import Test.Unit (TestSuite, suite, test)
--- import Test.Utils (assert, assertEquivalence, check, withErrorMsg)
 import Test.Utils (assert, check, withErrorMsg)
 
 suitex :: TestSuite
