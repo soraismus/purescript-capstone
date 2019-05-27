@@ -62,8 +62,6 @@ reportObject object rlProxy =
     Left errorStr -> reportError errorStr
     Right record -> report record
 
-foreign import unsafeSingleton :: forall r0 a. String -> a -> Record r0
-
 singleton
   :: forall l r s v
    . IsSymbol s
@@ -74,3 +72,5 @@ singleton
   -> Record r
 singleton sProxy value =
   unsafeSingleton (reflectSymbol sProxy) value
+
+foreign import unsafeSingleton :: forall r0 a. String -> a -> Record r0

@@ -1,5 +1,6 @@
 module Data.Argonaut.Decode.Record.Cross2.Class
-  ( class DecodeJsonWith
+  ( RenameField(RenameField)
+  , class DecodeJsonWith
   , decodeJsonWith
   ) where
 
@@ -19,6 +20,7 @@ import Foreign.Object (Object, lookup)
 import Record (get, insert)
 import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency
 import Type.Equality (class TypeEquals, to)
+import Type.Prelude (class ListToRow)
 import Type.Row
   ( class Cons
   , class Lacks
@@ -28,6 +30,8 @@ import Type.Row
   , kind RowList
   )
 import Unsafe.Coerce (unsafeCoerce)
+
+data RenameField (sym :: Symbol) a = RenameField (SProxy sym) a
 
 class DecodeJsonWith
   (f :: Type -> Type)
@@ -52,23 +56,21 @@ instance decodeJsonWithNil
 
 instance decodeJsonWithCons_1
   :: ( Bind f
-     -- , SameSize1 f dl r a
-     -- , SameSize1 f Nil () a
      , Cons s v () r
      , Cons ds dv () dr
-     -- , DecodeJsonWith f Nil () Nil () a
      , IsSymbol s
      , IsSymbol ds
-     -- , Lacks s ()
-     -- , Lacks ds ()
      , RowToList r l
-     -- , RowToList () Nil
      , RowToList dr dl
-     -- , RowToList () Nil
      , Status f
-     , TypeEquals dv (Json -> a -> f (Tuple v (SProxy s)))
+     -- , TypeEquals dv (Json -> a -> f (Tuple v (SProxy s)))
+     --, TypeEquals dv (Json -> a -> Tuple (SProxy s) (f v))
+     , TypeEquals dv (Json -> a -> RenameField s (f v))
+     --, TypeEquals dv (Json -> a -> Record resultRow)
+     --, Cons s (f v) () resultRow
+     --, RowToList resultRow (Cons s (f v) Nil)
+     --, ListToRow (Cons s (f v) Nil) resultRow
      )
-  -- => DecodeJsonWith f (Cons ds dv dl') dr (Cons s v l') r a
   => DecodeJsonWith f (Cons ds dv Nil) dr (Cons s v Nil) r a
   where
   decodeJsonWith _ _ decoderRecord object x = do
@@ -82,12 +84,20 @@ instance decodeJsonWithCons_1
       oldFieldName :: String
       oldFieldName = reflectSymbol oldSProxy
 
-      decoder :: Json -> a -> f (Tuple v (SProxy s))
+      -- decoder :: Json -> a -> f (Tuple v (SProxy s))
+      --decoder :: Json -> a -> Tuple (SProxy s) (f v)
+      decoder :: Json -> a -> RenameField s (f v)
       decoder = to $ get oldSProxy decoderRecord
+      --decoder :: Json -> a -> resultRow
+      --decoder :: Json -> a -> f v
+      --decoder = get newSProxy $ to $ get oldSProxy decoderRecord
 
     case lookup oldFieldName object of
       Just jsonVal -> do
-        Tuple val _ <- decoder jsonVal x
+        --let Tuple _ fVal = decoder jsonVal x
+        let RenameField _ fVal = decoder jsonVal x
+        val <- fVal
+        --val <- decoder jsonVal x
         report $ singleton newSProxy val
       Nothing ->
         reportError $ getMissingFieldErrorMessage oldFieldName
@@ -108,9 +118,14 @@ instance decodeJsonWithCons
      , RowToList dr dl
      , RowToList dr' dl'
      , Status f
-     , TypeEquals dv (Json -> a -> f (Tuple v (SProxy s)))
+     -- , TypeEquals dv (Json -> a -> f (Tuple v (SProxy s)))
+     --, TypeEquals dv (Json -> a -> Tuple (SProxy s) (f v))
+     , TypeEquals dv (Json -> a -> RenameField s (f v))
+     --, TypeEquals dv (Json -> a -> Record resultRow)
+     --, Cons s (f v) () resultRow
+     --, RowToList resultRow (Cons s (f v) Nil)
+     --, ListToRow (Cons s (f v) Nil) resultRow
      )
-  -- => DecodeJsonWith f (Cons ds dv dl') dr (Cons s v l') r a
   => DecodeJsonWith f (Cons ds dv (Cons ds' dv' dl'')) dr (Cons s v (Cons s' v' l'')) r a
   where
   decodeJsonWith _ _ decoderRecord object x = do
@@ -124,7 +139,10 @@ instance decodeJsonWithCons
       oldFieldName :: String
       oldFieldName = reflectSymbol oldSProxy
 
-      decoder :: Json -> a -> f (Tuple v (SProxy s))
+      -- decoder :: Json -> a -> f (Tuple v (SProxy s))
+      --decoder :: Json -> a -> Tuple (SProxy s) (f v)
+      decoder :: Json -> a -> RenameField s (f v)
+      --decoder :: Json -> a -> f v
       decoder = to $ get oldSProxy decoderRecord
 
       -- To prevent unnecessary creation of intermediate decoder records,
@@ -143,7 +161,8 @@ instance decodeJsonWithCons
 
     case lookup oldFieldName object of
       Just jsonVal -> do
-        Tuple val _ <- decoder jsonVal x
+        let RenameField _ fVal = decoder jsonVal x
+        val <- fVal
         report $ insert newSProxy val rest
       Nothing ->
         reportError $ getMissingFieldErrorMessage oldFieldName
