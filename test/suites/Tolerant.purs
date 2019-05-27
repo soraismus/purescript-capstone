@@ -86,6 +86,19 @@ suitex =
                 }
         let result = decodeJson $ encodeJson value
         assertEquivalence result value
+    suite "Record -- with non-Plus fields -- CANNOT COMPILE" $ pure unit
+--       test "{ a0 :: Object Json }" do
+--         let value = { a0: objectValue }
+--         let result = decodeJson $ encodeJson value
+--         assertEquivalence result value
+--       test "{ a0 :: NonEmpty Array Int }" do
+--         let value = { a0: NonEmpty 0 [] }
+--         let result = decodeJson $ encodeJson value
+--         assertEquivalence result value
+--       test "{ a0 :: NonEmpty List Int }" do
+--         let value = { a0: NonEmpty 0 Nil }
+--         let result = decodeJson $ encodeJson value
+--         assertEquivalence result value
     suite "Record -- with absent fields" do
       test "#0" do
         let
@@ -170,6 +183,7 @@ suitex =
           , a14: empty
           , a15: empty
           }
+
     suite "Maybe" do
       test "Just 0" do
         let value = Just 0
