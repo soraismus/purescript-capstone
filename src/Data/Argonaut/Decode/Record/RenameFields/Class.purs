@@ -25,8 +25,6 @@ import Type.Data.Symbol
   )
 import Type.Row (class ListToRow, class RowToList, Cons, Nil, kind RowList)
 
-data FieldName (s :: Symbol) = FieldName
-
 class HasSymbol (l :: RowList) (s :: Symbol) (b :: Boolean) | l s -> b
 instance hasSymbol :: HasSymbol_ l s b True => HasSymbol l s b
 
