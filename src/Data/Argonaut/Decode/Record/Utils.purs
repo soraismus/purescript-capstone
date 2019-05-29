@@ -1,7 +1,7 @@
 module Data.Argonaut.Decode.Record.Utils
   ( elaborateFailure
   , getMissingFieldErrorMessage
-  , getSubRecord
+--   , getSubRecord
   , reportJson
   , reportObject
   , singleton
@@ -27,11 +27,7 @@ import Foreign.Object (Object)
 import Type.Data.RowList (RLProxy) -- Argonaut dependency
 import Type.Equality (class TypeEquals)
 import Type.Prelude (class ListToRow)
-import Type.Row
-  ( class RowToList
-  , Cons
-  , Nil
-  )
+import Type.Row (class RowToList, Cons, Nil)
 
 elaborateFailure :: ∀ a. String -> Either String a -> Either String a
 elaborateFailure s e =
@@ -43,18 +39,18 @@ getMissingFieldErrorMessage :: String -> String
 getMissingFieldErrorMessage fieldName =
   "JSON was missing expected field: " <> fieldName
 
-getSubRecord
-  :: forall l0 l2 r0 r1 r2
-   . Instantiate l0 r0
-  => RowToList r2 l2
-  => SameKeys l0 r2
-  => SameSize l0 r2
-  => SubFields l2 r1
-  => RLProxy l0
-  -> Record r1
-  -> Record r2
-getSubRecord rlProxy =
-  unsafeGetSubRecord (instantiate rlProxy)
+-- getSubRecord
+--   :: forall l0 l2 r0 r1 r2
+--    . Instantiate l0 r0
+--   => RowToList r2 l2
+--   => SameKeys l0 r2
+--   => SameSize l0 l2
+--   => SubFields l2 r1
+--   => RLProxy l0
+--   -> Record r1
+--   -> Record r2
+-- getSubRecord rlProxy =
+--   unsafeGetSubRecord (instantiate rlProxy)
 
 notObjectErrorMessage :: String
 notObjectErrorMessage = "Could not convert JSON to object"

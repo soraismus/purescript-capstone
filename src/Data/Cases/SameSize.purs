@@ -2,14 +2,12 @@ module Data.SameSize
   ( class SameSize
   ) where
 
-import Type.Row (kind RowList, Cons, Nil, class Cons)
+import Type.Row (kind RowList, Cons, Nil)
 
-class SameSize (l :: RowList) (r :: # Type) | l -> r
+class SameSize (l0 :: RowList) (l1 :: RowList)
 
-instance sameSizeNil :: SameSize Nil ()
+instance sameSizeNil :: SameSize Nil Nil
 
 instance sameSizeCons
-  :: ( Cons s0 v0 r' r
-     , SameSize l' r'
-     )
-  => SameSize (Cons s1 v1 l') r
+  :: SameSize l0' l1'
+  => SameSize (Cons s0 v0 l0') (Cons s1 v1 l1')

@@ -42,25 +42,25 @@ instance renameFieldsCons
   :: ( Cons origS v r0' r0
      --, Cons origS dv dr' dr
      , Cons origS (SProxy newS) dr' dr
-     , Cons newS v r2' r2
+     , Cons newS  v             r2' r2
      , IsSymbol origS
      , IsSymbol newS
-     , Lacks origS r0'
-     , Lacks origS dr'
-     , Lacks newS r2'
+     , Lacks    origS r0'
+     , Lacks    origS dr'
+     , Lacks    newS  r2'
      , RenameFields l0' r0' dl' dr' l2' r2'
-     , RowToList r0 l0
-     , RowToList r0' l0'
-     , RowToList dr dl
-     , RowToList dr' dl'
-     , RowToList r2 l2
-     , RowToList r2' l2'
-     , SameKeys l0 dr
-     , SameKeys l0' dr'
-     , SameSize dl r2
-     , SameSize dl' r2'
-     , SameValues l0 r2
-     , SameValues l0' r2'
+     , RowToList  r0  l0
+     , RowToList  r0' l0'
+     , RowToList  dr  dl
+     , RowToList  dr' dl'
+     , RowToList  r2  l2
+     , RowToList  r2' l2'
+     , SameKeys   l0  dr
+     , SameKeys   l0' dr'
+     , SameSize   dl  l2
+     , SameSize   dl' l2'
+     , SameValues l0  l2
+     , SameValues l0' l2'
      --, TypeEquals dv (SProxy newS)
      )
   => RenameFields

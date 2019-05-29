@@ -1,0 +1,216 @@
+module Test.Suites.SameValues
+  where
+--   ( suitex
+--   ) where
+--
+-- import Prelude (discard)
+--
+-- import Data.SameSize (class SameSize)
+-- import Data.SameValues (class SameValues)
+-- import Test.Unit (Test, TestSuite, suite, test)
+-- import Test.Unit.Assert (assert)
+-- import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency
+-- import Type.Row (Cons, Nil)
+--
+-- data A0 = A0
+-- data A1 = A1
+-- data A2 = A2
+-- data A3 = A3
+-- data A4 = A4
+-- data A5 = A5
+-- data A6 = A6
+--
+-- assertSameValues :: forall l0 l1. SameValues l0 l1 => RLProxy l0 -> RLProxy l1 -> Test
+-- assertSameValues _ _ = assert "Failure to have same keys" true
+--
+-- assertSameValuesAndSameSize
+--   :: forall l0 l1
+--    . SameValues l0 l1
+--   => SameSize l0 l1
+--   => RLProxy l0
+--   -> RLProxy l1
+--   -> Test
+-- assertSameValuesAndSameSize _ _ =
+--   assert "Failure to have same keys or same size" true
+--
+-- suitex :: TestSuite
+-- suitex =
+--   suite "SameValues" do
+--     suite "the two arguments have identical size" do
+--       test "Empty rowlist" do
+--         let value0 = RLProxy :: RLProxy Nil
+--         let value1 = RLProxy :: RLProxy Nil
+--         assertSameValuesAndSameSize value0 value1
+--       test "Single value" do
+--         let value0 = RLProxy :: RLProxy (Cons "a0" Int Nil)
+--         let value1 = RLProxy :: RLProxy (Cons "a0" Int Nil)
+--         assertSameValuesAndSameSize value0 value1
+--       test "Single value with different keys" do
+--         let value0 = RLProxy :: RLProxy (Cons "a0" Int Nil)
+--         let value1 = RLProxy :: RLProxy (Cons "b0" Int Nil)
+--         assertSameValuesAndSameSize value0 value1
+--       test "Two values #0" do
+--         let value0 = RLProxy :: RLProxy (Cons "a0" Int (Cons "a1" Int Nil))
+--         let value1 = RLProxy :: RLProxy (Cons "a0" Int (Cons "a1" Int Nil))
+--         assertSameValuesAndSameSize value0 value1
+--       test "Two values #1" do
+--         let value0 = RLProxy :: RLProxy (Cons "a0" Int (Cons "a1" String Nil))
+--         let value1 = RLProxy :: RLProxy (Cons "a0" Int (Cons "a1" String Nil))
+--         assertSameValuesAndSameSize value0 value1
+--       test "Two values with different keys #0" do
+--         let value0 = RLProxy :: RLProxy (Cons "a0" Int (Cons "a1" Int Nil))
+--         let value1 = RLProxy :: RLProxy (Cons "b0" Int (Cons "b1" Int Nil))
+--         assertSameValuesAndSameSize value0 value1
+--       test "Two values with different keys #1" do
+--         let value0 = RLProxy :: RLProxy (Cons "a0" Int (Cons "a1" String Nil))
+--         let value1 = RLProxy :: RLProxy (Cons "b0" Int (Cons "b1" String Nil))
+--         assertSameValuesAndSameSize value0 value1
+--       test "Three values #0" do
+--         let
+--           value0 :: RLProxy (Cons "a0" Int (Cons "a1" Int (Cons "a2" Int Nil)))
+--           value0 = RLProxy
+--           value1 :: RLProxy (Cons "a0" Int (Cons "a1" Int (Cons "a2" Int Nil)))
+--           value1 = RLProxy
+--         assertSameValuesAndSameSize value0 value1
+--       test "Three values #1" do
+--         let
+--           value0 :: RLProxy (Cons "a0" Int (Cons "a1" String (Cons "a2" Boolean Nil)))
+--           value0 = RLProxy
+--           value1 :: RLProxy (Cons "a0" Int (Cons "a1" String (Cons "a2" Boolean Nil)))
+--           value1 = RLProxy
+--         assertSameValuesAndSameSize value0 value1
+--       test "Three values with different keys #0" do
+--         let
+--           value0 :: RLProxy (Cons "a0" Int (Cons "a1" Int (Cons "a2" Int Nil)))
+--           value0 = RLProxy
+--           value1 :: RLProxy (Cons "b0" Int (Cons "b1" Int (Cons "b2" Int Nil)))
+--           value1 = RLProxy
+--         assertSameValuesAndSameSize value0 value1
+--       test "Three values with different keys #1" do
+--         let
+--           value0 :: RLProxy (Cons "a0" Int (Cons "a1" String (Cons "a2" Boolean Nil)))
+--           value0 = RLProxy
+--           value1 :: RLProxy (Cons "b0" Int (Cons "b1" String (Cons "b2" Boolean Nil)))
+--           value1 = RLProxy
+--         assertSameValuesAndSameSize value0 value1
+--       test "Multiple values with different keys" do
+--         let
+--             value0
+--               :: RLProxy
+--                   (Cons "a0" Int (
+--                   (Cons "a1" String (
+--                   (Cons "a2" Boolean (
+--                   (Cons "a3" Int (
+--                   (Cons "a4" String (
+--                   (Cons "a5" Boolean (
+--                   (Cons "a6" Int Nil)))))))))))))
+--             value0 = RLProxy
+--             value1
+--               :: RLProxy
+--                   (Cons "b0" String (
+--                   (Cons "b1" Int (
+--                   (Cons "b2" Boolean (
+--                   (Cons "b3" Int (
+--                   (Cons "b4" Boolean (
+--                   (Cons "b5" String (
+--                   (Cons "b6" Int Nil)))))))))))))
+--             value1 = RLProxy
+--         assertSameValuesAndSameSize value0 value1
+--
+--     suite "the first argument has smaller size" do
+--       test "Empty rowlist #0" do
+--         let value0 = RLProxy :: RLProxy Nil
+--         let value1 = RLProxy :: RLProxy Nil
+--         assertSameValues value0 value1
+--       test "Empty rowlist #1" do
+--         let value0 = RLProxy :: RLProxy Nil
+--         let value1 = RLProxy :: RLProxy (Cons "a0" Int Nil)
+--         assertSameValues value0 value1
+--       test "Empty rowlist #2" do
+--         let
+--           value0 :: RLProxy Nil
+--           value0 = RLProxy
+--           value1
+--             :: RLProxy
+--                   (Cons "a0" Int
+--                   (Cons "a1" String
+--                   (Cons "a2" Boolean
+--                   (Cons "a3" Int Nil))))
+--           value1 = RLProxy
+--         assertSameValues value0 value1
+--       test "Single value #0" do
+--         let value0 = RLProxy :: RLProxy (Cons "a0" Int Nil)
+--         let value1 = RLProxy :: RLProxy (Cons "a0" Int (Cons "a1" Int Nil))
+--         assertSameValues value0 value1
+--       test "Single value #1" do
+--         let value0 = RLProxy :: RLProxy (Cons "a0" Int Nil)
+--         let value1 = RLProxy :: RLProxy (Cons "a1" String (Cons "a0" Int Nil))
+--         assertSameValues value0 value1
+--       test "Single value #2" do
+--         let
+--             value0 :: RLProxy (Cons "a0" Int Nil)
+--             value0 = RLProxy
+--             value1
+--               :: RLProxy
+--                   (Cons "a0" Int (
+--                   (Cons "a1" Int (
+--                   (Cons "a2" Int (
+--                   (Cons "a3" Int Nil)))))))
+--             value1 = RLProxy
+--         assertSameValues value0 value1
+--       test "Single value #3" do
+--         let
+--             value0 :: RLProxy (Cons "a0" Int Nil)
+--             value0 = RLProxy
+--             value1
+--               :: RLProxy
+--                   (Cons "a3" String (
+--                   (Cons "a2" Boolean (
+--                   (Cons "a1" Int (
+--                   (Cons "a0" String Nil)))))))
+--             value1 = RLProxy
+--         assertSameValues value0 value1
+--       test "Two values #0" do
+--         let
+--           value0 :: RLProxy (Cons "a0" Int (Cons "a1" Int Nil))
+--           value0 = RLProxy
+--           value1 :: RLProxy (Cons "a0" Int (Cons "a1" Int (Cons "a2" Int Nil)))
+--           value1 = RLProxy
+--         assertSameValues value0 value1
+--       test "Two values #1" do
+--         let
+--           value0 :: RLProxy (Cons "a0" Int (Cons "a1" String Nil))
+--           value0 = RLProxy
+--           value1 :: RLProxy (Cons "a1" Boolean (Cons "a0" String (Cons "a2" Int Nil)))
+--           value1 = RLProxy
+--         assertSameValues value0 value1
+--       test "Multiple keys with different values" do
+--         let
+--             value0
+--               :: RLProxy
+--                   (Cons "a0" A0 (
+--                   (Cons "a1" A1 (
+--                   (Cons "a2" A2 (
+--                   (Cons "a3" A3 (
+--                   (Cons "a4" A4 (
+--                   (Cons "a5" A5 (
+--                   (Cons "a6" A6 Nil)))))))))))))
+--             value0 = RLProxy
+--             value1
+--               :: RLProxy
+--                   (Cons "ba" Int (
+--                   (Cons "bb" A6 (
+--                   (Cons "bc" String (
+--                   (Cons "bd" A4 (
+--                   (Cons "be" Boolean (
+--                   (Cons "bf" A2 (
+--                   (Cons "bg" Int (
+--                   (Cons "bh" A0 (
+--                   (Cons "bi" String (
+--                   (Cons "bj" A1 (
+--                   (Cons "bk" A3 (
+--                   (Cons "bl" Boolean (
+--                   (Cons "bm" Int (
+--                   (Cons "bn" A5 Nil)))))))))))))))))))))))))))
+--             value1 = RLProxy
+--         assertSameValues value0 value1

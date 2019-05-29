@@ -39,8 +39,8 @@ renameFields
   => SameKeys l1 r1
   => SameKeys l3 r3
   -- => SameSize l1 r2
-  => SameSize l1 r1
-  => SameSize l3 r3
+  => SameSize l1 l1
+  => SameSize l3 l3
   -- => SubFields l2 r4
   => SubFields l1 r4
   => SubFields l3 r4
