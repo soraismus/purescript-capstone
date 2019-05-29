@@ -4,144 +4,123 @@ module Test.Suites.RenameFields.Class
 
 import Prelude (discard)
 
--- import Data.Argonaut.Decode.Record.RenameFields (renameFields)
 import Data.Argonaut.Decode.Record.RenameFields.Class (renameFields)
-import Data.Either (Either(Left))
-import Data.List (List, (:))
+import Data.Either (Either(Left, Right))
+import Data.List ((:))
 import Data.List (List(Nil)) as List
-import Data.Maybe (Maybe(Just))
+import Data.Maybe (Maybe(Just, Nothing))
 import Data.Symbol (SProxy(SProxy))
-import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency
 import Test.Unit (TestSuite, suite, test)
 import Test.Unit.Assert (shouldEqual)
-import Type.Row (Cons, Nil)
+
+data Arbitrary a (s :: Symbol) = Arbitrary
 
 suitex :: TestSuite
 suitex =
   suite "RenameFields" do
     test "#0" do
       let value = {}
-      let result =
-            renameFields
-              (RLProxy :: RLProxy Nil)
-              (RLProxy :: RLProxy Nil)
-              (RLProxy :: RLProxy Nil)
-              {}
-              value
+      let result = renameFields {} value
       result `shouldEqual` value
 
     test "#1" do
       let value = { a0: 0 }
-      let result =
-            renameFields
-              (RLProxy :: RLProxy (Cons "a0" Int Nil))
-              (RLProxy :: RLProxy (Cons "a0" (SProxy "b0") Nil))
-              (RLProxy :: RLProxy (Cons "b0" Int Nil))
-              { a0: (SProxy :: SProxy "b0") }
-              value
+      let result = renameFields { a0: (SProxy :: SProxy "b0") } value
       result `shouldEqual` { b0: 0 }
 
     test "#2" do
-      let
-        proxy0
-          :: RLProxy
-                (Cons "a0" Int
-                (Cons "a1" String
-                (Cons "a2" Boolean Nil)))
-        proxy0 = RLProxy
-
-        proxy1
-          :: RLProxy
-                (Cons "a0" (SProxy "b0")
-                (Cons "a1" (SProxy "b1")
-                (Cons "a2" (SProxy "b2") Nil)))
-        proxy1 = RLProxy
-
-        proxy2
-          :: RLProxy
-                (Cons "b0" Int
-                (Cons "b1" String
-                (Cons "b2" Boolean Nil)))
-        proxy2 = RLProxy
-
-        value = { a0: 0, a1: "1", a2: true }
-
-        result =
-          renameFields
-            proxy0
-            proxy1
-            proxy2
-            { a0: (SProxy :: SProxy "b0")
-            , a1: (SProxy :: SProxy "b1")
-            , a2: (SProxy :: SProxy "b2")
-            }
-            value
-      result `shouldEqual` { b0: value.a0, b1: value.a1, b2: value.a2 }
+      let value = { a0: 0 }
+      let result = renameFields {} value
+      result `shouldEqual` value
 
     test "#3" do
-      let
-        proxy0
-          :: RLProxy
-                (Cons "a0" Int
-                (Cons "a1" String
-                (Cons "a2" Boolean
-                (Cons "a3" (Maybe Int)
-                (Cons "a4" (Either String Int)
-                (Cons "a5" (Array Int)
-                (Cons "a6" (List Int)
-                (Cons "a7" { c0 :: Int, c1 :: String } Nil))))))))
-        proxy0 = RLProxy
+      let value = { a0: 0, a1: "1", a2: true }
+      let result = renameFields {} value
+      result `shouldEqual` value
 
-        proxy1
-          :: RLProxy
-                (Cons "a0" (SProxy "b0")
-                (Cons "a1" (SProxy "b1")
-                (Cons "a2" (SProxy "b2")
-                (Cons "a3" (SProxy "b3")
-                (Cons "a4" (SProxy "b4")
-                (Cons "a5" (SProxy "b5")
-                (Cons "a6" (SProxy "b6")
-                (Cons "a7" (SProxy "b7") Nil))))))))
-        proxy1 = RLProxy
+    test "#4" do
+      let value = { a0: 0, a1: "1", a2: true }
+      let result =
+            renameFields
+              { a0: (SProxy :: SProxy "b0")
+              , a1: (SProxy :: SProxy "b1")
+              , a2: (SProxy :: SProxy "b2")
+              }
+              value
+      result `shouldEqual` { b0: value.a0, b1: value.a1, b2: value.a2 }
 
-        proxy2
-          :: RLProxy
-                (Cons "b0" Int
-                (Cons "b1" String
-                (Cons "b2" Boolean
-                (Cons "b3" (Maybe Int)
-                (Cons "b4" (Either String Int)
-                (Cons "b5" (Array Int)
-                (Cons "b6" (List Int)
-                (Cons "b7" { c0 :: Int, c1 :: String } Nil))))))))
-        proxy2 = RLProxy
+    test "#5" do
+      let value = { a0: 0, a1: "1", a2: true }
+      let result =
+            renameFields
+              { a0: (Arbitrary :: Arbitrary Int "b0")
+              , a1: (Arbitrary :: Arbitrary String "b1")
+              , a2: (Arbitrary :: Arbitrary {} "b2")
+              }
+              value
+      result `shouldEqual` { b0: value.a0, b1: value.a1, b2: value.a2 }
 
-        value =
-          { a0: 0
-          , a1: "1"
-          , a2: true
-          , a3: Just 3
-          , a4: Left "4"
-          , a5: [5]
-          , a6: 6 : List.Nil
-          , a7: { c0: 70, c1: "71" }
-          }
-
-        result =
-          renameFields
-            proxy0
-            proxy1
-            proxy2
-            { a0: (SProxy :: SProxy "b0")
-            , a1: (SProxy :: SProxy "b1")
-            , a2: (SProxy :: SProxy "b2")
-            , a3: (SProxy :: SProxy "b3")
-            , a4: (SProxy :: SProxy "b4")
-            , a5: (SProxy :: SProxy "b5")
-            , a6: (SProxy :: SProxy "b6")
-            , a7: (SProxy :: SProxy "b7")
+    test "#6" do
+      let value =
+            { a0: 0
+            , a1: "1"
+            , a2: true
+            , a3: Just 3
+            , a4: (Left "4" :: Either String Int)
+            , a5: [5]
+            , a6: 6 : List.Nil
+            , a7: { c0: 70, c1: "71" }
             }
-            value
+      let result = renameFields {} value
+      result `shouldEqual` value
+
+    test "#7" do
+      let value =
+            { a0: 0
+            , a1: "1"
+            , a2: true
+            , a3: Just 3
+            , a4: (Left "4" :: Either String Int)
+            , a5: [5]
+            , a6: 6 : List.Nil
+            , a7: { c0: 70, c1: "71" }
+            }
+      let result = renameFields { a3: (SProxy :: SProxy "b3") } value
+      result
+        `shouldEqual`
+        { a0: value.a0
+        , a1: value.a1
+        , a2: value.a2
+        , b3: value.a3
+        , a4: value.a4
+        , a5: value.a5
+        , a6: value.a6
+        , a7: value.a7
+        }
+
+    test "#8" do
+      let value =
+            { a0: 0
+            , a1: "1"
+            , a2: true
+            , a3: Just 3
+            , a4: (Left "4" :: Either String Int)
+            , a5: [5]
+            , a6: 6 : List.Nil
+            , a7: { c0: 70, c1: "71" }
+            }
+      let result =
+            renameFields
+              { a0: (SProxy :: SProxy "b0")
+              , a1: (SProxy :: SProxy "b1")
+              , a2: (SProxy :: SProxy "b2")
+              , a3: (SProxy :: SProxy "b3")
+              , a4: (SProxy :: SProxy "b4")
+              , a5: (SProxy :: SProxy "b5")
+              , a6: (SProxy :: SProxy "b6")
+              , a7: (SProxy :: SProxy "b7")
+              }
+              value
       result
         `shouldEqual`
         { b0: value.a0
@@ -152,4 +131,227 @@ suitex =
         , b5: value.a5
         , b6: value.a6
         , b7: value.a7
+        }
+
+    test "#9" do
+      let value =
+            { a0: 100
+            , b0: 200
+            , a1: "101"
+            , b1: "201"
+            , a2: true
+            , b2: false
+            , a3: Just 3
+            , b3: (Nothing :: Maybe Int)
+            , a4: (Left "4" :: Either String Int)
+            , b4: (Right 4 :: Either String Int)
+            , a5: [105]
+            , b5: [205]
+            , a6: 106 : List.Nil
+            , b6: 206 : List.Nil
+            , a7: { c0: 1070, c1: "1071" }
+            , b7: { c0: 2070, c1: "2071" }
+            }
+      let result = renameFields {} value
+      result `shouldEqual` value
+
+    test "#10" do
+      let value =
+            { a0: 100
+            , b0: 200
+            , a1: "101"
+            , b1: "201"
+            , a2: true
+            , b2: false
+            , a3: Just 3
+            , b3: (Nothing :: Maybe Int)
+            , a4: (Left "4" :: Either String Int)
+            , b4: (Right 4 :: Either String Int)
+            , a5: [105]
+            , b5: [205]
+            , a6: 106 : List.Nil
+            , b6: 206 : List.Nil
+            , a7: { c0: 1070, c1: "1071" }
+            , b7: { c0: 2070, c1: "2071" }
+            }
+      let result = renameFields { a3: (SProxy :: SProxy "c3") } value
+      result
+        `shouldEqual`
+        { a0: value.a0
+        , b0: value.b0
+        , a1: value.a1
+        , b1: value.b1
+        , a2: value.a2
+        , b2: value.b2
+        , c3: value.a3
+        , b3: value.b3
+        , a4: value.a4
+        , b4: value.b4
+        , a5: value.a5
+        , b5: value.b5
+        , a6: value.a6
+        , b6: value.b6
+        , a7: value.a7
+        , b7: value.b7
+        }
+
+    test "#11" do
+      let value =
+            { a0: 100
+            , b0: 200
+            , a1: "101"
+            , b1: "201"
+            , a2: true
+            , b2: false
+            , a3: Just 3
+            , b3: (Nothing :: Maybe Int)
+            , a4: (Left "4" :: Either String Int)
+            , b4: (Right 4 :: Either String Int)
+            , a5: [105]
+            , b5: [205]
+            , a6: 106 : List.Nil
+            , b6: 206 : List.Nil
+            , a7: { c0: 1070, c1: "1071" }
+            , b7: { c0: 2070, c1: "2071" }
+            }
+      let result =
+            renameFields
+              { a0: (SProxy :: SProxy "c0")
+              , a1: (SProxy :: SProxy "c1")
+              , a2: (SProxy :: SProxy "c2")
+              , a3: (SProxy :: SProxy "c3")
+              , a4: (SProxy :: SProxy "c4")
+              , a5: (SProxy :: SProxy "c5")
+              , a6: (SProxy :: SProxy "c6")
+              , a7: (SProxy :: SProxy "c7")
+              }
+              value
+      result
+        `shouldEqual`
+        { c0: value.a0
+        , b0: value.b0
+        , c1: value.a1
+        , b1: value.b1
+        , c2: value.a2
+        , b2: value.b2
+        , c3: value.a3
+        , b3: value.b3
+        , c4: value.a4
+        , b4: value.b4
+        , c5: value.a5
+        , b5: value.b5
+        , c6: value.a6
+        , b6: value.b6
+        , c7: value.a7
+        , b7: value.b7
+        }
+
+    test "#12" do
+      let value =
+            { a0: 100
+            , b0: 200
+            , a1: "101"
+            , b1: "201"
+            , a2: true
+            , b2: false
+            , a3: Just 3
+            , b3: (Nothing :: Maybe Int)
+            , a4: (Left "4" :: Either String Int)
+            , b4: (Right 4 :: Either String Int)
+            , a5: [105]
+            , b5: [205]
+            , a6: 106 : List.Nil
+            , b6: 206 : List.Nil
+            , a7: { c0: 1070, c1: "1071" }
+            , b7: { c0: 2070, c1: "2071" }
+            }
+      let result =
+            renameFields
+              { a7: (SProxy :: SProxy "c7")
+              , a5: (SProxy :: SProxy "c5")
+              , a3: (SProxy :: SProxy "c3")
+              , a1: (SProxy :: SProxy "c1")
+              , a0: (SProxy :: SProxy "c0")
+              , a2: (SProxy :: SProxy "c2")
+              , a4: (SProxy :: SProxy "c4")
+              , a6: (SProxy :: SProxy "c6")
+              }
+              value
+      result
+        `shouldEqual`
+        { c0: value.a0
+        , b0: value.b0
+        , c1: value.a1
+        , b1: value.b1
+        , c2: value.a2
+        , b2: value.b2
+        , c3: value.a3
+        , b3: value.b3
+        , c4: value.a4
+        , b4: value.b4
+        , c5: value.a5
+        , b5: value.b5
+        , c6: value.a6
+        , b6: value.b6
+        , c7: value.a7
+        , b7: value.b7
+        }
+
+    test "#13" do
+      let value =
+            { a0: 100
+            , b0: 200
+            , a1: "101"
+            , b1: "201"
+            , a2: true
+            , b2: false
+            , a3: Just 3
+            , b3: (Nothing :: Maybe Int)
+            , a4: (Left "4" :: Either String Int)
+            , b4: (Right 4 :: Either String Int)
+            , a5: [105]
+            , b5: [205]
+            , a6: 106 : List.Nil
+            , b6: 206 : List.Nil
+            , a7: { c0: 1070, c1: "1071" }
+            , b7: { c0: 2070, c1: "2071" }
+            }
+      let result =
+            renameFields
+              { a0: (SProxy :: SProxy "c0")
+              , b0: (SProxy :: SProxy "d0")
+              , a1: (SProxy :: SProxy "c1")
+              , b1: (SProxy :: SProxy "d1")
+              , a2: (SProxy :: SProxy "c2")
+              , b2: (SProxy :: SProxy "d2")
+              , a3: (SProxy :: SProxy "c3")
+              , b3: (SProxy :: SProxy "d3")
+              , a4: (SProxy :: SProxy "c4")
+              , b4: (SProxy :: SProxy "d4")
+              , a5: (SProxy :: SProxy "c5")
+              , b5: (SProxy :: SProxy "d5")
+              , a6: (SProxy :: SProxy "c6")
+              , b6: (SProxy :: SProxy "d6")
+              , a7: (SProxy :: SProxy "c7")
+              , b7: (SProxy :: SProxy "d7")
+              }
+              value
+      result
+        `shouldEqual`
+        { c0: value.a0
+        , d0: value.b0
+        , c1: value.a1
+        , d1: value.b1
+        , c2: value.a2
+        , d2: value.b2
+        , c3: value.a3
+        , d3: value.b3
+        , c4: value.a4
+        , d4: value.b4
+        , c5: value.a5
+        , d5: value.b5
+        , c6: value.a6
+        , d6: value.b6
+        , c7: value.a7
+        , d7: value.b7
         }
