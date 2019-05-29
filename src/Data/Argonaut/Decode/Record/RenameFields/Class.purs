@@ -82,6 +82,16 @@ instance renameFields_Cons
         l2
         True
 
+class RenameFields
+  (l0 :: RowList)
+  (l1 :: RowList)
+  (l2 :: RowList)
+  | l0 l1 -> l2
+  , l0 l2 -> l1
+instance renameFieldsRenameFields_
+  :: RenameFields_ l0 l1 l2 True
+  => RenameFields l0 l1 l2
+
 class Reify (l :: RowList) where
   reify :: RLProxy l -> List (Tuple String String)
 instance reifyNil :: Reify Nil where
@@ -105,16 +115,6 @@ reify'
   => f r
   -> List (Tuple String String)
 reify' _ = reify (RLProxy :: RLProxy l)
-
-class RenameFields
-  (l0 :: RowList)
-  (l1 :: RowList)
-  (l2 :: RowList)
-  | l0 l1 -> l2
-  , l0 l2 -> l1
-instance renameFieldsRenameFields_
-  :: RenameFields_ l0 l1 l2 True
-  => RenameFields l0 l1 l2
 
 renameFields
   :: forall f l0 l1 l2 r0 r1 r2
