@@ -54,13 +54,16 @@ class RenameFields_
   (continue :: Boolean)
   | l0 l1 -> l2
   , l0 l2 -> l1
-  , l1 l2 -> l0
+--   , l1 l2 -> l0
 instance renameFields_False :: RenameFields_ l0 l1 l2 False
 instance renameFields_Nil :: RenameFields_ Nil l l True
+-- instance renameFields_NilNil :: RenameFields_ Nil Nil Nil True
+-- instance renameFields_NilCons
+--   :: RenameFields_ Nil (Cons s1 v1 l1') (Cons s2 v2 l2') True
 instance renameFields_Cons
   :: ( RenameFields_ l0' l1' l2_ifEq' eq
-     , RenameFields_ (Cons sa (f sb) Nil) l0' lx uneqAndHas
-     , RenameFields_ l0' (Cons s v lx) l2_ifHas' uneqAndHas
+     , RenameFields_ l0' (Cons s v l1') lx uneqAndHas
+     , RenameFields_ (Cons sa (f sb) Nil) lx l2_ifHas uneqAndHas
      , RenameFields_ (Cons sa (f sb) l0') l1' l2_ifLacks' uneqAndLacks
      , And uneq has uneqAndHas
      , And uneq lacks uneqAndLacks
@@ -75,13 +78,68 @@ instance renameFields_Cons
      , If eq
           (RLProxy (Cons sb v l2_ifEq'))
           (RLProxy l2_ifUneq')
-          (RLProxy l2)
+          (RLProxy (Cons s2 v2 l2'))
      )
   => RenameFields_
         (Cons sa (f sb) l0')
         (Cons s v l1')
-        l2
+        (Cons s2 v2 l2')
         True
+
+-- instance renameFields_Cons
+--   :: ( RenameFields_ l0' l1' l2_ifEq' eq1
+--      , RenameFields_ (Cons sa0 (f sb) Nil) l0' uneq1_eq2_has1_lx uneq1_has1
+--      , RenameFields_ l0' (Cons sa1 v1 uneq1_eq2_has1_lx) uneq1_eq2_has1_l2' uneq1_has1
+--      , RenameFields_ (Cons sa0 (f sb) l0') l1' l2_ifLacks' uneq1_lacks1
+--      , And uneq1 has1 uneq1_has1
+--      , And uneq1 lacks1 uneq1_lacks1
+--      , Not has1 lacks1
+--      , HasSymbol_ l0' sa1 has1 uneq1
+--      , If has1
+--           (RLProxy uneq1_eq2_has1_l2'
+--           (RLProxy (Cons sa1 v1 l2_ifLacks'))
+--           (RLProxy l2_ifUneq')
+--
+--
+--      , Equals sa0 sa1 eq1
+--      , Equals sa0 sa2 eq2
+--      , Not eq1 uneq1
+--      , Not eq2 uneq2
+--      , And eq1   eq2   eq1_eq2
+--      , And eq1   uneq2 eq1_uneq2
+--      , And uneq1 eq2   uneq1_eq2
+--      , And uneq1 uneq2 uneq1_uneq2
+--
+--      -- 0. eq1 and eq2
+--      , If eq1_eq2
+--             (RLProxy (Cons sb v1 l2'))
+--             (RLProxy l2_ifNotBothEq')
+--             (RLProxy (Cons sa2 v2 l2'))
+--
+--      -- 0. eq1 and eq2
+--      , RenameFields_ l0' l1' l2' eq1_eq2
+--
+--      -- 1. uneq1 and eq2
+--      , HasSymbol_ l0' sa1 has1 uneq1_eq2
+--      , Not has1 lacks1
+--      , And uneq1_eq2 has1 uneq1_eq2_has1
+--      , And uneq1_eq2 lacks1 uneq1_eq2_lacks1
+--      , If has1
+--           (RLProxy uneq1_eq2_has1_l2'
+--           (RLProxy (Cons sa1 v1 l2_ifLacks'))
+--           (RLProxy l2_ifUneq')
+--      , RenameFields_ (Cons sa0 (f sb) Nil) l0' uneq1_eq2_has1_lx uneq1_eq2_has1
+--      , RenameFields_ l0' (Cons sa1 v1 uneq1_eq2_has1_lx) uneq1_eq2_has1_l2' uneq1_eq2_has1
+--
+--      -- 2. eq1 and uneq2
+--      -- 3. uneq1 and uneq2
+--
+--      )
+--   => RenameFields_
+--         (Cons sa0 (f sb) l0')
+--         (Cons sa1 v1 l1')
+--         (Cons sa2 v2 l2')
+--         True
 
 class RenameFields
   (l0 :: RowList)
