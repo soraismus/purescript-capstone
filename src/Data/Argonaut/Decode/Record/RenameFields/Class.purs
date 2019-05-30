@@ -68,7 +68,7 @@ instance renameFields_Cons
      , If eq
           (RLProxy (Cons sb v l2_ifEq'))
           (RLProxy l2_ifUneq)
-          (RLProxy (Cons s2 v2 l2'))
+          (RLProxy (Cons s2 v l2'))
      , HasSymbol_ l0' s1 has uneq
      , Not has lacks
      , And uneq has uneqAndHas
@@ -85,7 +85,7 @@ instance renameFields_Cons
   => RenameFields_
         (Cons sa (f sb) l0')
         (Cons s1 v l1')
-        (Cons s2 v2 l2')
+        (Cons s2 v l2')
         True
 
 -- instance renameFields_Cons
