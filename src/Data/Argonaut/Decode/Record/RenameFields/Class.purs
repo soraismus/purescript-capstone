@@ -60,6 +60,7 @@ instance renameFields_Nil :: RenameFields_ Nil l l True
 -- instance renameFields_NilNil :: RenameFields_ Nil Nil Nil True
 -- instance renameFields_NilCons
 --   :: RenameFields_ Nil (Cons s1 v1 l1') (Cons s2 v2 l2') True
+
 instance renameFields_Cons
   :: ( RenameFields_ l0' l1' l2_ifEq' eq
      , RenameFields_ l0' (Cons s v l1') lx uneqAndHas
@@ -72,12 +73,12 @@ instance renameFields_Cons
      , If has
           (RLProxy l2_ifHas')
           (RLProxy (Cons s v l2_ifLacks'))
-          (RLProxy l2_ifUneq')
+          (RLProxy l2_ifUneq)
      , Not eq uneq
      , Equals sa s eq
      , If eq
           (RLProxy (Cons sb v l2_ifEq'))
-          (RLProxy l2_ifUneq')
+          (RLProxy l2_ifUneq)
           (RLProxy (Cons s2 v2 l2'))
      )
   => RenameFields_
