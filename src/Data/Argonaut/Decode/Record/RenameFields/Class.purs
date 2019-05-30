@@ -47,6 +47,25 @@ instance hasSymbol_Cons
      )
   => HasSymbol_ (Cons s0 v l') s1 output True
 
+class HasSymbol2_
+  (l :: RowList)
+  (s :: Symbol)
+  (b :: Boolean)
+  (continue :: Boolean)
+  | l s -> b
+instance hasSymbol2_False :: HasSymbol2_ l s False False
+instance hasSymbol2_Nil :: HasSymbol2_ Nil s False True
+instance hasSymbol2_Cons
+  :: ( HasSymbol2_ l' s1 output' uneq
+     , Equals s s1 eq
+     , Not eq uneq
+     , If eq
+         (BProxy True)
+         (BProxy output')
+         (BProxy output)
+     )
+  => HasSymbol2_ (Cons s0 (f s) l') s1 output True
+
 class RenameFields_
   (l0 :: RowList)
   (l1 :: RowList)
@@ -61,26 +80,51 @@ instance renameFields_Nil :: RenameFields_ Nil l l True
 -- instance renameFields_NilCons
 --   :: RenameFields_ Nil (Cons s1 v1 l1') (Cons s2 v2 l2') True
 
+-- instance renameFields_Cons
+--   :: ( Equals sa s1 eq
+--      , Not eq uneq
+--      , If eq
+--           (RLProxy (Cons sb v l2_ifEq'))
+--           (RLProxy l2_ifUneq)
+--           (RLProxy (Cons s2 v l2'))
+--      , HasSymbol_ l0' s1 has uneq
+--      , Not has lacks
+--      , And uneq has uneqAndHas
+--      , And uneq lacks uneqAndLacks
+--      , If has
+--           (RLProxy l2_ifHas)
+--           (RLProxy (Cons s1 v l2_ifLacks'))
+--           (RLProxy l2_ifUneq)
+--      , RenameFields_ l0'                  l1'             l2_ifEq'    eq
+--      , RenameFields_ l0'                  (Cons s1 v l1') lx          uneqAndHas
+--      , RenameFields_ (Cons sa (f sb) Nil) lx              l2_ifHas    uneqAndHas
+--      , RenameFields_ (Cons sa (f sb) l0') l1'             l2_ifLacks' uneqAndLacks
+--      )
+--   => RenameFields_
+--         (Cons sa (f sb) l0')
+--         (Cons s1 v l1')
+--         (Cons s2 v l2')
+--         True
+
 instance renameFields_Cons
-  :: (
-       Equals sa s1 eq
+  :: ( Equals sb s2 eq
      , Not eq uneq
      , If eq
-          (RLProxy (Cons sb v l2_ifEq'))
-          (RLProxy l2_ifUneq)
-          (RLProxy (Cons s2 v l2'))
-     , HasSymbol_ l0' s1 has uneq
+          (RLProxy (Cons sa v l1_ifEq'))
+          (RLProxy l1_ifUneq)
+          (RLProxy (Cons s1 v l1'))
+     , HasSymbol2_ l0' s2 has uneq
      , Not has lacks
      , And uneq has uneqAndHas
      , And uneq lacks uneqAndLacks
      , If has
-          (RLProxy l2_ifHas')
-          (RLProxy (Cons s1 v l2_ifLacks'))
-          (RLProxy l2_ifUneq)
-     , RenameFields_ l0'                  l1'             l2_ifEq'    eq
-     , RenameFields_ l0'                  (Cons s1 v l1') lx          uneqAndHas
-     , RenameFields_ (Cons sa (f sb) Nil) lx              l2_ifHas    uneqAndHas
-     , RenameFields_ (Cons sa (f sb) l0') l1'             l2_ifLacks' uneqAndLacks
+          (RLProxy l1_ifHas)
+          (RLProxy (Cons s2 v l1_ifLacks'))
+          (RLProxy l1_ifUneq)
+     , RenameFields_ l0'                  l1_ifEq'    l2'             eq
+     , RenameFields_ l0'                  lx          (Cons s2 v l2') uneqAndHas
+     , RenameFields_ (Cons sa (f sb) Nil) l1_ifHas    lx              uneqAndHas
+     , RenameFields_ (Cons sa (f sb) l0') l1_ifLacks' l2'             uneqAndLacks
      )
   => RenameFields_
         (Cons sa (f sb) l0')
@@ -182,8 +226,8 @@ renameFields
    . Reify l0
   => RenameFields l0 l1 l2
   => RowToList r0 l0
-  => RowToList r1 l1
-  => ListToRow l2 r2
+  => ListToRow l1 r1
+  => RowToList r2 l2
   => f r0
   -> Record r1
   -> Record r2

@@ -2,6 +2,11 @@ module Test.Suites.RenameFields.Class
   ( suitex
   ) where
 
+import Prelude (discard, map, (<<<), ($), show)
+import Data.Argonaut.Core (Json)
+import Data.Argonaut.Decode (decodeJson)
+import Test.Utils (assertEquivalence)
+
 import Prelude (discard)
 
 import Data.Argonaut.Decode.Record.RenameFields.Class (renameFields)
@@ -15,9 +20,21 @@ import Test.Unit.Assert (shouldEqual)
 
 data Arbitrary a (s :: Symbol) = Arbitrary
 
+foreign import jsonValue :: Json
+
 suitex :: TestSuite
 suitex =
   suite "RenameFields" do
+
+    test "inference" do
+      let
+          --value :: Either String { a0 :: Int }
+          value = decodeJson jsonValue
+      let
+          result :: Either String { b0 :: Int }
+          result = map (renameFields { a0: (SProxy :: SProxy "b0" )}) value
+      assertEquivalence result { b0: 0 }
+
     test "#0" do
       let value = {}
       let result = renameFields {} value
