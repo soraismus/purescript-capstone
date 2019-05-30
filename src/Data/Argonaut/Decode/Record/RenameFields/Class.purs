@@ -54,6 +54,7 @@ class RenameFields_
   (continue :: Boolean)
   | l0 l1 -> l2
   , l0 l2 -> l1
+  , l1 l2 -> l0
 instance renameFields_False :: RenameFields_ l0 l1 l2 False
 instance renameFields_Nil :: RenameFields_ Nil l l True
 instance renameFields_Cons
