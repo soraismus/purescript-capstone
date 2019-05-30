@@ -2,13 +2,12 @@ module Test.Suites.RenameFields.Class
   ( suitex
   ) where
 
-import Prelude (discard, map, (<<<), ($), show)
+import Data.Argonaut.Encode (encodeJson)
+
+import Prelude (discard, map, (<<<), ($))
+
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode (decodeJson)
-import Test.Utils (assertEquivalence)
-
-import Prelude (discard)
-
 import Data.Argonaut.Decode.Record.RenameFields.Class (renameFields)
 import Data.Either (Either(Left, Right))
 import Data.List ((:))
@@ -17,23 +16,15 @@ import Data.Maybe (Maybe(Just, Nothing))
 import Data.Symbol (SProxy(SProxy))
 import Test.Unit (TestSuite, suite, test)
 import Test.Unit.Assert (shouldEqual)
+import Test.Utils (assertEquivalence)
 
 data Arbitrary a (s :: Symbol) = Arbitrary
 
-foreign import jsonValue :: Json
+foreign import foreignValue :: Json
 
 suitex :: TestSuite
 suitex =
   suite "RenameFields" do
-
-    test "inference" do
-      let
-          --value :: Either String { a0 :: Int }
-          value = decodeJson jsonValue
-      let
-          result :: Either String { b0 :: Int }
-          result = map (renameFields { a0: (SProxy :: SProxy "b0" )}) value
-      assertEquivalence result { b0: 0 }
 
     test "#0" do
       let value = {}
@@ -372,3 +363,32 @@ suitex =
         , c7: value.a7
         , d7: value.b7
         }
+
+    suite "Inference" do
+      test "#0" do
+        let value = decodeJson foreignValue
+        let result = map (renameFields { a0: (SProxy :: SProxy "b0" )}) value
+        assertEquivalence result { b0: 0 }
+
+      test "#1" do
+        let value = decodeJson foreignValue
+        let result =
+              map (renameFields { i0: (SProxy :: SProxy "j0" )})
+                <<< map (renameFields { h0: (SProxy :: SProxy "i0" )})
+                <<< map (renameFields { g0: (SProxy :: SProxy "h0" )})
+                <<< map (renameFields
+                          { f0: (SProxy :: SProxy "g0" )
+                          , a2: (SProxy :: SProxy "b2" )
+                          })
+                <<< map (renameFields { c1: (SProxy :: SProxy "d1" )})
+                <<< map (renameFields { e0: (SProxy :: SProxy "f0" )})
+                <<< map (renameFields { b1: (SProxy :: SProxy "c1" )})
+                <<< map (renameFields { d0: (SProxy :: SProxy "e0" )})
+                <<< map (renameFields
+                          { c0: (SProxy :: SProxy "d0" )
+                          , a1: (SProxy :: SProxy "b1" )
+                          })
+                <<< map (renameFields { b0: (SProxy :: SProxy "c0" )})
+                <<< map (renameFields { a0: (SProxy :: SProxy "b0" )})
+                $ value
+        assertEquivalence result { j0: 0, d1: 1, b2: 2, a3: 3 }
