@@ -62,24 +62,25 @@ instance renameFields_Nil :: RenameFields_ Nil l l True
 --   :: RenameFields_ Nil (Cons s1 v1 l1') (Cons s2 v2 l2') True
 
 instance renameFields_Cons
-  :: ( RenameFields_ l0' l1' l2_ifEq' eq
-     , RenameFields_ l0' (Cons s1 v l1') lx uneqAndHas
-     , RenameFields_ (Cons sa (f sb) Nil) lx l2_ifHas uneqAndHas
-     , RenameFields_ (Cons sa (f sb) l0') l1' l2_ifLacks' uneqAndLacks
-     , And uneq has uneqAndHas
-     , And uneq lacks uneqAndLacks
-     , Not has lacks
-     , HasSymbol_ l0' s1 has uneq
-     , If has
-          (RLProxy l2_ifHas')
-          (RLProxy (Cons s1 v l2_ifLacks'))
-          (RLProxy l2_ifUneq)
+  :: (
+       Equals sa s1 eq
      , Not eq uneq
-     , Equals sa s1 eq
      , If eq
           (RLProxy (Cons sb v l2_ifEq'))
           (RLProxy l2_ifUneq)
           (RLProxy (Cons s2 v2 l2'))
+     , HasSymbol_ l0' s1 has uneq
+     , Not has lacks
+     , And uneq has uneqAndHas
+     , And uneq lacks uneqAndLacks
+     , If has
+          (RLProxy l2_ifHas')
+          (RLProxy (Cons s1 v l2_ifLacks'))
+          (RLProxy l2_ifUneq)
+     , RenameFields_ l0'                  l1'             l2_ifEq'    eq
+     , RenameFields_ l0'                  (Cons s1 v l1') lx          uneqAndHas
+     , RenameFields_ (Cons sa (f sb) Nil) lx              l2_ifHas    uneqAndHas
+     , RenameFields_ (Cons sa (f sb) l0') l1'             l2_ifLacks' uneqAndLacks
      )
   => RenameFields_
         (Cons sa (f sb) l0')
