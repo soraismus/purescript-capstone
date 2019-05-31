@@ -20,7 +20,7 @@ import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency
 import Type.Prelude (class ListToRow)
 import Type.Row (class RowToList, Cons, Nil)
 
-elaborateFailure :: ∀ a. String -> Either String a -> Either String a
+elaborateFailure :: forall a. String -> Either String a -> Either String a
 elaborateFailure s e =
   lmap msg e
   where
