@@ -2,8 +2,6 @@ module Test.Suites.RenameFields.Class
   ( suitex
   ) where
 
-import Data.Argonaut.Encode (encodeJson)
-
 import Prelude (discard, map, (<<<), ($))
 
 import Data.Argonaut.Core (Json)
