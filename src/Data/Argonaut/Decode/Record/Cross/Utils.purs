@@ -35,7 +35,7 @@ decodeJsonWith decoderRecord = reportJson go
   where
   go :: Object Json -> f (Record r2)
   go object = do
-    record1 <- reportObject object (RLProxy :: RLProxy l1)
+    record1 <- reportObject object
     record0 <-
       D.decodeJsonWith
         (RLProxy :: RLProxy dl)

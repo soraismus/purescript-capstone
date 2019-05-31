@@ -1,7 +1,6 @@
 module Data.Argonaut.Decode.Record.Utils
   ( elaborateFailure
   , getMissingFieldErrorMessage
---   , getSubRecord
   , reportJson
   , reportObject
   , singleton
@@ -11,17 +10,13 @@ import Prelude
 
 import Data.Argonaut.Core (Json, toObject)
 import Data.Argonaut.Decode.Class (class GDecodeJson, gDecodeJson)
--- import Data.Argonaut.Decode.Record.Instantiate.Class
---   ( class Instantiate
---   , instantiate
---   )
 import Data.Bifunctor (lmap)
 import Data.Either (Either(Left, Right))
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Status (class Status, report, reportError)
 import Data.Symbol (class IsSymbol, SProxy, reflectSymbol)
 import Foreign.Object (Object)
-import Type.Data.RowList (RLProxy) -- Argonaut dependency
+import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency
 import Type.Equality (class TypeEquals)
 import Type.Prelude (class ListToRow)
 import Type.Row (class RowToList, Cons, Nil)
@@ -56,10 +51,9 @@ reportObject
   => RowToList r l
   => Status f
   => Object Json
-  -> RLProxy l
   -> f (Record r)
-reportObject object rlProxy =
-  case gDecodeJson object rlProxy of
+reportObject object =
+  case gDecodeJson object (RLProxy :: RLProxy l) of
     Left errorStr -> reportError errorStr
     Right record -> report record
 

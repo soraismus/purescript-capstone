@@ -40,5 +40,5 @@ decodeJsonWith decoderRecord = reportJson go
         (RLProxy :: RLProxy dl)
         decoderRecord
         object
-    record1 <- reportObject object (RLProxy :: RLProxy l1)
+    record1 <- reportObject object
     report $ disjointUnion record0 record1
