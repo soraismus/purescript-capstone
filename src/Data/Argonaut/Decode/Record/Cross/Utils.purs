@@ -21,7 +21,7 @@ decodeJsonWith
    . Bind f
   => D.DecodeJsonWith f l0 r0 r1 l2 r2 r3 (Record r2)
   => GDecodeJson r2 l2
-  -- => Nub r3 r3
+  => Nub r3 r3
   => RowToList r0 l0
   => RowToList r2 l2
   => Status f

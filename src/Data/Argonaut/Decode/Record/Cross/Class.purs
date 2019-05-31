@@ -17,6 +17,7 @@ import Type.Equality (class TypeEquals, to)
 import Type.Row
   ( class Cons
   , class Lacks
+  , class Nub
   , class Union
   , Cons
   , Nil
@@ -53,18 +54,19 @@ instance decodeJsonWithNil
 
 instance decodeJsonWithCons
   :: ( Bind f
-     , Cons s dv dr' dr
-     , Cons s v rdiff' rdiff
-     , Cons s v runion' runion
-     , DecodeJsonWith f dl' dr' rdiff' lsrc rsrc runion' a
+     , Cons s fn r0' r0
+     , Cons s v r1' r1
+     , Cons s v r3' r3
+     , DecodeJsonWith f l0' r0' r1' l2 r2 r3' a
      , IsSymbol s
      , Status f
-     , Lacks s rdiff'
-     , Lacks s runion'
-     , TypeEquals dv (Json -> a -> f v)
-     , Union rdiff rsrc runion
+     , Lacks s r1'
+     , Lacks s r3'
+     , Nub r3 r3
+     , TypeEquals fn (Json -> a -> f v)
+     , Union r1 r2 r3
      )
-  => DecodeJsonWith f (Cons s dv dl') dr rdiff lsrc rsrc runion a
+  => DecodeJsonWith f (Cons s fn l0') r0 r1 l2 r2 r3 a
   where
   decodeJsonWith _ _ decoderRecord object x = do
     let
@@ -80,13 +82,13 @@ instance decodeJsonWithCons
       -- To prevent unnecessary creation of intermediate decoder records,
       -- coercion is used rather than calling `Record.delete sProxy`
       -- to induce the next expected type.
-      decoderRecord' :: Record dr'
+      decoderRecord' :: Record r0'
       decoderRecord' = unsafeCoerce decoderRecord
 
     doRest <-
       decodeJsonWith
-        (RLProxy :: RLProxy dl')
-        (RLProxy :: RLProxy lsrc)
+        (RLProxy :: RLProxy l0')
+        (RLProxy :: RLProxy l2)
         decoderRecord'
         object
         x
