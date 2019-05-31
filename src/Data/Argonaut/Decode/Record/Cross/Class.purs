@@ -27,24 +27,22 @@ import Unsafe.Coerce (unsafeCoerce)
 
 class DecodeJsonWith
   (f :: Type -> Type)
-  (l1 :: RowList)
-  (r1 :: # Type)
   (l0 :: RowList)
   (r0 :: # Type)
+  (r1 :: # Type)
   a
-  | l1 -> r1 l0 r0 a where
+  | l0 -> r0 r1 a where
   decodeJsonWith
     :: RLProxy l0
-    -> RLProxy l1
-    -> Record r1
+    -> Record r0
     -> Object Json
     -> a
-    -> f (Record r0)
+    -> f (Record r1)
 
 instance decodeJsonWithNil
   :: Status f
-  => DecodeJsonWith f Nil () Nil () a where
-  decodeJsonWith _ _ _ _ _ = report {}
+  => DecodeJsonWith f Nil () () a where
+  decodeJsonWith _ _ _ _ = report {}
 
 instance decodeJsonWithCons
   :: ( Bind f
@@ -61,11 +59,11 @@ instance decodeJsonWithCons
      , SameKeys1 dl' r' a
      , Status f
      , TypeEquals dv (Json -> a -> f v)
-     , DecodeJsonWith f dl' dr' l' r' a
+     , DecodeJsonWith f dl' dr' r' a
      )
-  => DecodeJsonWith f (Cons s dv dl') dr (Cons s v l') r a
+  => DecodeJsonWith f (Cons s dv dl') dr r a
   where
-  decodeJsonWith _ _ decoderRecord object x = do
+  decodeJsonWith _ decoderRecord object x = do
     let
       sProxy :: SProxy s
       sProxy = SProxy
@@ -84,7 +82,6 @@ instance decodeJsonWithCons
 
     rest <-
       decodeJsonWith
-        (RLProxy :: RLProxy l')
         (RLProxy :: RLProxy dl')
         decoderRecord'
         object

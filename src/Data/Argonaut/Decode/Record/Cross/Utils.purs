@@ -1,6 +1,5 @@
 module Data.Argonaut.Decode.Record.Cross.Utils
   ( decodeJsonWith
-  , decodeJsonWith'
   ) where
 
 import Prelude (class Bind, bind, ($))
@@ -14,12 +13,12 @@ import Data.Argonaut.Decode.Record.Cross.Class
 import Data.Argonaut.Decode.Record.Utils (reportJson, reportObject)
 import Data.Status (class Status, report)
 import Foreign.Object (Object)
-import Record (merge, union)
+import Record (disjointUnion)
 import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency
 import Type.Row (class Nub, class RowToList, class Union)
 
 decodeJsonWith
-  :: forall dr dl f l0 l1 l2 r0 r1 r2
+  :: forall dr dl f l1 l2 r0 r1 r2
    . Bind f
   => GDecodeJson r1 l1
   => Nub r2 r2
@@ -28,7 +27,7 @@ decodeJsonWith
   => RowToList dr dl
   => Status f
   => Union r0 r1 r2
-  => D.DecodeJsonWith f dl dr l0 r0 (Record r1)
+  => D.DecodeJsonWith f dl dr r0 (Record r1)
   => Record dr
   -> Json
   -> f (Record r2)
@@ -39,36 +38,8 @@ decodeJsonWith decoderRecord = reportJson go
     record1 <- reportObject object (RLProxy :: RLProxy l1)
     record0 <-
       D.decodeJsonWith
-        (RLProxy :: RLProxy l0)
         (RLProxy :: RLProxy dl)
         decoderRecord
         object
         record1
-    report $ merge record0 record1
-
-decodeJsonWith'
-  :: forall dr dl f l0 l1 l2 r0 r1 r2
-   . Bind f
-  => GDecodeJson r1 l1
-  => RowToList r1 l1
-  => RowToList r2 l2
-  => RowToList dr dl
-  => Status f
-  => Union r0 r1 r2
-  => D.DecodeJsonWith f dl dr l0 r0 (Record r1)
-  => Record dr
-  -> Json
-  -> f (Record r2)
-decodeJsonWith' decoderRecord = reportJson go
-  where
-  go :: Object Json -> f (Record r2)
-  go object = do
-    record1 <- reportObject object (RLProxy :: RLProxy l1)
-    record0 <-
-      D.decodeJsonWith
-        (RLProxy :: RLProxy l0)
-        (RLProxy :: RLProxy dl)
-        decoderRecord
-        object
-        record1
-    report $ union record0 record1
+    report $ disjointUnion record0 record1
