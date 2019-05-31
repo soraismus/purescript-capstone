@@ -8,7 +8,6 @@ import Prelude (class Bind, bind, identity, ($), (<<<))
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode.Record.Utils (getMissingFieldErrorMessage)
 import Data.Maybe (Maybe(Just, Nothing))
-import Data.SameKeys1 (class SameKeys1)
 import Data.Status (class Status, report, reportError)
 import Data.Symbol (class IsSymbol, SProxy(SProxy), reflectSymbol)
 import Foreign.Object (Object, lookup)
@@ -32,12 +31,12 @@ class DecodeJsonWith
   (f :: Type -> Type)
   (l0 :: RowList)
   (r0 :: # Type)
-  (r1 :: # Type)          -- no longer necessary
   a
   (lsrc :: RowList)
   (rsrc :: # Type)
   (runion :: # Type)
-  | l0 -> r0 r1 a
+  (rdiff :: # Type)
+  | l0 -> r0 a rdiff
   , lsrc -> rsrc
   , l0 lsrc -> runion
   where
@@ -51,35 +50,26 @@ class DecodeJsonWith
 
 instance decodeJsonWithNil
   :: Status f
-  => DecodeJsonWith f Nil () () a             Nil () ()
+  => DecodeJsonWith f Nil () a             lsrc rsrc rsrc ()
   where
   decodeJsonWith _ _ _ _ _ = report identity
 
 instance decodeJsonWithCons
   :: ( Bind f
-     , Cons s v r' r
      , Cons s dv dr' dr
      , IsSymbol s
-     , Lacks s r'
-     , Lacks s dr'
-     , RowToList r l
-     , RowToList r' l'
-     , RowToList dr dl
-     , RowToList dr' dl'
-     , SameKeys1 dl r a
-     , SameKeys1 dl' r' a
      , Status f
      , TypeEquals dv (Json -> a -> f v)
-     , DecodeJsonWith f dl' dr' r' a           lsrc rsrc runion'
 
-     , Nub runion runion
-     , Union rsrc r1 runion
-     , RowToList runion (Cons s v lunion')
-     , ListToRow lunion' runion'
+     , Union rdiff rsrc runion
+     , Cons s v rdiff' rdiff
+     , Lacks s rdiff'
+
+     , DecodeJsonWith f dl' dr' a           lsrc rsrc runion' rdiff'
      , Lacks s runion'
      , Cons s v runion' runion
      )
-  => DecodeJsonWith f (Cons s dv dl') dr r a        lsrc rsrc runion
+  => DecodeJsonWith f (Cons s dv dl') dr a        lsrc rsrc runion rdiff
   where
   decodeJsonWith _ _ decoderRecord object x = do
     let
