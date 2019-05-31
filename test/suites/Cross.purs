@@ -14,8 +14,7 @@ import Test.Utils (assert, check, withErrorMsg)
 suites :: TestSuite
 suites =
   suite "Cross" do
-
-    test "#i" do
+    test "#0" do
       let
         result
           :: Either
@@ -42,9 +41,7 @@ suites =
               , a3: Just "hello"
               , a4: Just true
               })
-
-
-    test "#0" do
+    test "#1" do
       let
         result
           :: Either
@@ -75,7 +72,7 @@ suites =
               , a4: Just false
               })
 
-    test "#iii" do
+    test "#2" do
       let
         result
           :: Either
@@ -108,7 +105,7 @@ suites =
               , a4: Just false
               })
 
-    test "#iv" do
+    test "#3" do
       let
         result
           :: Either
@@ -141,7 +138,7 @@ suites =
               , a4: Just false
               })
 
-    test "#1" do
+    test "#4" do
       let
         result
           :: Either
@@ -171,7 +168,7 @@ suites =
               , a3: Just "bye"
               , a4: Just false
               })
-    test "#2" do
+    test "#5" do
       let
         result
           :: Either
@@ -201,7 +198,7 @@ suites =
               , a3: Just $ show 0
               , a4: Just (1 `mod` 2 == 0)
                   })
-    test "#3" do
+    test "#6" do
       let
         isEven :: Int -> Boolean
         isEven i = (i `mod` 2) == 0
