@@ -17,7 +17,6 @@ import Data.Status (class Status, report, reportError)
 import Data.Symbol (class IsSymbol, SProxy, reflectSymbol)
 import Foreign.Object (Object)
 import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency
-import Type.Equality (class TypeEquals)
 import Type.Prelude (class ListToRow)
 import Type.Row (class RowToList, Cons, Nil)
 
@@ -58,10 +57,9 @@ reportObject object =
     Right record -> report record
 
 singleton
-  :: forall l r s v
+  :: forall r s v
    . IsSymbol s
-  => ListToRow l r
-  => TypeEquals (RLProxy l) (RLProxy (Cons s v Nil))
+  => ListToRow (Cons s v Nil) r
   => SProxy s
   -> v
   -> Record r
