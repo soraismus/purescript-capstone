@@ -14,32 +14,30 @@ import Data.Argonaut.Decode.Record.Utils (reportJson, reportObject)
 import Data.Status (class Status, report)
 import Foreign.Object (Object)
 import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency
-import Type.Row (class Nub, class RowToList, class Union)
+import Type.Row (class Nub, class RowToList)
 
 decodeJsonWith
-  :: forall dr dl f l1 l2 r0 r1 r2
+  :: forall f l0 l2 r0 r1 r2 r3
    . Bind f
-  => GDecodeJson r1 l1
-  -- => Nub r2 r2
-  => RowToList r1 l1
+  => D.DecodeJsonWith f l0 r0 r1 l2 r2 r3 (Record r2)
+  => GDecodeJson r2 l2
+  -- => Nub r3 r3
+  => RowToList r0 l0
   => RowToList r2 l2
-  => RowToList dr dl
   => Status f
-  => Union r0 r1 r2
-   => D.DecodeJsonWith f dl dr r0 l1 r1 r2 (Record r1)
-  => Record dr
+  => Record r0
   -> Json
-  -> f (Record r2)
+  -> f (Record r3)
 decodeJsonWith decoderRecord = reportJson go
   where
-  go :: Object Json -> f (Record r2)
+  go :: Object Json -> f (Record r3)
   go object = do
-    (record1 :: Record r1) <- reportObject object
-    (getFields0 :: Record r1 -> Record r2) <-
+    (record2 :: Record r2) <- reportObject object
+    (addFields1 :: Record r2 -> Record r3) <-
       D.decodeJsonWith
-        (RLProxy :: RLProxy dl)
-        (RLProxy :: RLProxy l1)
+        (RLProxy :: RLProxy l0)
+        (RLProxy :: RLProxy l2)
         decoderRecord
         object
-        record1
-    report $ getFields0 record1
+        record2
+    report $ addFields1 record2

@@ -47,7 +47,7 @@ class DecodeJsonWith
 
 instance decodeJsonWithNil
   :: Status f
-  => DecodeJsonWith f Nil () ()             lsrc rsrc rsrc a
+  => DecodeJsonWith f Nil () () l r r a
   where
   decodeJsonWith _ _ _ _ _ = report identity
 
