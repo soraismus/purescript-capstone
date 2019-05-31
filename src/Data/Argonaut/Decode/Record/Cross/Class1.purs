@@ -1,4 +1,4 @@
-module Data.Argonaut.Decode.Record.Cross.Class
+module Data.Argonaut.Decode.Record.Cross.Class2
   ( class DecodeJsonWith
   , decodeJsonWith
   ) where

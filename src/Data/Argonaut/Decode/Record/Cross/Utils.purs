@@ -15,7 +15,7 @@ import Data.Status (class Status, report)
 import Foreign.Object (Object)
 import Record (disjointUnion)
 import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency
-import Type.Row (class Nub, class RowToList, class Union)
+import Type.Row (class Nub, class RowToList, class Union, Nil)
 
 decodeJsonWith
   :: forall dr dl f l1 l2 r0 r1 r2
@@ -27,7 +27,8 @@ decodeJsonWith
   => RowToList dr dl
   => Status f
   => Union r0 r1 r2
-  => D.DecodeJsonWith f dl dr r0 (Record r1)
+  -- => D.DecodeJsonWith f dl dr r0 (Record r1)        l1 r1 r2
+  => D.DecodeJsonWith f dl dr r0 (Record r1)        Nil () r0
   => Record dr
   -> Json
   -> f (Record r2)
@@ -36,10 +37,13 @@ decodeJsonWith decoderRecord = reportJson go
   go :: Object Json -> f (Record r2)
   go object = do
     record1 <- reportObject object
-    record0 <-
+    getRecord0 <-
       D.decodeJsonWith
         (RLProxy :: RLProxy dl)
+        -- (RLProxy :: RLProxy l1)
+        (RLProxy :: RLProxy Nil)
         decoderRecord
         object
         record1
-    report $ disjointUnion record0 record1
+    report $ disjointUnion (getRecord0 {}) record1
+    --report $ getRecord0 record1
