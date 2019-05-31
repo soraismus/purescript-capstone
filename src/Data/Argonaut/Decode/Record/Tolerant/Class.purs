@@ -39,7 +39,7 @@ class D.DecodeJson a <= DecodeJson a where
   decodeJson :: Json -> Either String a
 
 instance decodeRecord
-  :: ( GDecodeJson r0 l0 r1 l1 r2 l2
+  :: ( GDecodeJson l0 l1 l2 r2
      , RowToList r2 l2
      )
   => DecodeJson (Record r2)
@@ -55,22 +55,15 @@ instance decodeRecord
       Nothing ->
         Left "Could not convert JSON to object"
 
-else instance decodeDecodeJson
-  :: D.DecodeJson a
-  => DecodeJson a
-  where
+else instance decodeDecodeJson :: D.DecodeJson a => DecodeJson a where
   decodeJson = D.decodeJson
 
 class D.GDecodeJson r2 l2 <= GDecodeJson
-  (r0 :: # Type)
   (l0 :: RowList)
-  (r1 :: # Type)
   (l1 :: RowList)
-  (r2 :: # Type)
   (l2 :: RowList)
-  | l0 -> r0
-  , l1 -> r1
-  , l2 -> r2
+  (r2 :: # Type)
+  | l2 -> r2
   where
   gDecodeJson
     :: Object Json
@@ -79,11 +72,10 @@ class D.GDecodeJson r2 l2 <= GDecodeJson
     -> RLProxy l2
     -> Either String (Record r2)
 
-instance gDecodeJsonNil :: GDecodeJson r0 l0 r1 l1 () Nil
-  where
+instance gDecodeJson_Nil :: GDecodeJson l0 l1 Nil () where
   gDecodeJson _ _ _ _ = Right {}
 
-instance gDecodeJsonCons_Plus_1
+instance gDecodeJson_ConsOne_Plus
   :: ( Cons s (f v) () r2
      , IsSymbol s
      , Lacks s ()
@@ -91,7 +83,7 @@ instance gDecodeJsonCons_Plus_1
      , Plus f
      , DecodeJson (f v)
      )
-  => GDecodeJson r0 l0 r1 l1 r2 (Cons s (f v) Nil)
+  => GDecodeJson l0 l1 (Cons s (f v) Nil) r2
   where
   gDecodeJson object _ _ _ = do
     let
@@ -106,15 +98,14 @@ instance gDecodeJsonCons_Plus_1
       Nothing ->
         Right $ singleton sProxy (empty :: f v)
 
-
-else instance gDecodeJsonCons_nonPlus_1
+else instance gDecodeJson_ConsOne_nonPlus
   :: ( Cons s v () r2
      , IsSymbol s
      , Lacks s ()
      , ListToRow (Cons s v Nil) r2
      , DecodeJson v
      )
-  => GDecodeJson r0 l0 r1 l1 r2 (Cons s v Nil)
+  => GDecodeJson l0 l1 (Cons s v Nil) r2
   where
   gDecodeJson object _ _ _ = do
     let
@@ -129,12 +120,12 @@ else instance gDecodeJsonCons_nonPlus_1
       Nothing ->
         Left $ getMissingFieldErrorMessage fieldName
 
-instance gDecodeJsonCons_Plus
+instance gDecodeJson_ConsMany_Plus
   :: ( Cons s (f v) r1' r1
      , Cons s (f v) r2' r2
      , Cons s2' v2' r2'' r2'
      , D.GDecodeJson r2'' l2''
-     , GDecodeJson r0 l0 r1' l1' r2' (Cons s2' v2' l2'')
+     , GDecodeJson l0 l1' (Cons s2' v2' l2'') r2'
      , IsSymbol s
      , IsSymbol s2'
      , Lacks s r2'
@@ -144,13 +135,7 @@ instance gDecodeJsonCons_Plus
      , DecodeJson v2'
      , TypeEquals (RLProxy l1) (RLProxy (Cons s v l1'))
      )
-  => GDecodeJson
-        r0
-        l0
-        r1
-        l1
-        r2
-        (Cons s (f v) (Cons s2' v2' l2''))
+  => GDecodeJson l0 l1 (Cons s (f v) (Cons s2' v2' l2'')) r2
   where
   gDecodeJson object _ _ _ = do
     let
@@ -170,12 +155,12 @@ instance gDecodeJsonCons_Plus
       Nothing ->
         Right $ insert sProxy empty rest
 
-else instance gDecodeJsonCons_nonPlus
+else instance gDecodeJson_ConsMany_nonPlus
   :: ( Cons s v r0' r0
      , Cons s v r2' r2
      , Cons s2' v2' r2'' r2'
      , D.GDecodeJson r2'' l2''
-     , GDecodeJson r0' l0' r1 l1 r2' (Cons s2' v2' l2'')
+     , GDecodeJson l0' l1 (Cons s2' v2' l2'') r2'
      , IsSymbol s
      , IsSymbol s2'
      , Lacks s r2'
@@ -184,13 +169,7 @@ else instance gDecodeJsonCons_nonPlus
      , DecodeJson v2'
      , TypeEquals (RLProxy l0) (RLProxy (Cons s v l0'))
      )
-  => GDecodeJson
-        r0
-        l0
-        r1
-        l1
-        r2
-        (Cons s v (Cons s2' v2' l2''))
+  => GDecodeJson l0 l1 (Cons s v (Cons s2' v2' l2'')) r2
   where
   gDecodeJson object _ _ _ = do
     let
