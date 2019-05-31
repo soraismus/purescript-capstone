@@ -68,10 +68,4 @@ singleton
 singleton sProxy value =
   unsafeSingleton (reflectSymbol sProxy) value
 
-foreign import unsafeGetSubRecord
-  :: forall r0 r1 r2
-   . Record r0
-  -> Record r1
-  -> Record r2
-
 foreign import unsafeSingleton :: forall r a. String -> a -> Record r
