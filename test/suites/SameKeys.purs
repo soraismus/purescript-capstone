@@ -1,5 +1,5 @@
 module Test.Suites.SameKeys
-  ( suitex
+  ( suites
   ) where
 
 import Prelude (Unit, discard)
@@ -25,8 +25,8 @@ assertSameKeysAndSameSize
 assertSameKeysAndSameSize _ _ =
   assert "Failure to have same keys or same size" true
 
-suitex :: TestSuite
-suitex =
+suites :: TestSuite
+suites =
   suite "SameKeys" do
 
     suite "the two arguments have identical size" do

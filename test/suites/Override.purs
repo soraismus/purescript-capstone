@@ -1,5 +1,5 @@
 module Test.Suites.Override
-  ( suitex
+  ( suites
   ) where
 
 import Prelude
@@ -11,8 +11,8 @@ import Data.Maybe (Maybe(Just))
 import Test.Unit (TestSuite, suite, test)
 import Test.Utils (assert, check, fails, withErrorMsg)
 
-suitex :: TestSuite
-suitex =
+suites :: TestSuite
+suites =
   suite "Override" do
     suite "Maybe" do
       suite "{ a0 :: Int, a1 :: Int, a2 :: Maybe Int }" do

@@ -1,6 +1,6 @@
 module Test.Suites.SameValues
   where
---   ( suitex
+--   ( suites
 --   ) where
 --
 -- import Prelude (discard)
@@ -33,8 +33,8 @@ module Test.Suites.SameValues
 -- assertSameValuesAndSameSize _ _ =
 --   assert "Failure to have same keys or same size" true
 --
--- suitex :: TestSuite
--- suitex =
+-- suites :: TestSuite
+-- suites =
 --   suite "SameValues" do
 --     suite "the two arguments have identical size" do
 --       test "Empty rowlist" do

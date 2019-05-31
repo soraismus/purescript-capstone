@@ -1,5 +1,5 @@
 module Test.Suites.Cross
-  ( suitex
+  ( suites
   ) where
 
 import Prelude
@@ -11,8 +11,8 @@ import Data.Maybe (Maybe(Just))
 import Test.Unit (TestSuite, suite, test)
 import Test.Utils (assert, check, withErrorMsg)
 
-suitex :: TestSuite
-suitex =
+suites :: TestSuite
+suites =
   suite "Cross" do
     suite "{ a0 :: Int, a1 :: Int, a2 :: Maybe Int, a3 :: Maybe String, a4 :: Maybe Boolean }" do
       suite "{ a0: 0, a1: 1, a2: Just 2, a3: Just \"hello\", a4: Just true }" do

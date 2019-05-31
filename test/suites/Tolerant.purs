@@ -1,5 +1,5 @@
 module Test.Suites.Tolerant
-  ( suitex
+  ( suites
   ) where
 
 import Prelude
@@ -41,8 +41,8 @@ instance encodeJsonFirst' :: EncodeJson a => EncodeJson (First' a) where
 foreign import jsonValue :: Json
 foreign import objectValue :: Object Json
 
-suitex :: TestSuite
-suitex =
+suites :: TestSuite
+suites =
   suite "Tolerant" do
     suite "Record -- no absent fields" do
       test "#0" do

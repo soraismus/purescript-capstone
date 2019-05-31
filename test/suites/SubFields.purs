@@ -1,5 +1,5 @@
 module Test.Suites.SubFields
-  ( suitex
+  ( suites
   ) where
 
 import Prelude (discard, pure, unit, ($))
@@ -25,8 +25,8 @@ assertSubFieldsAndSameSize
 assertSubFieldsAndSameSize _ _ =
   assert "Failure to be an equivalent record." true
 
-suitex :: TestSuite
-suitex =
+suites :: TestSuite
+suites =
   suite "SubFields" do
     suite "SubFields constraint is satisfied" do
       suite "the two arguments have identical size" do

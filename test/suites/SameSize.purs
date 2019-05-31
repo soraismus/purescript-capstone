@@ -1,5 +1,5 @@
 module Test.Suites.SameSize
-  ( suitex
+  ( suites
   ) where
 
 import Prelude (discard, pure, unit, ($))
@@ -18,8 +18,8 @@ assertSameSize
   -> Test
 assertSameSize _ _ = assert "Failure to have same size" true
 
-suitex :: TestSuite
-suitex =
+suites :: TestSuite
+suites =
   suite "SameSize" do
     suite "SameSize constraint is satisfied" do
       test "No key" do

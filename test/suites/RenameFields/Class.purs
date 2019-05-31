@@ -1,5 +1,5 @@
 module Test.Suites.RenameFields.Class
-  ( suitex
+  ( suites
   ) where
 
 import Prelude (discard, map, (<<<), ($))
@@ -20,8 +20,8 @@ data Arbitrary a (s :: Symbol) = Arbitrary
 
 foreign import foreignValue :: Json
 
-suitex :: TestSuite
-suitex =
+suites :: TestSuite
+suites =
   suite "RenameFields" do
 
     test "#0" do
