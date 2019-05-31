@@ -17,9 +17,6 @@ import Type.Equality (class TypeEquals, to)
 import Type.Row
   ( class Cons
   , class Lacks
-  , class ListToRow
-  , class Nub
-  , class RowToList
   , class Union
   , Cons
   , Nil
@@ -31,45 +28,43 @@ class DecodeJsonWith
   (f :: Type -> Type)
   (l0 :: RowList)
   (r0 :: # Type)
+  (r1 :: # Type)
+  (l2 :: RowList)
+  (r2 :: # Type)
+  (r3 :: # Type)
   a
-  (lsrc :: RowList)
-  (rsrc :: # Type)
-  (runion :: # Type)
-  (rdiff :: # Type)
-  | l0 -> r0 a rdiff
-  , lsrc -> rsrc
-  , l0 lsrc -> runion
+  | l0 -> r0 a r1
+  , l2 -> r2
+  , l0 l2 -> r3
   where
   decodeJsonWith
     :: RLProxy l0
-    -> RLProxy lsrc
+    -> RLProxy l2
     -> Record r0
     -> Object Json
     -> a
-    -> f (Record rsrc -> Record runion)
+    -> f (Record r2 -> Record r3)
 
 instance decodeJsonWithNil
   :: Status f
-  => DecodeJsonWith f Nil () a             lsrc rsrc rsrc ()
+  => DecodeJsonWith f Nil () ()             lsrc rsrc rsrc a
   where
   decodeJsonWith _ _ _ _ _ = report identity
 
 instance decodeJsonWithCons
   :: ( Bind f
      , Cons s dv dr' dr
+     , Cons s v rdiff' rdiff
+     , Cons s v runion' runion
+     , DecodeJsonWith f dl' dr' rdiff' lsrc rsrc runion' a
      , IsSymbol s
      , Status f
-     , TypeEquals dv (Json -> a -> f v)
-
-     , Union rdiff rsrc runion
-     , Cons s v rdiff' rdiff
      , Lacks s rdiff'
-
-     , DecodeJsonWith f dl' dr' a           lsrc rsrc runion' rdiff'
      , Lacks s runion'
-     , Cons s v runion' runion
+     , TypeEquals dv (Json -> a -> f v)
+     , Union rdiff rsrc runion
      )
-  => DecodeJsonWith f (Cons s dv dl') dr a        lsrc rsrc runion rdiff
+  => DecodeJsonWith f (Cons s dv dl') dr rdiff lsrc rsrc runion a
   where
   decodeJsonWith _ _ decoderRecord object x = do
     let

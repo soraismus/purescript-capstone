@@ -20,13 +20,13 @@ decodeJsonWith
   :: forall dr dl f l1 l2 r0 r1 r2
    . Bind f
   => GDecodeJson r1 l1
-  => Nub r2 r2
+  -- => Nub r2 r2
   => RowToList r1 l1
   => RowToList r2 l2
   => RowToList dr dl
   => Status f
   => Union r0 r1 r2
-  => D.DecodeJsonWith f dl dr (Record r1)        l1 r1 r2           r0
+   => D.DecodeJsonWith f dl dr r0 l1 r1 r2 (Record r1)
   => Record dr
   -> Json
   -> f (Record r2)
@@ -34,8 +34,8 @@ decodeJsonWith decoderRecord = reportJson go
   where
   go :: Object Json -> f (Record r2)
   go object = do
-    record1 <- reportObject object
-    getFields0 <-
+    (record1 :: Record r1) <- reportObject object
+    (getFields0 :: Record r1 -> Record r2) <-
       D.decodeJsonWith
         (RLProxy :: RLProxy dl)
         (RLProxy :: RLProxy l1)
