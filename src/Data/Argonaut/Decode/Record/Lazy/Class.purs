@@ -3,7 +3,7 @@ module Data.Argonaut.Decode.Record.Lazy.Class
   , gDecodeJson
   ) where
 
-import Prelude (bind, ($), (=<<))
+import Prelude (bind, ($))
 
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode.Class (class DecodeJson, decodeJson) as D
@@ -55,26 +55,25 @@ instance gDecodeJson_ConsNilCons
   => GDecodeJson (Cons s v l') r Nil () (Cons s v l') r
   where
   gDecodeJson _ _ object record = do
-    let
-      sProxy :: SProxy s
-      sProxy = SProxy
-
-      fieldName :: String
-      fieldName = reflectSymbol sProxy
-
-    (x :: Record r') <-
-      gDecodeJson
-        (RLProxy :: RLProxy Nil)
-        (RLProxy :: RLProxy l')
-        object
-        record
-
     case lookup fieldName object of
       Just jsonVal -> do
+        intermediate <- gDecodeJson nil l_ object record
         val <- D.decodeJson jsonVal
-        report $ insert sProxy val x
+        report $ insert s val intermediate
       Nothing ->
         reportError $ getMissingFieldErrorMessage fieldName
+    where
+    s :: SProxy s
+    s = SProxy
+
+    fieldName :: String
+    fieldName = reflectSymbol s
+
+    nil :: RLProxy Nil
+    nil = RLProxy
+
+    l_ :: RLProxy l'
+    l_ = RLProxy
 
 instance gDecodeJson_NilConsCons
   :: GDecodeJson Nil () (Cons s v l') r (Cons s v l') r
@@ -94,23 +93,22 @@ else instance gDecodeJson_ConsConsCons
   => GDecodeJson (Cons s v2 l0') r0 (Cons s1 v1 l1') r1 (Cons s v2 l2') r2
   where
   gDecodeJson _ _ object record = do
-    let
-      sProxy :: SProxy s
-      sProxy = SProxy
-
-      fieldName :: String
-      fieldName = reflectSymbol sProxy
-
-    (x :: Record r2') <-
-      gDecodeJson
-        (RLProxy :: RLProxy (Cons s1 v1 l1'))
-        (RLProxy :: RLProxy l2')
-        object
-        record
-
     case lookup fieldName object of
       Just jsonVal -> do
+        intermediate <- gDecodeJson l1 l2_ object record
         val <- D.decodeJson jsonVal
-        report $ insert sProxy val x
+        report $ insert s val intermediate
       Nothing ->
         reportError $ getMissingFieldErrorMessage fieldName
+    where
+    s :: SProxy s
+    s = SProxy
+
+    fieldName :: String
+    fieldName = reflectSymbol s
+
+    l1 :: RLProxy (Cons s1 v1 l1')
+    l1 = RLProxy
+
+    l2_ :: RLProxy l2'
+    l2_ = RLProxy
