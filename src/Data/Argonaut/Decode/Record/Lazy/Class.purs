@@ -3,7 +3,7 @@ module Data.Argonaut.Decode.Record.Lazy.Class
   , gDecodeJson
   ) where
 
-import Prelude (bind, identity, ($), (<<<))
+import Prelude (bind, const, identity, ($), (<<<))
 
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode.Class (class DecodeJson, decodeJson) as D
@@ -24,36 +24,55 @@ import Type.Row
   , kind RowList
   )
 
+-- class GDecodeJson
+--   (l0 :: RowList)
+--   (r0 :: # Type)
+--   (l1 :: RowList)
+--   (r1 :: # Type)
+--   (r2 :: # Type)
+--   | l0 -> r0
+--   , l1 -> r1
+--   , l0 l1 -> r2
+--   where
+--   gDecodeJson
+--     :: RLProxy l0
+--     -> RLProxy l1
+--     -> Object Json
+--     -> Either String (Record r1 -> Record r2)
+
 class GDecodeJson
   (l0 :: RowList)
   (r0 :: # Type)
   (l1 :: RowList)
   (r1 :: # Type)
+  (l2 :: RowList)
   (r2 :: # Type)
-  | l0 -> r0
-  , l1 -> r1
-  , l0 l1 -> r2
+  | l1 -> r1
+  , l2 -> r2
+  , l1 l2 -> l0 r0
   where
   gDecodeJson
-    :: RLProxy l0
-    -> RLProxy l1
+    :: RLProxy l1
+    -> RLProxy l2
     -> Object Json
     -> Either String (Record r1 -> Record r2)
 
-instance gDecodeJson_Nil :: GDecodeJson Nil () l r r where
+-- instance gDecodeJson_Nil :: GDecodeJson Nil () l r l r where
+--   gDecodeJson _ _ _ = report identity
+
+instance gDecodeJson__0 :: GDecodeJson Nil () Nil () Nil () where
   gDecodeJson _ _ _ = report identity
 
-instance gDecodeJson_Cons
-  :: ( Cons s v r0' r0
-     , Cons s v r2' r2
+instance gDecodeJson__2
+  :: ( Cons s v r' r
      , D.DecodeJson v
-     , GDecodeJson l0' r0' l1 r1 r2'
+     , GDecodeJson l' r' Nil () l' r'
      , IsSymbol s
-     , Lacks s r1
-     , Lacks s r2'
-     , Union r0 r1 r2
+     --, Lacks s ()
+     , Lacks s r'
+     --, Union r () r
      )
-  => GDecodeJson (Cons s v l0') r0 l1 r1 r2
+  => GDecodeJson (Cons s v l') r Nil () (Cons s v l') r
   where
   gDecodeJson _ _ object = do
     let
@@ -65,8 +84,47 @@ instance gDecodeJson_Cons
 
     doRest <-
       gDecodeJson
-        (RLProxy :: RLProxy l0')
-        (RLProxy :: RLProxy l1)
+        (RLProxy :: RLProxy Nil)
+        (RLProxy :: RLProxy l')
+        object
+
+    case lookup fieldName object of
+      Just jsonVal -> do
+        val <- D.decodeJson jsonVal
+        report $ insert sProxy val <<< doRest
+      Nothing ->
+        reportError $ getMissingFieldErrorMessage fieldName
+
+instance gDecodeJson__1
+  :: GDecodeJson Nil () (Cons s v l') r (Cons s v l') r
+  where
+  gDecodeJson _ _ _ = report identity
+
+else instance gDecodeJson__3
+  :: ( Cons s v r0' r0
+     , Cons s v r2' r2
+     , D.DecodeJson v
+     , GDecodeJson l0' r0' (Cons s1 v1 l1') r1 l2' r2'
+     , IsSymbol s
+     , Lacks s r1
+     , Lacks s r2'
+     , Union r0 r1 r2
+     )
+  -- => GDecodeJson (Cons s v l0') r0 l1 r1 l2 r2
+  => GDecodeJson (Cons s v2 l0') r0 (Cons s1 v1 l1') r1 (Cons s v2 l2') r2
+  where
+  gDecodeJson _ _ object = do
+    let
+      sProxy :: SProxy s
+      sProxy = SProxy
+
+      fieldName :: String
+      fieldName = reflectSymbol sProxy
+
+    doRest <-
+      gDecodeJson
+        (RLProxy :: RLProxy (Cons s1 v1 l1'))
+        (RLProxy :: RLProxy l2')
         object
 
     case lookup fieldName object of
