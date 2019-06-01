@@ -1,6 +1,7 @@
 module Data.RecordLike
   ( class RDelete
   , class RDisjointUnion
+  , class REmpty
   , class REqual
   , class RGet
   , class RInsert
@@ -13,6 +14,7 @@ module Data.RecordLike
   , rget
   , rdelete
   , rdisjointUnion
+  , rempty
   , requal
   , rinsert
   , rmerge
@@ -114,6 +116,15 @@ instance rdisjointUnionRecord :: RDisjointUnion Record l0 r0 l1 r1 l2 r2 where
 
 instance rdisjointUnionRProxy :: RDisjointUnion RProxy l0 r0 l1 r1 l2 r2 where
   rdisjointUnion _ _ _ _ _= RProxy
+
+class REmpty (f :: # Type -> Type) where
+  rempty :: f ()
+
+instance remptyRecord :: REmpty Record where
+  rempty = {}
+
+instance remptyRProxy :: REmpty RProxy where
+  rempty = RProxy
 
 class REqual
   (f :: # Type -> Type)
