@@ -62,8 +62,8 @@ instance gDecodeJson_ConsNilCons
   gDecodeJson _ _ object record = do
     case lookup fieldName object of
       Just jsonVal -> do
-        intermediate <- gDecodeJson nil l' object record
         val <- D.decodeJson jsonVal
+        intermediate <- gDecodeJson nil l' object record
         report $ rinsert l' l s val intermediate
       Nothing ->
         reportError $ getMissingFieldErrorMessage fieldName
@@ -103,18 +103,18 @@ else instance gDecodeJson_ConsConsCons
   => GDecodeJson
         (Either String)
         g
-        (Cons s v2 l0')
+        (Cons s v l0')
         r0
         (Cons s1 v1 l1')
         r1
-        (Cons s v2 l2')
+        (Cons s v l2')
         r2
   where
   gDecodeJson _ _ object record = do
     case lookup fieldName object of
       Just jsonVal -> do
-        intermediate <- gDecodeJson l1 l2' object record
         val <- D.decodeJson jsonVal
+        intermediate <- gDecodeJson l1 l2' object record
         report $ rinsert l2' l2 s val intermediate
       Nothing ->
         reportError $ getMissingFieldErrorMessage fieldName
