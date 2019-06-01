@@ -10,10 +10,10 @@ import Data.Argonaut.Decode.Class (class DecodeJson, decodeJson) as D
 import Data.Argonaut.Decode.Record.Utils (getMissingFieldErrorMessage)
 import Data.Either (Either)
 import Data.Maybe (Maybe(Just, Nothing))
+import Data.RecordLike (class RInsert, rinsert)
 import Data.Status (class Status, report, reportError)
 import Data.Symbol (class IsSymbol, SProxy(SProxy), reflectSymbol)
 import Foreign.Object (Object, lookup)
-import Record (insert)
 import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency
 import Type.Row
   ( class Cons
@@ -52,26 +52,30 @@ instance gDecodeJson_NilNilNil
 instance gDecodeJson_ConsNilCons
   :: ( Cons s v r' r
      , D.DecodeJson v
-     , GDecodeJson (Either String) Record l' r' Nil () l' r'
+     , GDecodeJson (Either String) g l' r' Nil () l' r'
      , IsSymbol s
      , Lacks s r'
+     , RInsert g SProxy s l' r' l r
      )
-  => GDecodeJson (Either String) Record (Cons s v l') r Nil () (Cons s v l') r
+  => GDecodeJson (Either String) g (Cons s v l') r Nil () (Cons s v l') r
   where
   gDecodeJson _ _ object record = do
     case lookup fieldName object of
       Just jsonVal -> do
-        intermediate <- gDecodeJson nil l_ object record
+        intermediate <- gDecodeJson nil l' object record
         val <- D.decodeJson jsonVal
-        report $ insert s val intermediate
+        report $ rinsert l' l s val intermediate
       Nothing ->
         reportError $ getMissingFieldErrorMessage fieldName
     where
     fieldName :: String
     fieldName = reflectSymbol s
 
-    l_ :: RLProxy l'
-    l_ = RLProxy
+    l' :: RLProxy l'
+    l' = RLProxy
+
+    l :: RLProxy l
+    l = RLProxy
 
     nil :: RLProxy Nil
     nil = RLProxy
@@ -89,15 +93,16 @@ else instance gDecodeJson_ConsConsCons
   :: ( Cons s v r0' r0
      , Cons s v r2' r2
      , D.DecodeJson v
-     , GDecodeJson (Either String) Record l0' r0' (Cons s1 v1 l1') r1 l2' r2'
+     , GDecodeJson (Either String) g l0' r0' (Cons s1 v1 l1') r1 l2' r2'
      , IsSymbol s
      , Lacks s r1
      , Lacks s r2'
+     , RInsert g SProxy s l2' r2' l2 r2
      , Union r0 r1 r2
      )
   => GDecodeJson
         (Either String)
-        Record
+        g
         (Cons s v2 l0')
         r0
         (Cons s1 v1 l1')
@@ -108,9 +113,9 @@ else instance gDecodeJson_ConsConsCons
   gDecodeJson _ _ object record = do
     case lookup fieldName object of
       Just jsonVal -> do
-        intermediate <- gDecodeJson l1 l2_ object record
+        intermediate <- gDecodeJson l1 l2' object record
         val <- D.decodeJson jsonVal
-        report $ insert s val intermediate
+        report $ rinsert l2' l2 s val intermediate
       Nothing ->
         reportError $ getMissingFieldErrorMessage fieldName
     where
@@ -120,8 +125,11 @@ else instance gDecodeJson_ConsConsCons
     l1 :: RLProxy (Cons s1 v1 l1')
     l1 = RLProxy
 
-    l2_ :: RLProxy l2'
-    l2_ = RLProxy
+    l2' :: RLProxy l2'
+    l2' = RLProxy
+
+    l2 :: RLProxy l2
+    l2 = RLProxy
 
     s :: SProxy s
     s = SProxy
