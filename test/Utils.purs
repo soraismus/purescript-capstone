@@ -30,7 +30,14 @@ import Test.Unit.Assert as Assert
 assert :: Tuple String Boolean -> Test
 assert = uncurry Assert.assert
 
-assertEquivalence :: forall f a. Status f => Eq a => Show a => f a -> a -> Test
+assertEquivalence
+  :: forall f a
+   . Status f
+  => Eq a
+  => Show a
+  => f a
+  -> a
+  -> Test
 assertEquivalence result value =
   assert $ checkEquivalence result value
 

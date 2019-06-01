@@ -15,14 +15,15 @@ import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency
 import Type.Row (class RowToList, class Union)
 
 decodeJson
-  :: forall l0 r0 l1 r1 r2
+  :: forall f l0 r0 l1 r1 r2
    . D.GDecodeJson l0 r0 l1 r1 r2
   => RowToList r0 l0
   => RowToList r1 l1
   => Union r0 r1 r2
-  => Json
+  => f r0
+  -> Json
   -> Either String (Record r1 -> Record r2)
-decodeJson =
+decodeJson _ =
   reportJson
     $ D.gDecodeJson
         (RLProxy :: RLProxy l0)

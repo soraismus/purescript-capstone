@@ -49,7 +49,7 @@ instance gDecodeJson_Cons
      , D.DecodeJson v
      , GDecodeJson l0' r0' l1 r1 r2'
      , IsSymbol s
-     , Lacks s r1'
+     , Lacks s r1
      , Lacks s r2'
      , Union r0 r1 r2
      )
