@@ -17,7 +17,6 @@ import Type.Equality (class TypeEquals, to)
 import Type.Row
   ( class Cons
   , class Lacks
-  , class Nub
   , class Union
   , Cons
   , Nil

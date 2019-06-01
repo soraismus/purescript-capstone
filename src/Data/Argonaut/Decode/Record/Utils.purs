@@ -21,10 +21,9 @@ import Type.Prelude (class ListToRow)
 import Type.Row (class RowToList, Cons, Nil)
 
 elaborateFailure :: forall a. String -> Either String a -> Either String a
-elaborateFailure s e =
-  lmap msg e
+elaborateFailure s e = lmap msg e
   where
-    msg m = "Failed to decode key '" <> s <> "': " <> m
+  msg m = "Failed to decode key '" <> s <> "': " <> m
 
 getMissingFieldErrorMessage :: String -> String
 getMissingFieldErrorMessage fieldName =
@@ -33,12 +32,7 @@ getMissingFieldErrorMessage fieldName =
 notObjectErrorMessage :: String
 notObjectErrorMessage = "Could not convert JSON to object"
 
-reportJson
-  :: forall a f r
-   . Status f
-  => (Object Json -> f a)
-  -> Json
-  -> f a
+reportJson :: forall a f . Status f => (Object Json -> f a) -> Json -> f a
 reportJson f json =
   case toObject json of
     Just object -> f object
