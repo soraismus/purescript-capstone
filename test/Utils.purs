@@ -3,6 +3,7 @@ module Test.Utils
   , assertEquivalence
   , check
   , check'
+  , checkError
   , capriciousFailure
   , doesntFail
   , doesntMeetExpectations
@@ -22,6 +23,7 @@ module Test.Utils
 
 import Prelude (class Eq, class Show, show, (==), (<>), ($))
 
+import Data.Either (Either)
 import Data.Status (class Status, isError, summarize)
 import Data.Tuple (Tuple(Tuple), uncurry)
 import Test.Unit (Test)
@@ -88,6 +90,14 @@ checkEquivalence result value =
         msg' = if state then successful else ("Should be " <> show value)
       in Tuple msg' state)
     result
+
+checkError
+  :: forall a
+   . Either String a
+  -> String
+  -> (a -> Boolean)
+  -> Tuple String Boolean
+checkError = check
 
 doesntFail :: String
 doesntFail = "is decoded despite expectation of failure"

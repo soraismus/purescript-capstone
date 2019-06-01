@@ -8,7 +8,7 @@ import Data.Argonaut.Decode.Record.Lazy (decodeJson')
 import Data.Argonaut.Encode (encodeJson)
 import Data.Maybe (Maybe(Just))
 import Test.Unit (TestSuite, suite, test)
-import Test.Utils (assert, check, withErrorMsg)
+import Test.Utils (assert, checkError, withErrorMsg)
 
 suites :: TestSuite
 suites =
@@ -24,7 +24,7 @@ suites =
                  }
         value1 = {}
         result = decodeJson' (encodeJson value0) value1
-      assert $ check result withErrorMsg (_ == value0)
+      assert $ checkError result withErrorMsg (_ == value0)
 
     test "#1" do
       let
@@ -37,7 +37,7 @@ suites =
         value1 = { b0: "b0" }
         result = decodeJson' (encodeJson value0) value1
       assert
-        $ check
+        $ checkError
             result
             withErrorMsg
             (_ == { a0: value0.a0
@@ -59,7 +59,7 @@ suites =
         value1 = { b0: "b0", b1: 1000, b2: 1002 }
         result = decodeJson' (encodeJson value0) value1
       assert
-        $ check
+        $ checkError
             result
             withErrorMsg
             (_ == { a0: value0.a0
@@ -83,7 +83,7 @@ suites =
 --         value1 = { a0: 1000 }
 --         result = decodeJson' (encodeJson value0) value1
 --       assert
---         $ check
+--         $ checkError
 --             result
 --             withErrorMsg
 --             (_ == { a0: value0.a0
@@ -104,7 +104,7 @@ suites =
 --         value1 = { a0: "b0" }
 --         result = decodeJson' (encodeJson value0) value1
 --       assert
---         $ check
+--         $ checkError
 --             result
 --             withErrorMsg
 --             (_ == { a0: value0.a0

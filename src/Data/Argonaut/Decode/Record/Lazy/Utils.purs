@@ -10,6 +10,7 @@ import Data.Argonaut.Decode.Record.Lazy.Class
   ) as D
 import Data.Argonaut.Decode.Record.Utils (reportJson)
 import Data.Either (Either)
+import Data.Status (class Status)
 import Foreign.Object (Object)
 import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency
 import Type.Row (class RowToList, class Union, Nil)
@@ -25,17 +26,18 @@ decodeJson
 decodeJson json = decodeJson' json {}
 
 decodeJson'
-  :: forall f l0 l1 l2 r0 r1 r2
-   . D.GDecodeJson (Either String) f l0 r0 l1 r1 l2 r2
+  :: forall f g l0 l1 l2 r0 r1 r2
+   . D.GDecodeJson f g l0 r0 l1 r1 l2 r2
   => RowToList r1 l1
   => RowToList r2 l2
+  => Status f
   => Union r0 r1 r2
   => Json
-  -> f r1
-  -> Either String (f r2)
+  -> g r1
+  -> f (g r2)
 decodeJson' json record = reportJson go json
   where
-  go :: Object Json -> Either String (f r2)
+  go :: Object Json -> f (g r2)
   go object =
     D.gDecodeJson
       (RLProxy :: RLProxy l1)
