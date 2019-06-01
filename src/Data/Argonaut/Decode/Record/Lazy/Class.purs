@@ -63,17 +63,17 @@ instance gDecodeJson_ConsNilCons
       Nothing ->
         reportError $ getMissingFieldErrorMessage fieldName
     where
-    s :: SProxy s
-    s = SProxy
-
     fieldName :: String
     fieldName = reflectSymbol s
+
+    l_ :: RLProxy l'
+    l_ = RLProxy
 
     nil :: RLProxy Nil
     nil = RLProxy
 
-    l_ :: RLProxy l'
-    l_ = RLProxy
+    s :: SProxy s
+    s = SProxy
 
 instance gDecodeJson_NilConsCons
   :: GDecodeJson Nil () (Cons s v l') r (Cons s v l') r
@@ -101,9 +101,6 @@ else instance gDecodeJson_ConsConsCons
       Nothing ->
         reportError $ getMissingFieldErrorMessage fieldName
     where
-    s :: SProxy s
-    s = SProxy
-
     fieldName :: String
     fieldName = reflectSymbol s
 
@@ -112,3 +109,6 @@ else instance gDecodeJson_ConsConsCons
 
     l2_ :: RLProxy l2'
     l2_ = RLProxy
+
+    s :: SProxy s
+    s = SProxy
