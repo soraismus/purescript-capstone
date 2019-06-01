@@ -4,22 +4,26 @@ module Test.Suites.Lazy
 
 import Prelude
 
-import Data.Argonaut.Decode.Record.Cross (decodeJsonWith)
 import Data.Argonaut.Decode.Record.Lazy (decodeJson)
 import Data.Argonaut.Encode (encodeJson)
-import Data.Either (Either(Right))
+import Data.Either (Either)
 import Data.Maybe (Maybe(Just))
 import Test.Unit (TestSuite, suite, test)
 import Test.Utils (assert, check, withErrorMsg)
-import Type.Row (RProxy(RProxy))
 
 suites :: TestSuite
 suites =
-  suite "Cross" do
+  suite "Lazy" do
 
     test "#0" do
       let
-        value = { a0: 0, a1: 1, a2: Just 2, a3: Just "hello", a4: Just true }
+        value0 = { a0: 0
+                 , a1: 1
+                 , a2: Just 2
+                 , a3: Just "hello"
+                 , a4: Just true
+                 }
+        value1 = {}
         getResult
           :: Either
               String
@@ -33,8 +37,8 @@ suites =
                   , a4 :: Maybe Boolean
                   }
               )
-        getResult = decodeJson value (encodeJson value)
-      assert $ check getResult withErrorMsg \f -> f {} == value
+        getResult = decodeJson value0 (encodeJson value0)
+      assert $ check getResult withErrorMsg \f -> f value1 == value0
 
     test "#1" do
       let
