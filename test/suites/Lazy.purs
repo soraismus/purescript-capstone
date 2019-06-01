@@ -4,7 +4,7 @@ module Test.Suites.Lazy
 
 import Prelude (discard, (==), ($))
 
-import Data.Argonaut.Decode.Record.Lazy (decodeJson)
+import Data.Argonaut.Decode.Record.Lazy (decodeJson')
 import Data.Argonaut.Encode (encodeJson)
 import Data.Maybe (Maybe(Just))
 import Test.Unit (TestSuite, suite, test)
@@ -23,7 +23,7 @@ suites =
                  , a4: Just true
                  }
         value1 = {}
-        getResult = decodeJson $ encodeJson value0
+        getResult = decodeJson' $ encodeJson value0
       assert $ check getResult withErrorMsg \f -> f value1 == value0
 
     test "#1" do
@@ -35,7 +35,7 @@ suites =
                  , a4: Just true
                  }
         value1 = { b0: "b0" }
-        getResult = decodeJson $ encodeJson value0
+        getResult = decodeJson' $ encodeJson value0
       assert
         $ check
             getResult
@@ -57,7 +57,7 @@ suites =
                  , a4: Just true
                  }
         value1 = { b0: "b0", b1: 1000, b2: 1002 }
-        getResult = decodeJson $ encodeJson value0
+        getResult = decodeJson' $ encodeJson value0
       assert
         $ check
             getResult
@@ -94,7 +94,7 @@ suites =
 --                   , a4 :: Maybe Boolean
 --                   }
 --               )
---         getResult = decodeJson (encodeJson value0)
+--         getResult = decodeJson' (encodeJson value0)
 --       assert
 --         $ check
 --             getResult
@@ -129,7 +129,7 @@ suites =
 --                   , b0 :: String
 --                   }
 --               )
---         getResult = decodeJson $ encodeJson value0
+--         getResult = decodeJson' $ encodeJson value0
 --       assert
 --         $ check
 --             getResult
