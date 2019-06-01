@@ -25,17 +25,17 @@ decodeJson
 decodeJson json = decodeJson' json {}
 
 decodeJson'
-  :: forall l0 l1 l2 r0 r1 r2
-   . D.GDecodeJson (Either String) Record l0 r0 l1 r1 l2 r2
+  :: forall f l0 l1 l2 r0 r1 r2
+   . D.GDecodeJson (Either String) f l0 r0 l1 r1 l2 r2
   => RowToList r1 l1
   => RowToList r2 l2
   => Union r0 r1 r2
   => Json
-  -> Record r1
-  -> Either String (Record r2)
+  -> f r1
+  -> Either String (f r2)
 decodeJson' json record = reportJson go json
   where
-  go :: Object Json -> Either String (Record r2)
+  go :: Object Json -> Either String (f r2)
   go object =
     D.gDecodeJson
       (RLProxy :: RLProxy l1)
