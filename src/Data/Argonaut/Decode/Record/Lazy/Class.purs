@@ -8,8 +8,9 @@ import Prelude (bind, identity, ($), (<<<))
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode.Class (class DecodeJson, decodeJson) as D
 import Data.Argonaut.Decode.Record.Utils (getMissingFieldErrorMessage)
-import Data.Either (Either(Left, Right))
+import Data.Either (Either)
 import Data.Maybe (Maybe(Just, Nothing))
+import Data.Status (report, reportError)
 import Data.Symbol (class IsSymbol, SProxy(SProxy), reflectSymbol)
 import Foreign.Object (Object, lookup)
 import Record (insert)
@@ -40,7 +41,7 @@ class GDecodeJson
     -> Either String (Record r1 -> Record r2)
 
 instance gDecodeJson_Nil :: GDecodeJson Nil () l r r where
-  gDecodeJson _ _ _ = Right identity
+  gDecodeJson _ _ _ = report identity
 
 instance gDecodeJson_Cons
   :: ( Cons s v r0' r0
@@ -71,6 +72,6 @@ instance gDecodeJson_Cons
     case lookup fieldName object of
       Just jsonVal -> do
         val <- D.decodeJson jsonVal
-        Right $ insert sProxy val <<< doRest
+        report $ insert sProxy val <<< doRest
       Nothing ->
-        Left $ getMissingFieldErrorMessage fieldName
+        reportError $ getMissingFieldErrorMessage fieldName
