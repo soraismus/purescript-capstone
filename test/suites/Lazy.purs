@@ -37,7 +37,7 @@ suites =
                   , a4 :: Maybe Boolean
                   }
               )
-        getResult = decodeJson value1 (encodeJson value0)
+        getResult = decodeJson (encodeJson value0)
       assert $ check getResult withErrorMsg \f -> f value1 == value0
 
     test "#1" do
@@ -63,7 +63,7 @@ suites =
                   , b0 :: String
                   }
               )
-        getResult = decodeJson value1 (encodeJson value0)
+        getResult = decodeJson (encodeJson value0)
       assert
         $ check
             getResult

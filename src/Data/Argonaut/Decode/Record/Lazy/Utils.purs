@@ -31,18 +31,13 @@ import Type.Row (class RowToList, class Union)
 
 decodeJson
   :: forall f l0 l1 l2 r0 r1 r2
-  -- . D.GDecodeJson l0 r0 l1 r1 r2
    . D.GDecodeJson l0 r0 l1 r1 l2 r2
-  -- => RowToList r0 l0
-  -- => RowToList r1 l1
-
   => RowToList r1 l1
   => RowToList r2 l2
   => Union r0 r1 r2
-  => f r1
-  -> Json
+  => Json
   -> Either String (Record r1 -> Record r2)
-decodeJson _ =
+decodeJson =
   reportJson
     $ D.gDecodeJson
         (RLProxy :: RLProxy l1)
