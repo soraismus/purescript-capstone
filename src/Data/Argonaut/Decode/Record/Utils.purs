@@ -34,11 +34,11 @@ notObjectErrorMessage :: String
 notObjectErrorMessage = "Could not convert JSON to object"
 
 reportJson
-  :: forall f r
+  :: forall a f r
    . Status f
-  => (Object Json -> f (Record r))
+  => (Object Json -> f a)
   -> Json
-  -> f (Record r)
+  -> f a
 reportJson f json =
   case toObject json of
     Just object -> f object

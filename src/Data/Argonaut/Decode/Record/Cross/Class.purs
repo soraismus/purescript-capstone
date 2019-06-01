@@ -26,7 +26,7 @@ import Type.Row
 import Unsafe.Coerce (unsafeCoerce)
 
 class DecodeJsonWith
-  (f :: Type -> Type)
+  (f  :: Type -> Type)
   (l0 :: RowList)
   (r0 :: # Type)
   (r1 :: # Type)
@@ -62,7 +62,6 @@ instance decodeJsonWithCons
      , Status f
      , Lacks s r1'
      , Lacks s r3'
-     , Nub r3 r3
      , TypeEquals fn (Json -> a -> f v)
      , Union r1 r2 r3
      )
