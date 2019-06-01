@@ -3,7 +3,7 @@ module Data.Argonaut.Decode.Record.Lazy.Class
   , gDecodeJson
   ) where
 
-import Prelude (bind, identity, ($), (<<<))
+import Prelude (bind, ($), (=<<))
 
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode.Class (class DecodeJson, decodeJson) as D
@@ -39,10 +39,11 @@ class GDecodeJson
     :: RLProxy l1
     -> RLProxy l2
     -> Object Json
-    -> Either String (Record r1 -> Record r2)
+    -> Record r1
+    -> Either String (Record r2)
 
 instance gDecodeJson_NilNilNil :: GDecodeJson Nil () Nil () Nil () where
-  gDecodeJson _ _ _ = report identity
+  gDecodeJson _ _ _ = report
 
 instance gDecodeJson_ConsNilCons
   :: ( Cons s v r' r
@@ -53,7 +54,7 @@ instance gDecodeJson_ConsNilCons
      )
   => GDecodeJson (Cons s v l') r Nil () (Cons s v l') r
   where
-  gDecodeJson _ _ object = do
+  gDecodeJson _ _ object record = do
     let
       sProxy :: SProxy s
       sProxy = SProxy
@@ -61,23 +62,24 @@ instance gDecodeJson_ConsNilCons
       fieldName :: String
       fieldName = reflectSymbol sProxy
 
-    doRest <-
+    (x :: Record r') <-
       gDecodeJson
         (RLProxy :: RLProxy Nil)
         (RLProxy :: RLProxy l')
         object
+        record
 
     case lookup fieldName object of
       Just jsonVal -> do
         val <- D.decodeJson jsonVal
-        report $ insert sProxy val <<< doRest
+        report $ insert sProxy val x
       Nothing ->
         reportError $ getMissingFieldErrorMessage fieldName
 
 instance gDecodeJson_NilConsCons
   :: GDecodeJson Nil () (Cons s v l') r (Cons s v l') r
   where
-  gDecodeJson _ _ _ = report identity
+  gDecodeJson _ _ _ = report
 
 else instance gDecodeJson_ConsConsCons
   :: ( Cons s v r0' r0
@@ -91,7 +93,7 @@ else instance gDecodeJson_ConsConsCons
      )
   => GDecodeJson (Cons s v2 l0') r0 (Cons s1 v1 l1') r1 (Cons s v2 l2') r2
   where
-  gDecodeJson _ _ object = do
+  gDecodeJson _ _ object record = do
     let
       sProxy :: SProxy s
       sProxy = SProxy
@@ -99,15 +101,16 @@ else instance gDecodeJson_ConsConsCons
       fieldName :: String
       fieldName = reflectSymbol sProxy
 
-    doRest <-
+    (x :: Record r2') <-
       gDecodeJson
         (RLProxy :: RLProxy (Cons s1 v1 l1'))
         (RLProxy :: RLProxy l2')
         object
+        record
 
     case lookup fieldName object of
       Just jsonVal -> do
         val <- D.decodeJson jsonVal
-        report $ insert sProxy val <<< doRest
+        report $ insert sProxy val x
       Nothing ->
         reportError $ getMissingFieldErrorMessage fieldName

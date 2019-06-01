@@ -3,8 +3,6 @@ module Data.Argonaut.Decode.Record.Lazy.Utils
   , decodeJson'
   ) where
 
-import Prelude (bind, pure, ($))
-
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode.Record.Lazy.Class
   ( class GDecodeJson
@@ -12,6 +10,7 @@ import Data.Argonaut.Decode.Record.Lazy.Class
   ) as D
 import Data.Argonaut.Decode.Record.Utils (reportJson)
 import Data.Either (Either)
+import Foreign.Object (Object)
 import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency
 import Type.Row (class RowToList, class Union, Nil)
 
@@ -23,9 +22,7 @@ decodeJson
   => Union r () r
   => Json
   -> Either String (Record r)
-decodeJson json = do
-  f <- decodeJson' json
-  pure $ f {}
+decodeJson json = decodeJson' json {}
 
 decodeJson'
   :: forall l0 l1 l2 r0 r1 r2
@@ -34,9 +31,14 @@ decodeJson'
   => RowToList r2 l2
   => Union r0 r1 r2
   => Json
-  -> Either String (Record r1 -> Record r2)
-decodeJson' =
-  reportJson
-    $ D.gDecodeJson
-        (RLProxy :: RLProxy l1)
-        (RLProxy :: RLProxy l2)
+  -> Record r1
+  -> Either String (Record r2)
+decodeJson' json record = reportJson go json
+  where
+  go :: Object Json -> Either String (Record r2)
+  go object =
+    D.gDecodeJson
+      (RLProxy :: RLProxy l1)
+      (RLProxy :: RLProxy l2)
+      object
+      record
