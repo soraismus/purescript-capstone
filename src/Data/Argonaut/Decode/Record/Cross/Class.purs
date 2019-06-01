@@ -3,7 +3,7 @@ module Data.Argonaut.Decode.Record.Cross.Class
   , decodeJsonWith
   ) where
 
-import Prelude (class Bind, bind, identity, ($), (<<<))
+import Prelude (class Bind, bind, ($))
 
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode.Record.Utils (getMissingFieldErrorMessage)
@@ -17,7 +17,6 @@ import Type.Equality (class TypeEquals, to)
 import Type.Row
   ( class Cons
   , class Lacks
-  , class Nub
   , class Union
   , Cons
   , Nil
@@ -27,6 +26,7 @@ import Unsafe.Coerce (unsafeCoerce)
 
 class DecodeJsonWith
   (f  :: Type -> Type)
+  (g  :: # Type -> Type)
   (l0 :: RowList)
   (r0 :: # Type)
   (r1 :: # Type)
@@ -41,15 +41,15 @@ class DecodeJsonWith
   decodeJsonWith
     :: RLProxy l0
     -> RLProxy l2
-    -> Record r0
+    -> g r0
     -> Object Json
     -> a
-    -> Record r2
-    -> f (Record r3)
+    -> g r2
+    -> f (g r3)
 
 instance decodeJsonWithNil
   :: Status f
-  => DecodeJsonWith f Nil () () l r r a
+  => DecodeJsonWith f Record Nil () () l r r a
   where
   decodeJsonWith _ _ _ _ _ = report
 
@@ -58,7 +58,7 @@ instance decodeJsonWithCons
      , Cons s fn r0' r0
      , Cons s v r1' r1
      , Cons s v r3' r3
-     , DecodeJsonWith f l0' r0' r1' l2 r2 r3' a
+     , DecodeJsonWith f Record l0' r0' r1' l2 r2 r3' a
      , IsSymbol s
      , Status f
      , Lacks s r1'
@@ -66,7 +66,7 @@ instance decodeJsonWithCons
      , TypeEquals fn (Json -> a -> f v)
      , Union r1 r2 r3
      )
-  => DecodeJsonWith f (Cons s fn l0') r0 r1 l2 r2 r3 a
+  => DecodeJsonWith f Record (Cons s fn l0') r0 r1 l2 r2 r3 a
   where
   decodeJsonWith _ _ decoderRecord object x record = do
     case lookup fieldName object of
