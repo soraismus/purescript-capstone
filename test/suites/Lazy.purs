@@ -2,7 +2,7 @@ module Test.Suites.Lazy
   ( suites
   ) where
 
-import Prelude
+import Prelude (discard, (==), ($))
 
 import Data.Argonaut.Decode.Record.Lazy (decodeJson)
 import Data.Argonaut.Encode (encodeJson)
@@ -37,7 +37,7 @@ suites =
                   , a4 :: Maybe Boolean
                   }
               )
-        getResult = decodeJson (encodeJson value0)
+        getResult = decodeJson $ encodeJson value0
       assert $ check getResult withErrorMsg \f -> f value1 == value0
 
     test "#1" do
@@ -63,7 +63,7 @@ suites =
                   , b0 :: String
                   }
               )
-        getResult = decodeJson (encodeJson value0)
+        getResult = decodeJson $ encodeJson value0
       assert
         $ check
             getResult
@@ -98,7 +98,7 @@ suites =
 --                   , a4 :: Maybe Boolean
 --                   }
 --               )
---         getResult = decodeJson value0 (encodeJson value0)
+--         getResult = decodeJson (encodeJson value0)
 --       assert
 --         $ check
 --             getResult
@@ -133,7 +133,7 @@ suites =
 --                   , b0 :: String
 --                   }
 --               )
---         getResult = decodeJson value0 (encodeJson value0)
+--         getResult = decodeJson $ encodeJson value0
 --       assert
 --         $ check
 --             getResult
