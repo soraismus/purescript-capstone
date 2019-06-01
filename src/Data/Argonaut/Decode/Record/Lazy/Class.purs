@@ -3,7 +3,7 @@ module Data.Argonaut.Decode.Record.Lazy.Class
   , gDecodeJson
   ) where
 
-import Prelude (bind, const, identity, ($), (<<<))
+import Prelude (bind, identity, ($), (<<<))
 
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode.Class (class DecodeJson, decodeJson) as D
@@ -24,22 +24,6 @@ import Type.Row
   , kind RowList
   )
 
--- class GDecodeJson
---   (l0 :: RowList)
---   (r0 :: # Type)
---   (l1 :: RowList)
---   (r1 :: # Type)
---   (r2 :: # Type)
---   | l0 -> r0
---   , l1 -> r1
---   , l0 l1 -> r2
---   where
---   gDecodeJson
---     :: RLProxy l0
---     -> RLProxy l1
---     -> Object Json
---     -> Either String (Record r1 -> Record r2)
-
 class GDecodeJson
   (l0 :: RowList)
   (r0 :: # Type)
@@ -57,20 +41,15 @@ class GDecodeJson
     -> Object Json
     -> Either String (Record r1 -> Record r2)
 
--- instance gDecodeJson_Nil :: GDecodeJson Nil () l r l r where
---   gDecodeJson _ _ _ = report identity
-
-instance gDecodeJson__0 :: GDecodeJson Nil () Nil () Nil () where
+instance gDecodeJson_NilNilNil :: GDecodeJson Nil () Nil () Nil () where
   gDecodeJson _ _ _ = report identity
 
-instance gDecodeJson__2
+instance gDecodeJson_ConsNilCons
   :: ( Cons s v r' r
      , D.DecodeJson v
      , GDecodeJson l' r' Nil () l' r'
      , IsSymbol s
-     --, Lacks s ()
      , Lacks s r'
-     --, Union r () r
      )
   => GDecodeJson (Cons s v l') r Nil () (Cons s v l') r
   where
@@ -95,12 +74,12 @@ instance gDecodeJson__2
       Nothing ->
         reportError $ getMissingFieldErrorMessage fieldName
 
-instance gDecodeJson__1
+instance gDecodeJson_NilConsCons
   :: GDecodeJson Nil () (Cons s v l') r (Cons s v l') r
   where
   gDecodeJson _ _ _ = report identity
 
-else instance gDecodeJson__3
+else instance gDecodeJson_ConsConsCons
   :: ( Cons s v r0' r0
      , Cons s v r2' r2
      , D.DecodeJson v
@@ -110,7 +89,6 @@ else instance gDecodeJson__3
      , Lacks s r2'
      , Union r0 r1 r2
      )
-  -- => GDecodeJson (Cons s v l0') r0 l1 r1 l2 r2
   => GDecodeJson (Cons s v2 l0') r0 (Cons s1 v1 l1') r1 (Cons s v2 l2') r2
   where
   gDecodeJson _ _ object = do
