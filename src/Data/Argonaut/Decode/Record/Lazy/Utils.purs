@@ -16,7 +16,7 @@ import Type.Row (class RowToList, class Union, Nil)
 
 decodeJson
   :: forall l r
-   . D.GDecodeJson l r Nil () l r
+   . D.GDecodeJson (Either String) Record l r Nil () l r
   => RowToList r l
   => RowToList r l
   => Union r () r
@@ -26,7 +26,7 @@ decodeJson json = decodeJson' json {}
 
 decodeJson'
   :: forall l0 l1 l2 r0 r1 r2
-   . D.GDecodeJson l0 r0 l1 r1 l2 r2
+   . D.GDecodeJson (Either String) Record l0 r0 l1 r1 l2 r2
   => RowToList r1 l1
   => RowToList r2 l2
   => Union r0 r1 r2

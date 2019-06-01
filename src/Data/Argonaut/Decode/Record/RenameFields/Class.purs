@@ -152,4 +152,8 @@ renameFields nameChanges record =
   nameChanges' = fromFoldable $ reify' nameChanges
 
 foreign import renameFields'
-  :: forall r0 r1. Fn2 (Array (Tuple String String)) (Record r0) (Record r1)
+  :: forall r0 r1
+   . Fn2
+        (Array (Tuple String String))
+        (Record r0)
+        (Record r1)

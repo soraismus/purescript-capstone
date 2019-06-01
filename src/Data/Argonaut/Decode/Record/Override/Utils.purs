@@ -20,7 +20,7 @@ import Type.Row (class Nub, class RowToList, class Union)
 decodeJsonWith
   :: forall dr dl f l0 l1 l2 r0 r1 r2
    . Bind f
-  => D.DecodeJsonWith f dl dr l0 r0
+  => D.DecodeJsonWith f Record dl dr l0 r0
   => GDecodeJson r1 l1
   => Nub r2 r2
   => RowToList r1 l1

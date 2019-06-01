@@ -21,6 +21,7 @@ You can edit this file as you like.
     , "type-equality"
     , "typelevel-prelude"
     , "unsafe-coerce"
+    , "variant"
     ]
 , packages =
     ./packages.dhall

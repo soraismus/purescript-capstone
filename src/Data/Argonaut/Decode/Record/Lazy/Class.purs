@@ -10,7 +10,7 @@ import Data.Argonaut.Decode.Class (class DecodeJson, decodeJson) as D
 import Data.Argonaut.Decode.Record.Utils (getMissingFieldErrorMessage)
 import Data.Either (Either)
 import Data.Maybe (Maybe(Just, Nothing))
-import Data.Status (report, reportError)
+import Data.Status (class Status, report, reportError)
 import Data.Symbol (class IsSymbol, SProxy(SProxy), reflectSymbol)
 import Foreign.Object (Object, lookup)
 import Record (insert)
@@ -25,6 +25,8 @@ import Type.Row
   )
 
 class GDecodeJson
+  (f  :: Type -> Type)
+  (g  :: # Type -> Type)
   (l0 :: RowList)
   (r0 :: # Type)
   (l1 :: RowList)
@@ -39,20 +41,22 @@ class GDecodeJson
     :: RLProxy l1
     -> RLProxy l2
     -> Object Json
-    -> Record r1
-    -> Either String (Record r2)
+    -> g r1
+    -> f (g r2)
 
-instance gDecodeJson_NilNilNil :: GDecodeJson Nil () Nil () Nil () where
+instance gDecodeJson_NilNilNil
+  :: Status f
+  => GDecodeJson f g Nil () Nil () Nil () where
   gDecodeJson _ _ _ = report
 
 instance gDecodeJson_ConsNilCons
   :: ( Cons s v r' r
      , D.DecodeJson v
-     , GDecodeJson l' r' Nil () l' r'
+     , GDecodeJson (Either String) Record l' r' Nil () l' r'
      , IsSymbol s
      , Lacks s r'
      )
-  => GDecodeJson (Cons s v l') r Nil () (Cons s v l') r
+  => GDecodeJson (Either String) Record (Cons s v l') r Nil () (Cons s v l') r
   where
   gDecodeJson _ _ object record = do
     case lookup fieldName object of
@@ -76,7 +80,8 @@ instance gDecodeJson_ConsNilCons
     s = SProxy
 
 instance gDecodeJson_NilConsCons
-  :: GDecodeJson Nil () (Cons s v l') r (Cons s v l') r
+  :: Status f
+  => GDecodeJson f g Nil () (Cons s v l') r (Cons s v l') r
   where
   gDecodeJson _ _ _ = report
 
@@ -84,13 +89,21 @@ else instance gDecodeJson_ConsConsCons
   :: ( Cons s v r0' r0
      , Cons s v r2' r2
      , D.DecodeJson v
-     , GDecodeJson l0' r0' (Cons s1 v1 l1') r1 l2' r2'
+     , GDecodeJson (Either String) Record l0' r0' (Cons s1 v1 l1') r1 l2' r2'
      , IsSymbol s
      , Lacks s r1
      , Lacks s r2'
      , Union r0 r1 r2
      )
-  => GDecodeJson (Cons s v2 l0') r0 (Cons s1 v1 l1') r1 (Cons s v2 l2') r2
+  => GDecodeJson
+        (Either String)
+        Record
+        (Cons s v2 l0')
+        r0
+        (Cons s1 v1 l1')
+        r1
+        (Cons s v2 l2')
+        r2
   where
   gDecodeJson _ _ object record = do
     case lookup fieldName object of
