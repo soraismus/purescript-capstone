@@ -12,6 +12,7 @@ You can edit this file as you like.
     , "either"
     , "foreign-object"
     , "generics-rep"
+    , "heterogeneous"
     , "maybe"
     , "proxy"
     , "psci-support"

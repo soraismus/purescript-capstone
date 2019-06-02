@@ -1,0 +1,95 @@
+module Heterogeneous.Mapping.Utils
+  where
+--   ( hmap
+--   , hmapWithIndex
+--   ) where
+--
+-- import Prelude (class Bind, bind)
+--
+-- import Data.Argonaut.Core (Json)
+-- import Data.Argonaut.Decode.Class (class GDecodeJson)
+-- import Data.Argonaut.Decode.Record.Cross.Class
+--   ( class DecodeJsonWith
+--   , decodeJsonWith
+--   ) as D
+-- import Data.Argonaut.Decode.Record.Utils (reportJson, reportObject)
+-- import Data.Status (class Status)
+-- import Foreign.Object (Object)
+-- import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency
+-- import Type.Row (class RowToList)
+--
+-- -- class HMap f a b | f a -> b where
+-- --   hmap :: f -> a -> b
+-- -- class HMapWithIndex f a b | f a -> b where
+-- --   hmapWithIndex :: f -> a -> b
+-- -- instance hmapRecord ::
+-- --   ( RL.RowToList rin rl
+-- --   , MapRecordWithIndex rl (ConstMapping fn) rin rout
+-- --   ) =>
+-- --   HMap fn { | rin } { | rout }
+-- --   where
+-- --   hmap =
+-- --     Builder.build
+-- --       <<< mapRecordWithIndexBuilder (RLProxy :: RLProxy rl)
+-- --       <<< ConstMapping
+-- --           -- Indices are irrelevant, so `MapRecordWithIndex` might not matter.
+-- -- instance hmapWithIndexRecord ::
+-- --   ( RL.RowToList rin rl
+-- --   , MapRecordWithIndex rl fn rin rout
+-- --   ) =>
+-- --   HMapWithIndex fn { | rin } { | rout }
+-- --   where
+-- --   hmapWithIndex =
+-- --     Builder.build
+-- --       <<< mapRecordWithIndexBuilder (RLProxy :: RLProxy rl)
+-- -- class MapRecordWithIndex
+-- --   (l :: RowList)
+-- --   f
+-- --   (r0 :: # Type)
+-- --   (r1 :: # Type)
+-- --   | l   -> r0
+-- --   , l f -> r1
+-- --   where
+-- --   mapRecordWithIndexBuilder :: RLProxy l -> f -> Builder (Record r0) (Record r1)
+-- -- instance mapRecordWithIndexCons
+-- --   :: ( IsSymbol s
+-- --      , MappingWithIndex f (SProxy s) va vb
+-- --      , MapRecordWithIndex l' f r0 r1' -- transform :: (l', f) -> (r0 -> r1')
+-- --      , Cons s va r1' r1x
+-- --      , Cons s vb r1' r1
+-- --      )
+-- --   => MapRecordWithIndex (Cons s va l') f r0 r1
+-- --   where
+-- --   mapRecordWithIndexBuilder _ f =
+-- --     Builder.modify sproxy (mappingWithIndex f sproxy)
+-- --       <<< mapRecordWithIndexBuilder (RLProxy :: RLProxy l')
+-- --     where
+-- --     sproxy = SProxy :: SProxy s
+-- -- instance mapRecordWithIndexNil :: MapRecordWithIndex RL.Nil fn as as where
+-- --   mapRecordWithIndexBuilder _ _ = identity
+--
+-- MapRecordWithIndex l f
+--
+-- hmapWithIndex
+--   :: forall f l0 l2 r0 r1 r2 r3
+--    . Bind f
+--   => D.DecodeJsonWith f Record l0 r0 r1 l2 r2 r3 (Record r2)
+--   => GDecodeJson r2 l2
+--   => RowToList r0 l0
+--   => RowToList r2 l2
+--   => Status f
+--   => Record r0
+--   -> Json
+--   -> f (Record r3)
+-- decodeJsonWith decoderRecord = reportJson go
+--   where
+--   go :: Object Json -> f (Record r3)
+--   go object = do
+--     record2 <- reportObject object
+--     D.decodeJsonWith
+--       (RLProxy :: RLProxy l0)
+--       (RLProxy :: RLProxy l2)
+--       decoderRecord
+--       object
+--       record2
+--       record2
