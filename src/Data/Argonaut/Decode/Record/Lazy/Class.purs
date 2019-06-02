@@ -28,14 +28,13 @@ class GDecodeJson
   (f  :: Type -> Type)
   (g  :: # Type -> Type)
   (l0 :: RowList)
-  (r0 :: # Type)
   (l1 :: RowList)
   (r1 :: # Type)
   (l2 :: RowList)
   (r2 :: # Type)
   | l1 -> r1
   , l2 -> r2
-  , l1 l2 -> l0 r0
+  , l1 l2 -> l0
   where
   gDecodeJson
     :: RLProxy l1
@@ -46,18 +45,18 @@ class GDecodeJson
 
 instance gDecodeJson_NilNilNil
   :: Status f
-  => GDecodeJson f g Nil () Nil () Nil () where
+  => GDecodeJson f g Nil Nil () Nil () where
   gDecodeJson _ _ _ = report
 
 instance gDecodeJson_ConsNilCons
   :: ( Cons s v r' r
      , D.DecodeJson v
-     , GDecodeJson (Either String) g l' r' Nil () l' r'
+     , GDecodeJson (Either String) g l' Nil () l' r'
      , IsSymbol s
      , Lacks s r'
      , RInsert g SProxy s l' r' l r
      )
-  => GDecodeJson (Either String) g (Cons s v l') r Nil () (Cons s v l') r
+  => GDecodeJson (Either String) g (Cons s v l') Nil () (Cons s v l') r
   where
   gDecodeJson _ _ object record = do
     case lookup fieldName object of
@@ -85,26 +84,23 @@ instance gDecodeJson_ConsNilCons
 
 instance gDecodeJson_NilConsCons
   :: Status f
-  => GDecodeJson f g Nil () (Cons s v l') r (Cons s v l') r
+  => GDecodeJson f g Nil (Cons s v l') r (Cons s v l') r
   where
   gDecodeJson _ _ _ = report
 
 else instance gDecodeJson_ConsConsCons
-  :: ( Cons s v r0' r0
-     , Cons s v r2' r2
+  :: ( Cons s v r2' r2
      , D.DecodeJson v
-     , GDecodeJson (Either String) g l0' r0' (Cons s1 v1 l1') r1 l2' r2'
+     , GDecodeJson (Either String) g l0' (Cons s1 v1 l1') r1 l2' r2'
      , IsSymbol s
      , Lacks s r1
      , Lacks s r2'
      , RInsert g SProxy s l2' r2' l2 r2
-     , Union r0 r1 r2
      )
   => GDecodeJson
         (Either String)
         g
         (Cons s v l0')
-        r0
         (Cons s1 v1 l1')
         r1
         (Cons s v l2')
