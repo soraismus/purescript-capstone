@@ -58,19 +58,3 @@ on
   -> a
   -> c
 on f g x y = f (eval g x) (eval g y)
-
--- -- ==============================================================================
--- -- class Profunctor p where
--- --   dimap :: forall a b c d. (a -> b) -> (c -> d) -> p b c -> p a d
--- -- package 'profunctor'
--- -- | Lift a pure function into any `Profunctor` which is also a `Category`.
--- arr :: forall a b p. Category p => Profunctor p => (a -> b) -> p a b
--- arr f = rmap f identity
--- -- ==============================================================================
--- type NaturalTransformation1 f g = forall a b. f a b -> g a b
--- class Functor f <= Apply f where
---   apply :: forall a b. f (a -> b) -> f a -> f b
---   apply :: forall a b. f (a, b) -> (f a, f b)
---   eval  :: forall a b. ((a, b), a) -> b
--- apply :: forall a b p. ClosedMonoidal p => f (p a b) -> p (f a) (f b)
--- -- ==============================================================================
