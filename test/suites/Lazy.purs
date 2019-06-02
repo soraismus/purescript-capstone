@@ -23,8 +23,8 @@ suites =
                  , a4: Just true
                  }
         value1 = {}
-        result = decodeJson' (encodeJson value0) value1
-      assert $ checkError result withErrorMsg (_ == value0)
+        result = decodeJson' $ encodeJson value0
+      assert $ checkError result withErrorMsg (\f -> f value1 == value0)
 
     test "#1" do
       let
@@ -35,18 +35,18 @@ suites =
                  , a4: Just true
                  }
         value1 = { b0: "b0" }
-        result = decodeJson' (encodeJson value0) value1
+        result = decodeJson' $ encodeJson value0
       assert
         $ checkError
             result
             withErrorMsg
-            (_ == { a0: value0.a0
-                  , a1: value0.a1
-                  , a2: value0.a2
-                  , a3: value0.a3
-                  , a4: value0.a4
-                  , b0: value1.b0
-                  })
+            (\f -> f value1 ==  { a0: value0.a0
+                                , a1: value0.a1
+                                , a2: value0.a2
+                                , a3: value0.a3
+                                , a4: value0.a4
+                                , b0: value1.b0
+                                })
 
     test "#2" do
       let
@@ -57,20 +57,20 @@ suites =
                  , a4: Just true
                  }
         value1 = { b0: "b0", b1: 1000, b2: 1002 }
-        result = decodeJson' (encodeJson value0) value1
+        result = decodeJson' $ encodeJson value0
       assert
         $ checkError
             result
             withErrorMsg
-            (_ == { a0: value0.a0
-                  , a1: value0.a1
-                  , a2: value0.a2
-                  , a3: value0.a3
-                  , a4: value0.a4
-                  , b0: value1.b0
-                  , b1: value1.b1
-                  , b2: value1.b2
-                  })
+            (\f -> f value1 ==  { a0: value0.a0
+                                , a1: value0.a1
+                                , a2: value0.a2
+                                , a3: value0.a3
+                                , a4: value0.a4
+                                , b0: value1.b0
+                                , b1: value1.b1
+                                , b2: value1.b2
+                                })
 
 --     test "#3 -- Does Not Compile" do
 --       let
@@ -81,17 +81,17 @@ suites =
 --                  , a4: Just true
 --                  }
 --         value1 = { a0: 1000 }
---         result = decodeJson' (encodeJson value0) value1
+--         result = decodeJson' $ encodeJson value0
 --       assert
 --         $ checkError
 --             result
 --             withErrorMsg
---             (_ == { a0: value0.a0
---                   , a1: value0.a1
---                   , a2: value0.a2
---                   , a3: value0.a3
---                   , a4: value0.a4
---                   })
+--             (\f -> f value1 ==  { a0: value0.a0
+--                                 , a1: value0.a1
+--                                 , a2: value0.a2
+--                                 , a3: value0.a3
+--                                 , a4: value0.a4
+--                                 })
 
 --     test "#4 -- Does Not Compile" do
 --       let
@@ -102,14 +102,14 @@ suites =
 --                  , a4: Just true
 --                  }
 --         value1 = { a0: "b0" }
---         result = decodeJson' (encodeJson value0) value1
+--         result = decodeJson' $ encodeJson value0
 --       assert
 --         $ checkError
 --             result
 --             withErrorMsg
---             (_ == { a0: value0.a0
---                   , a1: value0.a1
---                   , a2: value0.a2
---                   , a3: value0.a3
---                   , a4: value0.a4
---                   })
+--             (\f -> f value1 ==  { a0: value0.a0
+--                                 , a1: value0.a1
+--                                 , a2: value0.a2
+--                                 , a3: value0.a3
+--                                 , a4: value0.a4
+--                                 })

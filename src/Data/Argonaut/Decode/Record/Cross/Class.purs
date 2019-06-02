@@ -46,7 +46,6 @@ class DecodeJsonWith
     -> Object Json
     -> a
     -> f (p (g r2) (g r3))
-    -- -> f (g r2 -> g r3)
 
 instance decodeJsonWithNil
   :: ( Category p

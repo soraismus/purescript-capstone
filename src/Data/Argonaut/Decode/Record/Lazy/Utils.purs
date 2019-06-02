@@ -3,6 +3,8 @@ module Data.Argonaut.Decode.Record.Lazy.Utils
   , decodeJson'
   ) where
 
+import Prelude (class Functor, map, (#))
+
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode.Record.Lazy.Class
   ( class GDecodeJson
@@ -16,29 +18,28 @@ import Type.Row (class RowToList, Nil)
 
 decodeJson
   :: forall f l r
-   . D.GDecodeJson f Record l Nil () l r
+   . D.GDecodeJson Function f Record l Nil () l r
+  => Functor f
   => RowToList r l
   => RowToList r l
   => Status f
   => Json
   -> f (Record r)
-decodeJson json = decodeJson' json {}
+decodeJson json = map ((#) {}) (decodeJson' json)
 
 decodeJson'
   :: forall f g l0 l1 l2 r1 r2
-   . D.GDecodeJson f g l0 l1 r1 l2 r2
+   . D.GDecodeJson Function f g l0 l1 r1 l2 r2
   => RowToList r1 l1
   => RowToList r2 l2
   => Status f
   => Json
-  -> g r1
-  -> f (g r2)
-decodeJson' json record = reportJson go json
+  -> f (g r1 -> g r2)
+decodeJson' json = reportJson go json
   where
-  go :: Object Json -> f (g r2)
+  go :: Object Json -> f (g r1 -> g r2)
   go object =
     D.gDecodeJson
       (RLProxy :: RLProxy l1)
       (RLProxy :: RLProxy l2)
       object
-      record

@@ -3,7 +3,14 @@ module Data.Argonaut.Decode.Record.Lazy.Class
   , gDecodeJson
   ) where
 
-import Prelude (bind, ($))
+import Prelude
+  ( class Category
+  , class Semigroupoid
+  , bind
+  , identity
+  , ($)
+  , (<<<)
+  )
 
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode.Class (class DecodeJson, decodeJson) as D
@@ -18,6 +25,7 @@ import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency
 import Type.Row (class Cons, class Lacks, Cons, Nil, kind RowList)
 
 class GDecodeJson
+  (p  :: Type -> Type -> Type)
   (f  :: Type -> Type)
   (g  :: # Type -> Type)
   (l0 :: RowList)
@@ -33,30 +41,33 @@ class GDecodeJson
     :: RLProxy l1
     -> RLProxy l2
     -> Object Json
-    -> g r1
-    -> f (g r2)
+    -> f (p (g r1) (g r2))
 
 instance gDecodeJson_NilNilNil
-  :: Status f
-  => GDecodeJson f g Nil Nil () Nil () where
-  gDecodeJson _ _ _ = report
+  :: ( Category p
+     , Status f
+     )
+  => GDecodeJson p f g Nil Nil () Nil ()
+  where
+  gDecodeJson _ _ _ = report identity
 
 instance gDecodeJson_ConsNilCons
   :: ( Cons s v r' r
      , D.DecodeJson v
-     , GDecodeJson (Either String) g l' Nil () l' r'
+     , GDecodeJson p (Either String) g l' Nil () l' r'
      , IsSymbol s
      , Lacks s r'
-     , RInsert Function g SProxy s l' r' l r
+     , RInsert p g SProxy s l' r' l r
+     , Semigroupoid p
      )
-  => GDecodeJson (Either String) g (Cons s v l') Nil () (Cons s v l') r
+  => GDecodeJson p (Either String) g (Cons s v l') Nil () (Cons s v l') r
   where
-  gDecodeJson _ _ object record = do
+  gDecodeJson _ _ object = do
     case lookup fieldName object of
       Just jsonVal -> do
         val <- D.decodeJson jsonVal
-        intermediate <- gDecodeJson nil l' object record
-        report $ rinsert l' l s val intermediate
+        doRest <- gDecodeJson nil l' object
+        report $ rinsert l' l s val <<< doRest
       Nothing ->
         reportError $ getMissingFieldErrorMessage fieldName
     where
@@ -76,21 +87,25 @@ instance gDecodeJson_ConsNilCons
     s = SProxy
 
 instance gDecodeJson_NilConsCons
-  :: Status f
-  => GDecodeJson f g Nil (Cons s v l') r (Cons s v l') r
+  :: ( Category p
+     , Status f
+     )
+  => GDecodeJson p f g Nil (Cons s v l') r (Cons s v l') r
   where
-  gDecodeJson _ _ _ = report
+  gDecodeJson _ _ _ = report identity
 
 else instance gDecodeJson_ConsConsCons
   :: ( Cons s v r2' r2
      , D.DecodeJson v
-     , GDecodeJson (Either String) g l0' (Cons s1 v1 l1') r1 l2' r2'
+     , GDecodeJson p (Either String) g l0' (Cons s1 v1 l1') r1 l2' r2'
      , IsSymbol s
      , Lacks s r1
      , Lacks s r2'
-     , RInsert Function g SProxy s l2' r2' l2 r2
+     , RInsert p g SProxy s l2' r2' l2 r2
+     , Semigroupoid p
      )
   => GDecodeJson
+        p
         (Either String)
         g
         (Cons s v l0')
@@ -99,12 +114,12 @@ else instance gDecodeJson_ConsConsCons
         (Cons s v l2')
         r2
   where
-  gDecodeJson _ _ object record = do
+  gDecodeJson _ _ object = do
     case lookup fieldName object of
       Just jsonVal -> do
         val <- D.decodeJson jsonVal
-        intermediate <- gDecodeJson l1 l2' object record
-        report $ rinsert l2' l2 s val intermediate
+        doRest <- gDecodeJson l1 l2' object
+        report $ rinsert l2' l2 s val <<< doRest
       Nothing ->
         reportError $ getMissingFieldErrorMessage fieldName
     where
