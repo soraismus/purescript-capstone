@@ -33,6 +33,19 @@ module Heterogeneous.Mapping.Utils
 -- --       <<< mapRecordWithIndexBuilder (RLProxy :: RLProxy rl)
 -- --       <<< ConstMapping
 -- --           -- Indices are irrelevant, so `MapRecordWithIndex` might not matter.
+--
+-- newtype ZipProps fns = ZipProps (Record fns)
+-- instance zipProps
+--   :: ( IsSymbol s
+--      , Row.Cons s (a -> b) fns' fns
+--      )
+--   => MappingWithIndex (ZipProps fns) (SProxy s) a b
+--   where
+--   mappingWithIndex (ZipProps fns) s = Record.get s fns
+-- zipRecord { a: add 1, b: Tuple "bar", c: not } { a: 12, b: 42.0, c: true }
+--   where
+--   zipRecord = ZipProps >>> hmapWithIndex
+--
 -- -- instance hmapWithIndexRecord ::
 -- --   ( RL.RowToList rin rl
 -- --   , MapRecordWithIndex rl fn rin rout
@@ -42,6 +55,7 @@ module Heterogeneous.Mapping.Utils
 -- --   hmapWithIndex =
 -- --     Builder.build
 -- --       <<< mapRecordWithIndexBuilder (RLProxy :: RLProxy rl)
+--
 -- -- class MapRecordWithIndex
 -- --   (l :: RowList)
 -- --   f
@@ -68,7 +82,13 @@ module Heterogeneous.Mapping.Utils
 -- -- instance mapRecordWithIndexNil :: MapRecordWithIndex RL.Nil fn as as where
 -- --   mapRecordWithIndexBuilder _ _ = identity
 --
--- MapRecordWithIndex l f
+-- hmapWithIndex
+--   :: forall f r0 r1 r2 r3
+--    . MapRecordWithIndex l0 f r2 r3
+--    -- below transforms r0 -> r1
+--    -- but it becomes a function :: r2 -> r3
+--   => HMapWithIndex f (Record r2) (Record r3)
+--   => Record r0
 --
 -- hmapWithIndex
 --   :: forall f l0 l2 r0 r1 r2 r3
