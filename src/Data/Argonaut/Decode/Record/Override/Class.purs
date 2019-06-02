@@ -3,7 +3,15 @@ module Data.Argonaut.Decode.Record.Override.Class
   , decodeJsonWith
   ) where
 
-import Prelude (class Bind, bind, ($))
+import Prelude
+  ( class Bind
+  , class Category
+  , class Semigroupoid
+  , bind
+  , identity
+  , ($)
+  , (<<<)
+  )
 
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode.Record.Utils (getMissingFieldErrorMessage)
@@ -24,6 +32,7 @@ import Type.Row
 import Unsafe.Coerce (unsafeCoerce)
 
 class DecodeJsonWith
+  (p  :: Type -> Type -> Type)
   (f  :: Type -> Type)
   (g  :: # Type -> Type)
   (l0 :: RowList)
@@ -40,35 +49,37 @@ class DecodeJsonWith
     -> RLProxy l1
     -> g r0
     -> Object Json
-    -> g r1
-    -> f (g r2)
+    -> f (p (g r1) (g r2))
 
 instance decodeJsonWithNil
-  :: Status f
-  => DecodeJsonWith f g Nil () l r r
+  :: ( Category p
+     , Status f
+     )
+  => DecodeJsonWith p f g Nil () l r r
   where
-  decodeJsonWith _ _ _ _ = report
+  decodeJsonWith _ _ _ _ = report identity
 
 instance decodeJsonWithCons
   :: ( Bind f
      , Cons s fn r0' r0
      , Cons s v r2' r2
-     , DecodeJsonWith f g l0' r0' l1 r1 r2'
+     , DecodeJsonWith p f g l0' r0' l1 r1 r2'
      , IsSymbol s
      , Status f
      , Lacks s r2'
      , RGet g SProxy s l0 r0
-     , RInsert Function g SProxy s l2' r2' l2 r2
+     , RInsert p g SProxy s l2' r2' l2 r2
+     , Semigroupoid p
      , TypeEquals fn (Json -> f v)
      )
-  => DecodeJsonWith f g (Cons s fn l0') r0 l1 r1 r2
+  => DecodeJsonWith p f g (Cons s fn l0') r0 l1 r1 r2
   where
-  decodeJsonWith _ _ decoderRecord object record = do
+  decodeJsonWith _ _ decoderRecord object = do
     case lookup fieldName object of
       Just jsonVal -> do
         val <- decoder jsonVal
-        intermediate <- decodeJsonWith l0' l1 decoderRecord' object record
-        report $ rinsert l2' l2 s val intermediate
+        doRest <- decodeJsonWith l0' l1 decoderRecord' object
+        report $ rinsert l2' l2 s val <<< doRest
       Nothing ->
         reportError $ getMissingFieldErrorMessage fieldName
     where
