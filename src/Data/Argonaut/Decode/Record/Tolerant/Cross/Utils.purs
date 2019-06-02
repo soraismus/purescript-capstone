@@ -1,75 +1,40 @@
-module Data.Argonaut.Decode.Record.Tolerant.Cross.Utils
---   ( decodeJsonWith
---   , decodeJsonWith'
---   )
-  where
+module Data.Argonaut.Decode.Record.Tolerant.Cross.Class
+  ( class DecodeJson
+  , decodeJson
+  ) where
 
--- import Prelude (class Bind, bind, ($))
---
--- import Data.Argonaut.Core (Json)
--- import Data.Argonaut.Decode.Class (class GDecodeJson)
--- import Data.Argonaut.Decode.Record.Cross.Class
---   ( class DecodeJsonWith
---   , decodeJsonWith
---   ) as D
--- import Data.Argonaut.Decode.Record.Utils (reportJson, reportObject)
--- import Data.Status (class Status, report)
--- import Foreign.Object (Object)
--- import Record (merge, union)
--- import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency
--- import Type.Row (class Nub, class RowToList, class Union)
---
--- decodeJsonWith
---   :: forall dr dl f l0 l1 l2 r0 r1 r2
---    . Bind f
---   => GDecodeJson r1 l1
---   => Nub r2 r2
---   => RowToList r1 l1
---   => RowToList r2 l2
---   => RowToList dr dl
---   => Status f
---   => Union r0 r1 r2
---   => D.DecodeJsonWith f dl dr l0 r0 (Record r1)
---   => Record dr
---   -> Json
---   -> f (Record r2)
--- decodeJsonWith decoderRecord = reportJson go
---   where
---   go :: Object Json -> f (Record r2)
---   go object = do
---     record1 <- reportObject object
---     record0 <-
---       D.decodeJsonWith
---         (RLProxy :: RLProxy l0)
---         (RLProxy :: RLProxy dl)
---         decoderRecord
---         object
---         record1
---     report $ merge record0 record1
---
--- decodeJsonWith'
---   :: forall dr dl f l0 l1 l2 r0 r1 r2
---    . Bind f
---   => GDecodeJson r1 l1
---   => RowToList r1 l1
---   => RowToList r2 l2
---   => RowToList dr dl
---   => Status f
---   => Union r0 r1 r2
---   => D.DecodeJsonWith f dl dr l0 r0 (Record r1)
---   => Record dr
---   -> Json
---   -> f (Record r2)
--- decodeJsonWith' decoderRecord = reportJson go
---   where
---   go :: Object Json -> f (Record r2)
---   go object = do
---     record1 <- reportObject object (RLProxy :: RLProxy l1)
---     record0 <-
---       D.decodeJsonWith
---         (RLProxy :: RLProxy l0)
---         (RLProxy :: RLProxy dl)
---         decoderRecord
---         object
---         record1
---     report $ union record0 record1
+import Data.Argonaut.Core (Json, toObject)
+import Data.Argonaut.Decode.Record.Tolerant.Class
+  ( class DecodeJson
+  , class GDecodeJson
+  , decodeJson
+  , gDecodeJson
+  ) as D
+import Data.Either (Either)
+import Data.Maybe (Maybe(Just, Nothing))
+import Data.Status (reportError)
+import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency
+import Type.Row (class RowToList, Nil, kind RowList)
+
+class DecodeJson a where
+  decodeJson :: Json -> Either String a
+
+instance decodeRecord
+  :: ( D.GDecodeJson (Either String) Record l r Nil () l r
+     , RowToList r l
+     )
+  => DecodeJson (Record r)
+  where
+  decodeJson json =
+    case toObject json of
+      Just object ->
+        D.gDecodeJson
+          (RLProxy :: RLProxy Nil)
+          (RLProxy :: RLProxy l)
+          object
+          {}
+      Nothing ->
+        reportError "Could not convert JSON to object"
+
+else instance decodeDecodeJson :: D.DecodeJson a => DecodeJson a where
+  decodeJson = D.decodeJson
