@@ -1,8 +1,8 @@
-module Test.Suites.Utils.Singleton
+module Test.Suites.Record.Extra.Utils.Singleton
   ( suites
   ) where
 
-import Data.Argonaut.Decode.Record.Utils (singleton)
+import Record.Extra.Utils (singleton)
 import Data.Symbol (SProxy(SProxy))
 import Test.Unit (TestSuite, suite, test)
 import Test.Unit.Assert (shouldEqual)

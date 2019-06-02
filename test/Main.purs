@@ -13,7 +13,7 @@ import Test.Suites.Record.Extra.RenameFields (suites) as RenameFields
 import Test.Suites.SameSize (suites) as SameSize
 import Test.Suites.SubFields (suites) as SubFields
 import Test.Suites.Tolerant (suites) as Tolerant
-import Test.Suites.Utils.Singleton (suites) as Singleton
+import Test.Suites.Record.Extra.Utils.Singleton as Singleton
 import Test.Unit.Main (runTest)
 
 main :: Effect Unit

@@ -3,7 +3,6 @@ module Data.Argonaut.Decode.Record.Utils
   , getMissingFieldErrorMessage
   , reportJson
   , reportObject
-  , singleton
   ) where
 
 import Prelude
@@ -49,15 +48,3 @@ reportObject object =
   case gDecodeJson object (RLProxy :: RLProxy l) of
     Left errorStr -> reportError errorStr
     Right record -> report record
-
-singleton
-  :: forall r s v
-   . IsSymbol s
-  => ListToRow (Cons s v Nil) r
-  => SProxy s
-  -> v
-  -> Record r
-singleton sProxy value =
-  unsafeSingleton (reflectSymbol sProxy) value
-
-foreign import unsafeSingleton :: forall r a. String -> a -> Record r
