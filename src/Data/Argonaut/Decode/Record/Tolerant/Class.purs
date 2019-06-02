@@ -275,4 +275,3 @@ else instance gDecodeJson_ConsConsCons_nonPlus
 
     s :: SProxy s
     s = SProxy
-
