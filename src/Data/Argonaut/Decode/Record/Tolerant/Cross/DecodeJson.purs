@@ -1,46 +1,64 @@
-module Data.Argonaut.Decode.Record.Tolerant.Cross.DecodeJson
-  ( class DecodeJson
-  , decodeJson
+module Data.Argonaut.Decode.Record.Tolerant.Cross.Utils
+  ( decodeJsonWith
   ) where
 
-import Prelude (bind, ($))
+import Prelude (class Bind, bind, ($))
 
-import Data.Argonaut.Core (Json, toObject)
-import Data.Argonaut.Decode.Record.Tolerant.DecodeJson
-  ( class DecodeJson
-  , decodeJson
-  ) as D
+import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode.Record.Tolerant.GDecodeJson
   ( class GDecodeJson
   , gDecodeJson
-  ) as G
-import Data.Either (Either)
-import Data.Maybe (Maybe(Just, Nothing))
-import Data.Status (report, reportError)
+  )
+import Data.Argonaut.Decode.Record.Cross.Class
+  ( class DecodeJsonWith
+  , decodeJsonWith
+  ) as D
+import Data.Argonaut.Decode.Record.Utils (reportJson)
+import Data.Status (class Status, report)
+import Foreign.Object (Object)
 import Record.Builder (Builder, build)
 import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency
-import Type.Row (class RowToList, Nil, kind RowList)
+import Type.Row (class RowToList, Nil)
 
-class DecodeJson a where
-  decodeJson :: Json -> Either String a
+decodeJsonWith
+  :: forall f l0 l2 r0 r2 r3
+   . Bind f
+  => D.DecodeJsonWith Builder f Record l0 r0 l2 r2 r3 (Record r2)
 
-instance decodeRecord
-  :: ( G.GDecodeJson Builder (Either String) Record Nil () l r
-     , RowToList r l
-     )
-  => DecodeJson (Record r)
+  => GDecodeJson Builder f Record Nil () l2 r2
+  -- => GDecodeJson r2 l2
+  => RowToList r0 l0
+  => RowToList r2 l2
+  => Status f
+  => Record r0
+  -> Json
+  -> f (Record r3)
+decodeJsonWith decoderRecord = reportJson go
   where
-  decodeJson json =
-    case toObject json of
-      Just object -> do
-        builder <-
-          G.gDecodeJson
-            (RLProxy :: RLProxy Nil)
-            (RLProxy :: RLProxy l)
-            object
-        report $ build builder {}
-      Nothing ->
-        reportError "Could not convert JSON to object"
+  go :: Object Json -> f (Record r3)
+  go object = do
+    (record2 :: Record r2) <- reportObject object
+    (addFields0 :: Builder (Record r2) (Record r3)) <-
+      D.decodeJsonWith
+        (RLProxy :: RLProxy l0)
+        (RLProxy :: RLProxy l2)
+        decoderRecord
+        object
+        record2
+    report $ build addFields0 record2
 
-else instance decodeDecodeJson :: D.DecodeJson a => DecodeJson a where
-  decodeJson = D.decodeJson
+reportObject
+  :: forall f l r
+   . Bind f
+  => GDecodeJson Builder f Record Nil () l r
+  => RowToList r l
+  => Status f
+  => Object Json
+  -> f (Record r)
+reportObject object = do
+  builder <-
+    gDecodeJson
+      (RLProxy :: RLProxy Nil)
+      (RLProxy :: RLProxy l)
+      object
+  report $ build builder {}
