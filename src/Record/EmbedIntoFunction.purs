@@ -36,7 +36,7 @@ instance embedIntoFunction_Cons
      , Lacks s r0'
      , Lacks s r2'
      , RGet Record SProxy s l0 r0
-     , RInsert Record SProxy s l2' r2' l2 r2
+     , RInsert Function Record SProxy s l2' r2' l2 r2
      )
   => EmbedIntoFunction (Cons s v l0') r0 l1 r1 r2
   where

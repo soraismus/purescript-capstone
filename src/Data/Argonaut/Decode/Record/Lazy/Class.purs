@@ -15,14 +15,7 @@ import Data.Status (class Status, report, reportError)
 import Data.Symbol (class IsSymbol, SProxy(SProxy), reflectSymbol)
 import Foreign.Object (Object, lookup)
 import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency
-import Type.Row
-  ( class Cons
-  , class Lacks
-  , class Union
-  , Cons
-  , Nil
-  , kind RowList
-  )
+import Type.Row (class Cons, class Lacks, Cons, Nil, kind RowList)
 
 class GDecodeJson
   (f  :: Type -> Type)
@@ -54,7 +47,7 @@ instance gDecodeJson_ConsNilCons
      , GDecodeJson (Either String) g l' Nil () l' r'
      , IsSymbol s
      , Lacks s r'
-     , RInsert g SProxy s l' r' l r
+     , RInsert Function g SProxy s l' r' l r
      )
   => GDecodeJson (Either String) g (Cons s v l') Nil () (Cons s v l') r
   where
@@ -95,7 +88,7 @@ else instance gDecodeJson_ConsConsCons
      , IsSymbol s
      , Lacks s r1
      , Lacks s r2'
-     , RInsert g SProxy s l2' r2' l2 r2
+     , RInsert Function g SProxy s l2' r2' l2 r2
      )
   => GDecodeJson
         (Either String)

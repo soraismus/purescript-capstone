@@ -58,7 +58,7 @@ instance decodeJsonWithCons
      , Status f
      , Lacks s r2'
      , RGet g SProxy s l0 r0
-     , RInsert g SProxy s l2' r2' l2 r2
+     , RInsert Function g SProxy s l2' r2' l2 r2
      , TypeEquals fn (Json -> f v)
      )
   => DecodeJsonWith f g (Cons s fn l0') r0 l1 r1 r2

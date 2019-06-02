@@ -79,7 +79,7 @@ instance gDecodeJson_ConsNilCons_Plus
      , IsSymbol s
      , Lacks s r'
      , Plus f
-     , RInsert g SProxy s l' r' l r
+     , RInsert Function g SProxy s l' r' l r
      )
   => GDecodeJson (Either String) g Nil () (Cons s (f v) l') r
   where
@@ -113,7 +113,7 @@ else instance gDecodeJson_ConsNilCons_nonPlus
      , GDecodeJson (Either String) g Nil () l' r'
      , IsSymbol s
      , Lacks s r'
-     , RInsert g SProxy s l' r' l r
+     , RInsert Function g SProxy s l' r' l r
      )
   => GDecodeJson (Either String) g Nil () (Cons s v l') r
   where
@@ -156,7 +156,7 @@ else instance gDecodeJson_ConsConsCons_Plus
      , Lacks s r0
      , Lacks s r1'
      , Plus f
-     , RInsert g SProxy s l1' r1' l1 r1
+     , RInsert Function g SProxy s l1' r1' l1 r1
      )
   => GDecodeJson (Either String) g (Cons s1 v1 l0') r0 (Cons s (f v) l1') r1
   where
@@ -192,7 +192,7 @@ else instance gDecodeJson_ConsConsCons_nonPlus
      , IsSymbol s
      , Lacks s r0
      , Lacks s r1'
-     , RInsert g SProxy s l1' r1' l1 r1
+     , RInsert Function g SProxy s l1' r1' l1 r1
      )
   => GDecodeJson (Either String) g (Cons s1 v1 l0') r0 (Cons s v l1') r1
   where
