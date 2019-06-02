@@ -1,4 +1,4 @@
-module Data.Argonaut.Decode.Record.Tolerant.Cross.Class
+module Data.Argonaut.Decode.Record.Tolerant.Cross.DecodeJson
   ( class DecodeJson
   , decodeJson
   ) where
@@ -6,12 +6,14 @@ module Data.Argonaut.Decode.Record.Tolerant.Cross.Class
 import Prelude (bind, ($))
 
 import Data.Argonaut.Core (Json, toObject)
-import Data.Argonaut.Decode.Record.Tolerant.Class
+import Data.Argonaut.Decode.Record.Tolerant.DecodeJson
   ( class DecodeJson
-  , class GDecodeJson
   , decodeJson
-  , gDecodeJson
   ) as D
+import Data.Argonaut.Decode.Record.Tolerant.GDecodeJson
+  ( class GDecodeJson
+  , gDecodeJson
+  ) as G
 import Data.Either (Either)
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Status (report, reportError)
@@ -23,7 +25,7 @@ class DecodeJson a where
   decodeJson :: Json -> Either String a
 
 instance decodeRecord
-  :: ( D.GDecodeJson Builder (Either String) Record Nil () l r
+  :: ( G.GDecodeJson Builder (Either String) Record Nil () l r
      , RowToList r l
      )
   => DecodeJson (Record r)
@@ -32,7 +34,7 @@ instance decodeRecord
     case toObject json of
       Just object -> do
         builder <-
-          D.gDecodeJson
+          G.gDecodeJson
             (RLProxy :: RLProxy Nil)
             (RLProxy :: RLProxy l)
             object
