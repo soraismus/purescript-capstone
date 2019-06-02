@@ -17,24 +17,24 @@ import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency
 import Type.Row (class RowToList)
 
 decodeJsonWith
-  :: forall f l0 l2 r0 r1 r2 r3
+  :: forall f l0 l1 r0 r1 r2
    . Bind f
-  => D.DecodeJsonWith f Record l0 r0 r1 l2 r2 r3
-  => GDecodeJson r2 l2
+  => D.DecodeJsonWith f Record l0 r0 l1 r1 r2
+  => GDecodeJson r1 l1
   => RowToList r0 l0
-  => RowToList r2 l2
+  => RowToList r1 l1
   => Status f
   => Record r0
   -> Json
-  -> f (Record r3)
+  -> f (Record r2)
 decodeJsonWith decoderRecord = reportJson go
   where
-  go :: Object Json -> f (Record r3)
+  go :: Object Json -> f (Record r2)
   go object = do
     record2 <- reportObject object
     D.decodeJsonWith
       (RLProxy :: RLProxy l0)
-      (RLProxy :: RLProxy l2)
+      (RLProxy :: RLProxy l1)
       decoderRecord
       object
       record2

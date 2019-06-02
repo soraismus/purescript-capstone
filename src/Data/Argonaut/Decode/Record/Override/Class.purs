@@ -17,7 +17,6 @@ import Type.Equality (class TypeEquals, to)
 import Type.Row
   ( class Cons
   , class Lacks
-  , class Union
   , Cons
   , Nil
   , kind RowList
@@ -29,51 +28,47 @@ class DecodeJsonWith
   (g  :: # Type -> Type)
   (l0 :: RowList)
   (r0 :: # Type)
+  (l1 :: RowList)
   (r1 :: # Type)
-  (l2 :: RowList)
   (r2 :: # Type)
-  (r3 :: # Type)
-  | l0 -> r0 r1
-  , l2 -> r2
-  , l0 l2 -> r3
+  | l0 -> r0
+  , l1 -> r1
+  , l0 l1 -> r2
   where
   decodeJsonWith
     :: RLProxy l0
-    -> RLProxy l2
+    -> RLProxy l1
     -> g r0
     -> Object Json
-    -> g r2
-    -> f (g r3)
+    -> g r1
+    -> f (g r2)
 
 instance decodeJsonWithNil
   :: Status f
-  => DecodeJsonWith f g Nil () () l r r
+  => DecodeJsonWith f g Nil () l r r
   where
   decodeJsonWith _ _ _ _ = report
 
 instance decodeJsonWithCons
   :: ( Bind f
      , Cons s fn r0' r0
-     , Cons s v r1' r1
-     , Cons s v r3' r3
-     , DecodeJsonWith f g l0' r0' r1' l2 r2 r3'
+     , Cons s v r2' r2
+     , DecodeJsonWith f g l0' r0' l1 r1 r2'
      , IsSymbol s
      , Status f
-     , Lacks s r1'
-     , Lacks s r3'
+     , Lacks s r2'
      , RGet g SProxy s l0 r0
-     , RInsert g SProxy s l3' r3' l3 r3
+     , RInsert g SProxy s l2' r2' l2 r2
      , TypeEquals fn (Json -> f v)
-     , Union r1 r2 r3
      )
-  => DecodeJsonWith f g (Cons s fn l0') r0 r1 l2 r2 r3
+  => DecodeJsonWith f g (Cons s fn l0') r0 l1 r1 r2
   where
   decodeJsonWith _ _ decoderRecord object record = do
     case lookup fieldName object of
       Just jsonVal -> do
         val <- decoder jsonVal
-        intermediate <- decodeJsonWith l0' l2 decoderRecord' object record
-        report $ rinsert l3' l3 s val intermediate
+        intermediate <- decodeJsonWith l0' l1 decoderRecord' object record
+        report $ rinsert l2' l2 s val intermediate
       Nothing ->
         reportError $ getMissingFieldErrorMessage fieldName
     where
@@ -95,14 +90,14 @@ instance decodeJsonWithCons
     l0' :: RLProxy l0'
     l0' = RLProxy
 
+    l1 :: RLProxy l1
+    l1 = RLProxy
+
     l2 :: RLProxy l2
     l2 = RLProxy
 
-    l3 :: RLProxy l3
-    l3 = RLProxy
-
-    l3' :: RLProxy l3'
-    l3' = RLProxy
+    l2' :: RLProxy l2'
+    l2' = RLProxy
 
     s :: SProxy s
     s = SProxy
