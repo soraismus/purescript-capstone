@@ -2,7 +2,7 @@ module Data.Argonaut.Decode.Record.Cross.Utils
   ( decodeJsonWith
   ) where
 
-import Prelude (class Bind, bind)
+import Prelude (class Bind, bind, ($))
 
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode.Class (class GDecodeJson)
@@ -11,7 +11,7 @@ import Data.Argonaut.Decode.Record.Cross.Class
   , decodeJsonWith
   ) as D
 import Data.Argonaut.Decode.Record.Utils (reportJson, reportObject)
-import Data.Status (class Status)
+import Data.Status (class Status, report)
 import Foreign.Object (Object)
 import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency
 import Type.Row (class RowToList)
@@ -31,11 +31,25 @@ decodeJsonWith decoderRecord = reportJson go
   where
   go :: Object Json -> f (Record r3)
   go object = do
-    record2 <- reportObject object
-    D.decodeJsonWith
-      (RLProxy :: RLProxy l0)
-      (RLProxy :: RLProxy l2)
-      decoderRecord
-      object
-      record2
-      record2
+    (record2 :: Record r2) <- reportObject object
+    --(getFields0 :: Record ? -> Record ?) <-
+    getFields0 <-
+      D.decodeJsonWith
+        (RLProxy :: RLProxy l0)
+        (RLProxy :: RLProxy l2)
+        decoderRecord
+        object
+        record2
+    report $ getFields0 record2
+
+--   where
+--   go :: Object Json -> f (Record r3)
+--   go object = do
+--     record2 <- reportObject object
+--     D.decodeJsonWith
+--       (RLProxy :: RLProxy l0)
+--       (RLProxy :: RLProxy l2)
+--       decoderRecord
+--       object
+--       record2
+--       record2

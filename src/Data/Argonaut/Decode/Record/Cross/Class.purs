@@ -3,7 +3,7 @@ module Data.Argonaut.Decode.Record.Cross.Class
   , decodeJsonWith
   ) where
 
-import Prelude (class Bind, bind, ($))
+import Prelude (class Bind, bind, identity, ($), (<<<))
 
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode.Record.Utils (getMissingFieldErrorMessage)
@@ -36,14 +36,16 @@ class DecodeJsonWith
     -> g r0
     -> Object Json
     -> a
-    -> g r2
-    -> f (g r3)
+    -- -> p (g r2) (f (g r3))
+    -- -> g r2 -> f (g r3)
+    -> f (g r2 -> g r3)
 
+-- Category p => identity
 instance decodeJsonWithNil
   :: Status f
   => DecodeJsonWith f g Nil () l r r a
   where
-  decodeJsonWith _ _ _ _ _ = report
+  decodeJsonWith _ _ _ _ _ = report identity
 
 instance decodeJsonWithCons
   :: ( Bind f
@@ -59,12 +61,14 @@ instance decodeJsonWithCons
      )
   => DecodeJsonWith f g (Cons s fn l0') r0 l2 r2 r3 a
   where
-  decodeJsonWith _ _ decoderRecord object x record = do
+  decodeJsonWith _ _ decoderRecord object x = do
     case lookup fieldName object of
       Just jsonVal -> do
         val <- decoder jsonVal x
-        intermediate <- decodeJsonWith l0' l2 decoderRecord' object x record
-        report $ rinsert l3' l3 s val intermediate
+        doRest <- decodeJsonWith l0' l2 decoderRecord' object x
+        report $ rinsert l3' l3 s val <<< doRest
+--         intermediate <- decodeJsonWith l0' l2 decoderRecord' object x record
+--         report $ rinsert l3' l3 s val intermediate
       Nothing ->
         reportError $ getMissingFieldErrorMessage fieldName
     where
