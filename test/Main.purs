@@ -8,7 +8,7 @@ import Effect (Effect)
 import Test.Suites.Cross (suites) as Cross
 import Test.Suites.Lazy (suites) as Lazy
 import Test.Suites.Override (suites) as Override
-import Test.Suites.RenameFields.Class (suites) as RenameFields
+import Test.Suites.Record.Extra.RenameFields (suites) as RenameFields
 import Test.Suites.SameKeys (suites) as SameKeys
 import Test.Suites.SameSize (suites) as SameSize
 import Test.Suites.SubFields (suites) as SubFields

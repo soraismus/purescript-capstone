@@ -1,4 +1,4 @@
-module Test.Suites.RenameFields.Class
+module Test.Suites.Record.Extra.RenameFields
   ( suites
   ) where
 
@@ -6,7 +6,7 @@ import Prelude (discard, map, (<<<), ($))
 
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode (decodeJson)
-import Data.Argonaut.Decode.Record.RenameFields.Class (renameFields)
+import Record.Extra.RenameFields (renameFields)
 import Data.Either (Either(Left, Right))
 import Data.List ((:))
 import Data.List (List(Nil)) as List
