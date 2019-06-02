@@ -3,7 +3,15 @@ module Data.Argonaut.Decode.Record.Cross.Class
   , decodeJsonWith
   ) where
 
-import Prelude (class Bind, bind, identity, ($), (<<<))
+import Prelude
+  ( class Bind
+  , class Category
+  , class Semigroupoid
+  , bind
+  , identity
+  , ($)
+  , (<<<)
+  )
 
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode.Record.Utils (getMissingFieldErrorMessage)
@@ -18,6 +26,7 @@ import Type.Row (class Cons, class Lacks, Cons, Nil, kind RowList)
 import Unsafe.Coerce (unsafeCoerce)
 
 class DecodeJsonWith
+  (p  :: Type -> Type -> Type)
   (f  :: Type -> Type)
   (g  :: # Type -> Type)
   (l0 :: RowList)
@@ -36,14 +45,14 @@ class DecodeJsonWith
     -> g r0
     -> Object Json
     -> a
-    -- -> p (g r2) (f (g r3))
-    -- -> g r2 -> f (g r3)
-    -> f (g r2 -> g r3)
+    -> f (p (g r2) (g r3))
+    -- -> f (g r2 -> g r3)
 
--- Category p => identity
 instance decodeJsonWithNil
-  :: Status f
-  => DecodeJsonWith f g Nil () l r r a
+  :: ( Category p
+     , Status f
+     )
+  => DecodeJsonWith p f g Nil () l r r a
   where
   decodeJsonWith _ _ _ _ _ = report identity
 
@@ -51,15 +60,16 @@ instance decodeJsonWithCons
   :: ( Bind f
      , Cons s fn r0' r0
      , Cons s v r3' r3
-     , DecodeJsonWith f g l0' r0' l2 r2 r3' a
+     , DecodeJsonWith p f g l0' r0' l2 r2 r3' a
      , IsSymbol s
      , Status f
      , Lacks s r3'
      , RGet g SProxy s l0 r0
-     , RInsert Function g SProxy s l3' r3' l3 r3
+     , RInsert p g SProxy s l3' r3' l3 r3
+     , Semigroupoid p
      , TypeEquals fn (Json -> a -> f v)
      )
-  => DecodeJsonWith f g (Cons s fn l0') r0 l2 r2 r3 a
+  => DecodeJsonWith p f g (Cons s fn l0') r0 l2 r2 r3 a
   where
   decodeJsonWith _ _ decoderRecord object x = do
     case lookup fieldName object of
@@ -67,8 +77,6 @@ instance decodeJsonWithCons
         val <- decoder jsonVal x
         doRest <- decodeJsonWith l0' l2 decoderRecord' object x
         report $ rinsert l3' l3 s val <<< doRest
---         intermediate <- decodeJsonWith l0' l2 decoderRecord' object x record
---         report $ rinsert l3' l3 s val intermediate
       Nothing ->
         reportError $ getMissingFieldErrorMessage fieldName
     where

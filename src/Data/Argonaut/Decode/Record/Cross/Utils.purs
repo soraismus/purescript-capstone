@@ -19,7 +19,7 @@ import Type.Row (class RowToList)
 decodeJsonWith
   :: forall f l0 l2 r0 r2 r3
    . Bind f
-  => D.DecodeJsonWith f Record l0 r0 l2 r2 r3 (Record r2)
+  => D.DecodeJsonWith Function f Record l0 r0 l2 r2 r3 (Record r2)
   => GDecodeJson r2 l2
   => RowToList r0 l0
   => RowToList r2 l2
@@ -32,24 +32,11 @@ decodeJsonWith decoderRecord = reportJson go
   go :: Object Json -> f (Record r3)
   go object = do
     (record2 :: Record r2) <- reportObject object
-    --(getFields0 :: Record ? -> Record ?) <-
-    getFields0 <-
+    (addFields0 :: Record r2 -> Record r3) <-
       D.decodeJsonWith
         (RLProxy :: RLProxy l0)
         (RLProxy :: RLProxy l2)
         decoderRecord
         object
         record2
-    report $ getFields0 record2
-
---   where
---   go :: Object Json -> f (Record r3)
---   go object = do
---     record2 <- reportObject object
---     D.decodeJsonWith
---       (RLProxy :: RLProxy l0)
---       (RLProxy :: RLProxy l2)
---       decoderRecord
---       object
---       record2
---       record2
+    report $ addFields0 record2
