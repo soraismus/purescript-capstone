@@ -8,12 +8,8 @@ class SubFields (l :: RowList) (r :: # Type) | l -> r
 
 instance subFieldsNil :: SubFields Nil r
 
-instance subFieldsCons_one
-  :: Cons s v r' r
-  => SubFields (Cons s v Nil) r
-
-instance subFieldsCons_many
+instance subFields_Cons
   :: ( Cons s0 v0 r' r
-     , SubFields (Cons s1 v1 l'') r'
+     , SubFields l' r'
      )
-  => SubFields (Cons s0 v0 (Cons s1 v1 l'')) r
+  => SubFields (Cons s0 v0 l') r
