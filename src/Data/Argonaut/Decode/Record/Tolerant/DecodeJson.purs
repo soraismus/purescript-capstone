@@ -16,11 +16,7 @@ import Data.Maybe (Maybe(Just, Nothing))
 import Data.Status (report, reportError)
 import Record.Builder (Builder, build)
 import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency
-import Type.Row
-  ( class RowToList
-  , Nil
-  , kind RowList
-  )
+import Type.Row (class RowToList, Nil, kind RowList)
 
 class DecodeJson a where
   decodeJson :: Json -> Either String a
