@@ -20,7 +20,7 @@ class DecodeJson a where
   decodeJson :: Json -> Either String a
 
 instance decodeRecord
-  :: ( D.GDecodeJson (Either String) Record l r Nil () l r
+  :: ( D.GDecodeJson (Either String) Record Nil () l r
      , RowToList r l
      )
   => DecodeJson (Record r)
