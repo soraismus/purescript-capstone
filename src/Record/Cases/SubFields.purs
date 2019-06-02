@@ -1,4 +1,4 @@
-module Data.SubFields
+module Record.Extra.SubFields
   ( class SubFields
   ) where
 

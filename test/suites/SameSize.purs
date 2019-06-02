@@ -4,7 +4,7 @@ module Test.Suites.SameSize
 
 import Prelude (discard, pure, unit, ($))
 
-import Data.SameSize (class SameSize)
+import Record.Extra.SameSize (class SameSize)
 import Test.Unit (Test, TestSuite, suite, test)
 import Test.Unit.Assert (assert)
 import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency

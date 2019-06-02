@@ -4,8 +4,8 @@ module Test.Suites.SubFields
 
 import Prelude (discard, pure, unit, ($))
 
-import Data.SubFields (class SubFields)
-import Data.SameSize (class SameSize)
+import Record.Extra.SameSize (class SameSize)
+import Record.Extra.SubFields (class SubFields)
 import Test.Unit (Test, TestSuite, suite, test)
 import Test.Unit.Assert (assert)
 import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency

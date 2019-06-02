@@ -1,4 +1,4 @@
-module Data.SameSize
+module Record.Extra.SameSize
   ( class SameSize
   ) where
 
