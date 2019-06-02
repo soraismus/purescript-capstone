@@ -3,14 +3,7 @@ module Data.Argonaut.Decode.Record.Lazy.Class
   , gDecodeJson
   ) where
 
-import Prelude
-  ( class Category
-  , class Semigroupoid
-  , bind
-  , identity
-  , ($)
-  , (<<<)
-  )
+import Prelude (class Category, class Semigroupoid, bind, identity, ($), (<<<))
 
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode.Class (class DecodeJson, decodeJson) as D
