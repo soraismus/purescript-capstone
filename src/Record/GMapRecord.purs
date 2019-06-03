@@ -5,7 +5,6 @@ import Prelude (class Category, class Semigroupoid, identity, (<<<))
 
 import Data.RecordLike (class RGet, class RModify, rget, rmodify)
 import Data.Symbol (class IsSymbol, SProxy(SProxy))
-import Record.Builder (Builder)
 import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency
 import Type.Row (class Cons, class RowToList, Cons, Nil, kind RowList)
 import Unsafe.Coerce (unsafeCoerce)
@@ -17,7 +16,8 @@ mapRecord
   => RowToList r1 l1
   => Record r0
   -> p (f r1) (f r2)
-mapRecord = gMapRecord (RLProxy :: RLProxy l0) (RLProxy :: RLProxy l1)
+mapRecord =
+  gMapRecord (RLProxy :: RLProxy l0) (RLProxy :: RLProxy l1)
 
 class GMapRecord
   (p  :: Type -> Type -> Type)
@@ -49,7 +49,8 @@ instance gMapRecord_Cons
   => GMapRecord p f (Cons s v l0') r0 l1 r1 r2
   where
   gMapRecord l0 l1 record0 =
-      rmodify l2' l2 s (rget l0 s record0) <<< (gMapRecord l0' l1 record0')
+      rmodify l2' l2 s (rget l0 s record0)
+        <<< (gMapRecord l0' l1 record0')
     where
     l0' = (RLProxy :: RLProxy l0')
     l2' = (RLProxy :: RLProxy l2')
