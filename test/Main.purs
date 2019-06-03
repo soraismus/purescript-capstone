@@ -8,6 +8,7 @@ import Effect (Effect)
 import Test.Suites.Cross (suites) as Cross
 import Test.Suites.HasKeys (suites) as HasKeys
 import Test.Suites.Lazy (suites) as Lazy
+import Test.Suites.MapRecord (suites) as MapRecord
 import Test.Suites.Override (suites) as Override
 import Test.Suites.Record.Extra.RenameFields (suites) as RenameFields
 import Test.Suites.SameSize (suites) as SameSize
@@ -21,6 +22,7 @@ main = runTest do
   Cross.suites
   HasKeys.suites
   Lazy.suites
+  MapRecord.suites
   Override.suites
   RenameFields.suites
   SameSize.suites
