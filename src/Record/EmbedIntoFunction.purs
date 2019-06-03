@@ -3,9 +3,9 @@ module Record.Extra.EmbedIntoFunction where
 import Prelude (identity)
 import Data.Symbol (class IsSymbol, SProxy(SProxy))
 import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency
-import Type.Row (class Cons, Cons, Nil, kind RowList)
+import Type.Row (class Cons, class Lacks, Cons, Nil, kind RowList)
 import Unsafe.Coerce (unsafeCoerce)
-import Data.RecordLike (class RGet, class RModify, rget, rmodify)
+import Data.RecordLike (class RGet, class RInsert, class RModify, rget, rinsert, rmodify)
 
 class EmbedIntoFunction
   (l0 :: RowList)
@@ -21,6 +21,51 @@ class EmbedIntoFunction
 
 instance embedIntoFunction_Nil :: EmbedIntoFunction Nil () l r r where
   embed _ _ _ = identity
+
+class RTransform
+  (a  :: Type)
+  (v  :: Type)
+  (p  :: Type -> Type -> Type)
+  (f  :: # Type -> Type)
+  (g  :: Symbol -> Type)
+  (s  :: Symbol)
+  (l0 :: RowList)
+  (r0 :: # Type)
+  (l1 :: RowList)
+  (r1 :: # Type)
+  | l0 -> r0
+  , l1 -> r1
+  where
+  rtransform
+    :: a
+    -> RLProxy l0
+    -> RLProxy l1
+    -> g s
+    -> v
+    -> p (f r0) (f r1)
+
+data RInsert_ = RInsert_
+data RModify_ = RModify_
+
+instance rtransformRInsert
+  :: ( RInsert p f g s l0 r0 l1 r1
+     , Cons s v r0 r1
+     , Lacks s r0
+     , IsSymbol s
+     )
+  => RTransform RInsert_ v p f g s l0 r0 l1 r1
+  where
+  rtransform _ = rinsert
+
+-- instance rtransformRModifyRecord
+--   :: ( RModify p f g s l0 r0 l1 r1
+--      , Cons s v0 r r0
+--      , Cons s v1 r r1
+--      , IsSymbol s
+--      )
+--   => RTransform RModify_ p Record g s l0 r0 l1 r1
+--   where
+--   rtransform _ = rmodify
 
 instance embedIntoFunction_Cons
   :: (
