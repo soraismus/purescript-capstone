@@ -6,7 +6,7 @@ import Prelude (class Bind, bind, ($))
 
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode.Class (class GDecodeJson)
-import Data.Argonaut.Decode.Record.Override.Class
+import Data.Argonaut.Decode.Record.Override.DecodeJsonWith
   ( class DecodeJsonWith
   , decodeJsonWith
   ) as D

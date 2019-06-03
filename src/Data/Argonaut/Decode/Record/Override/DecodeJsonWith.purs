@@ -1,4 +1,4 @@
-module Data.Argonaut.Decode.Record.Override.Class
+module Data.Argonaut.Decode.Record.Override.DecodeJsonWith
   ( class DecodeJsonWith
   , decodeJsonWith
   ) where
