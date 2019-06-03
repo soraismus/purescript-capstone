@@ -1,38 +1,53 @@
 module Data.RecordLike
-  ( class RDelete
+  ( class RCompare
+  , class RContract
+  , class RDelete
   , class RDisjointUnion
   , class REmpty
+  , class RExpand
   , class REqual
   , class RGet
   , class RInsert
+  , class RMatch
   , class RMerge
   , class RModify
   , class RNub
+  , class ROn
+  , class ROnMatch
+  , class RPick
   , class RRename
   , class RSet
   , class RSingleton
   , class RUnion
-  , rget
+  , rcompare
+  , rcontract
   , rdelete
   , rdisjointUnion
   , rempty
+  , rexpand
   , requal
+  , rget
   , rinsert
+  , rmatch
   , rmerge
   , rmodify
   , rnub
+  , ron
+  , ronMatch
+  , rpick
   , rrename
   , rset
   , rsingleton
   , runion
   ) where
 
-import Prelude (const, eq, identity, (<<<))
+import Prelude (Ordering, const, eq, identity, pure, ($), (<<<))
 
+import Control.Alternative (class Alternative)
 import Data.Symbol (class IsSymbol, SProxy)
-import Data.Variant (class VariantEqs, Variant)
-import Data.Variant (inj, on) as Variant
-import Data.Variant.Internal (class VariantTags)
+import Data.Variant (class VariantEqs, class VariantMatchCases, Variant)
+import Data.Variant (contract, expand, inj, match, on, onMatch, prj) as Variant
+import Data.Variant.Internal (class Contractable, class VariantTags)
 import Record
   ( class EqualFields
   , delete
@@ -58,6 +73,12 @@ import Record.Builder
   , rename
   , union
   ) as Builder
+import Record.Extra
+  ( class Keys
+  , class OrdRecord
+  , compareRecord
+  , pick
+  ) as RecordExtra
 import Record.Extra.Utils (singleton) as Record
 import Type.Row
   ( class Cons
@@ -73,6 +94,61 @@ import Type.Row
   )
 import Type.Row (RLProxy) as TypeRow
 import Unsafe.Coerce (unsafeCoerce)
+
+class RCompare
+  (f :: # Type -> Type)
+  (l :: RowList)
+  (r :: # Type)
+  | l -> r
+  where
+  rcompare
+    :: TypeRow.RLProxy l
+    -> f r
+    -> f r
+    -> Ordering
+
+instance rcompareRecord
+  :: ( RecordExtra.OrdRecord l r
+     , RowToList r l
+     )
+  => RCompare Record l r
+  where
+  rcompare _ = RecordExtra.compareRecord
+
+class RContract
+  (p  :: Type -> Type -> Type)
+  (f  :: # Type -> Type)
+  (l0 :: RowList)
+  (r0 :: # Type)
+  (l1 :: RowList)
+  (r1 :: # Type)
+  | l0 -> r0
+  , l1 -> r1
+  where
+  rcontract
+    :: forall h r
+     . Alternative h
+    => Union r1 r r0
+    => TypeRow.RLProxy l0
+    -> TypeRow.RLProxy l1
+    -> p (f r0) (h (f r1))
+
+instance rcontractRecord
+  :: ( RecordExtra.Keys l1
+     , RowToList r1 l1
+     )
+  => RContract Function Record l0 r0 l1 r1
+  where
+  rcontract _ _ record = pure $ RecordExtra.pick record
+
+instance rcontractRProxy :: RContract Function RProxy l0 r0 l1 r1 where
+  rcontract _ _ _ = pure RProxy
+
+instance rcontractVariant
+  :: Contractable r0 r1
+  => RContract Function Variant l0 r0 l1 r1
+  where
+  rcontract _ _ = Variant.contract
 
 class RDelete
   (p  :: Type -> Type -> Type)
@@ -179,6 +255,29 @@ instance requalVariant
   => REqual Variant l r where
   requal _ = eq
 
+class RExpand
+  (p  :: Type -> Type -> Type)
+  (f  :: # Type -> Type)
+  (l0 :: RowList)
+  (r0 :: # Type)
+  (l1 :: RowList)
+  (r1 :: # Type)
+  | l0 -> r0
+  , l1 -> r1
+  where
+  rexpand
+    :: forall r
+     . Union r0 r r1
+    => TypeRow.RLProxy l0
+    -> TypeRow.RLProxy l1
+    -> p (f r0) (f r1)
+
+instance rexpandRProxy :: RExpand Function RProxy l0 r0 l1 r1 where
+  rexpand _ _ _ = RProxy
+
+instance rexpandVariant :: RExpand Function Variant l0 r0 l1 r1 where
+  rexpand _ _ = Variant.expand
+
 class RGet
   (f :: # Type -> Type)
   (g :: Symbol -> Type)
@@ -187,7 +286,7 @@ class RGet
   (r :: # Type)
   | l -> r
   where
-  rget :: forall r' v . Cons s v r' r => TypeRow.RLProxy l -> g s -> f r -> v
+  rget :: forall r' v. Cons s v r' r => TypeRow.RLProxy l -> g s -> f r -> v
 
 instance rgetRecord :: IsSymbol s => RGet Record SProxy s l r where
   rget _ = Record.get
@@ -236,6 +335,37 @@ instance rinsertVariant
   => RInsert Function Variant SProxy s l0 r0 l1 r1
   where
   rinsert _ _ s v _ = Variant.inj s v
+
+class RMatch
+  (f  :: # Type -> Type)
+  (g  :: # Type -> Type)
+  (v  :: Type)
+  (l0 :: RowList)
+  (r0 :: # Type)
+  (l1 :: RowList)
+  (r1 :: # Type)
+  (l2 :: RowList)
+  (r2 :: # Type)
+  | l0 -> r0
+  , l1 -> r1
+  , l2 -> r2
+  where
+  rmatch
+    :: Union r1 () r2
+    => TypeRow.RLProxy l0
+    -> TypeRow.RLProxy l1
+    -> TypeRow.RLProxy l2
+    -> f r0
+    -> g r2
+    -> v
+
+instance rmatchVariant
+  :: ( RowToList r0 l0
+     , VariantMatchCases l0 r1 v
+     )
+  => RMatch Record Variant v l0 r0 l1 r1 l2 r2
+  where
+  rmatch _ _ _ = Variant.match
 
 class RMerge
   (p  :: Type -> Type -> Type)
@@ -319,46 +449,6 @@ instance rmodifyVariant
       (Variant.inj s <<< f)
       (unsafeCoerce <<< identity)
 
--- class RInsert
---   (p  :: Type -> Type -> Type)
---   (f  :: # Type -> Type)
---   (g  :: Symbol -> Type)
---   (s  :: Symbol)
---   (l0 :: RowList)
---   (r0 :: # Type)
---   (l1 :: RowList)
---   (r1 :: # Type)
---   | l0 -> r0
---   , l1 -> r1
---   where
---   rinsert
---     :: forall v
---      . Cons s v r0 r1
---     => Lacks s r0
---     => TypeRow.RLProxy l0
---     -> TypeRow.RLProxy l1
---     -> g s
---     -> v
---     -> p (f r0) (f r1)
--- class RProject
---   (p  :: Type -> Type -> Type)
---   (f  :: # Type -> Type)
---   (g  :: Symbol -> Type)
---   (s  :: Symbol)
---   (l :: RowList)
---   (r :: # Type)
---   | l -> r
---   where
---   rproject
---     :: forall h r' v
---      . R.Cons s v r' r
---     -- => IsSymbol s
---     => Alternative h
---     => g sym
---     -> f r
---     -> h a
--- instance rprojectVariant :: RProject p Variant g s l0 r0 l1 r1
-
 class RNub
   (p  :: Type -> Type -> Type)
   (f  :: # Type -> Type)
@@ -387,6 +477,98 @@ instance rnubRProxy :: RNub Function RProxy l0 r0 l1 r1 where
 instance rnubVariant :: RNub Function Variant l0 r0 l1 r1 where
   rnub _ _ = unsafeCoerce
 
+class ROn
+  (f  :: # Type -> Type)
+  (g  :: Symbol -> Type)
+  (s  :: Symbol)
+  (l0 :: RowList)
+  (r0 :: # Type)
+  (l1 :: RowList)
+  (r1 :: # Type)
+  | l0 -> r0
+  , l1 -> r1
+  where
+  ron
+    :: forall a b
+     . Cons s a r0 r1
+    => TypeRow.RLProxy l0
+    -> TypeRow.RLProxy l1
+    -> g s
+    -> (a -> b)
+    -> (f r0 -> b)
+    -> f r1
+    -> b
+
+instance ronVariant :: IsSymbol s => ROn Variant SProxy s l0 r0 l1 r1 where
+  ron _ _ = Variant.on
+
+class ROnMatch
+  (f  :: # Type -> Type)
+  (g  :: # Type -> Type)
+  (v  :: Type)
+  (l0 :: RowList)
+  (r0 :: # Type)
+  (l1 :: RowList)
+  (r1 :: # Type)
+  (l2 :: RowList)
+  (r2 :: # Type)
+  (l3 :: RowList)
+  (r3 :: # Type)
+  | l0 -> r0
+  , l1 -> r1
+  , l2 -> r2
+  , l3 -> r3
+  where
+  ronMatch
+    :: Union r1 r2 r3
+    => TypeRow.RLProxy l0
+    -> TypeRow.RLProxy l1
+    -> TypeRow.RLProxy l2
+    -> TypeRow.RLProxy l3
+    -> f r0
+    -> (g r2 -> v)
+    -> g r3
+    -> v
+
+instance ronMatchVariant
+  :: ( RowToList r0 l0
+     , VariantMatchCases l0 r1 v
+     )
+  => ROnMatch Record Variant v l0 r0 l1 r1 l2 r2 l3 r3
+  where
+  ronMatch _ _ _ _ = Variant.onMatch
+
+class RPick
+  (p  :: Type -> Type -> Type)
+  (f  :: # Type -> Type)
+  (l0 :: RowList)
+  (r0 :: # Type)
+  (l1 :: RowList)
+  (r1 :: # Type)
+  | l0 -> r0
+  , l1 -> r1
+  where
+  rpick
+    :: forall r
+     . Union r1 r r0
+    => TypeRow.RLProxy l0
+    -> TypeRow.RLProxy l1
+    -> p (f r0) (f r1)
+
+-- instance rpickBuilder
+--   :: RPick Builder Record l0 r0 l1 r1 where
+--   rpick _ _ = Builder.pick
+
+instance rpickRecord
+  :: ( RecordExtra.Keys l1
+     , RowToList r1 l1
+     )
+  => RPick Function Record l0 r0 l1 r1 where
+  rpick _ _ = RecordExtra.pick
+
+instance rpickRProxy :: RPick Function RProxy l0 r0 l1 r1 where
+  rpick _ _ _ = RProxy
+
 class RRename
   (p  :: Type -> Type -> Type)
   (f  :: # Type -> Type)
@@ -413,6 +595,29 @@ class RRename
     -> g s0
     -> g s1
     -> p (f r0) (f r1)
+
+class RProject
+  (f  :: # Type -> Type)
+  (g  :: Symbol -> Type)
+  (s  :: Symbol)
+  (l :: RowList)
+  (r :: # Type)
+  | l -> r
+  where
+  rproject
+    :: forall h r' v
+     . Alternative h
+    => Cons s v r' r
+    => TypeRow.RLProxy l
+    -> g s
+    -> f r
+    -> h v
+
+instance rprojectRecord :: IsSymbol s => RProject Record SProxy s l r where
+  rproject _ s record = pure $ Record.get s record
+
+instance rprojectVariant :: IsSymbol s => RProject Variant SProxy s l r where
+  rproject _ = Variant.prj
 
 instance rrenameBuilder
   :: ( IsSymbol s0
