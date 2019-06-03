@@ -29,7 +29,7 @@ module Data.RecordLike
 
 import Prelude (const, eq, identity, (<<<))
 
-import Data.Symbol (class IsSymbol, SProxy(SProxy))
+import Data.Symbol (class IsSymbol, SProxy)
 import Data.Variant (class VariantEqs, Variant)
 import Data.Variant (inj, on) as Variant
 import Data.Variant.Internal (class VariantTags)
@@ -59,7 +59,6 @@ import Record.Builder
   , union
   ) as Builder
 import Record.Extra.Utils (singleton) as Record
-import Type.Data.RowList (RLProxy(RLProxy)) as TypeDataRowList
 import Type.Row
   ( class Cons
   , class Lacks
@@ -72,7 +71,7 @@ import Type.Row
   , RProxy(RProxy)
   , kind RowList
   )
-import Type.Row (RLProxy(RLProxy)) as TypeRow
+import Type.Row (RLProxy) as TypeRow
 import Unsafe.Coerce (unsafeCoerce)
 
 class RDelete
@@ -319,6 +318,46 @@ instance rmodifyVariant
       s
       (Variant.inj s <<< f)
       (unsafeCoerce <<< identity)
+
+-- class RInsert
+--   (p  :: Type -> Type -> Type)
+--   (f  :: # Type -> Type)
+--   (g  :: Symbol -> Type)
+--   (s  :: Symbol)
+--   (l0 :: RowList)
+--   (r0 :: # Type)
+--   (l1 :: RowList)
+--   (r1 :: # Type)
+--   | l0 -> r0
+--   , l1 -> r1
+--   where
+--   rinsert
+--     :: forall v
+--      . Cons s v r0 r1
+--     => Lacks s r0
+--     => TypeRow.RLProxy l0
+--     -> TypeRow.RLProxy l1
+--     -> g s
+--     -> v
+--     -> p (f r0) (f r1)
+-- class RProject
+--   (p  :: Type -> Type -> Type)
+--   (f  :: # Type -> Type)
+--   (g  :: Symbol -> Type)
+--   (s  :: Symbol)
+--   (l :: RowList)
+--   (r :: # Type)
+--   | l -> r
+--   where
+--   rproject
+--     :: forall h r' v
+--      . R.Cons s v r' r
+--     -- => IsSymbol s
+--     => Alternative h
+--     => g sym
+--     -> f r
+--     -> h a
+-- instance rprojectVariant :: RProject p Variant g s l0 r0 l1 r1
 
 class RNub
   (p  :: Type -> Type -> Type)

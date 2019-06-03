@@ -8,7 +8,7 @@ import Prelude (class Category, class Semigroupoid, identity, (<<<))
 
 import Data.RecordLike (class RGet, class RModify, rget, rmodify)
 import Data.Symbol (class IsSymbol, SProxy(SProxy))
-import Type.Row (class Cons, class RowToList, Cons, Nil, kind RowList)
+import Type.Row (class Cons, Cons, Nil, kind RowList)
 import Type.Row (RLProxy(RLProxy)) as TypeRow
 import Unsafe.Coerce (unsafeCoerce)
 
