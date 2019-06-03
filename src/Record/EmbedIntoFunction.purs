@@ -24,11 +24,11 @@ instance embedIntoFunction_Nil :: EmbedIntoFunction Nil () l r r where
 
 class RTransform
   (a  :: Type)
-  (v  :: Type)
   (p  :: Type -> Type -> Type)
   (f  :: # Type -> Type)
   (g  :: Symbol -> Type)
   (s  :: Symbol)
+  (v  :: Type)
   (l0 :: RowList)
   (r0 :: # Type)
   (l1 :: RowList)
@@ -53,22 +53,23 @@ instance rtransformRInsert
      , Lacks s r0
      , IsSymbol s
      )
-  => RTransform RInsert_ v p f g s l0 r0 l1 r1
+  => RTransform RInsert_ p f g s v l0 r0 l1 r1
   where
   rtransform _ = rinsert
 
--- instance rtransformRModifyRecord
---   :: ( RModify p f g s l0 r0 l1 r1
---      , Cons s v0 r r0
---      , Cons s v1 r r1
---      , IsSymbol s
---      )
---   => RTransform RModify_ p Record g s l0 r0 l1 r1
---   where
---   rtransform _ = rmodify
+instance rtransformRModify
+  :: ( RModify p f g s l0 r0 l1 r1
+     , Cons s v0 r r0
+     , Cons s v1 r r1
+     , IsSymbol s
+     )
+  => RTransform RModify_ p f g s (v0 -> v1) l0 r0 l1 r1
+  where
+  rtransform _ = rmodify
 
 instance embedIntoFunction_Cons
   :: (
+
 --      , RInsert Function Record SProxy s l2' r2' l2 r2
 --        Cons s v r0' r0
 --      , Cons s v r2' r2
