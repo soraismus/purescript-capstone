@@ -24,9 +24,7 @@ decodeJsonWith
   :: forall f l0 l2 r0 r2 r3
    . Bind f
   => D.DecodeJsonWith Builder f Record l0 r0 l2 r2 r3 (Record r2)
-
   => GDecodeJson Builder f Record Nil () l2 r2
-  -- => GDecodeJson r2 l2
   => RowToList r0 l0
   => RowToList r2 l2
   => Status f
@@ -37,8 +35,13 @@ decodeJsonWith decoderRecord = reportJson go
   where
   go :: Object Json -> f (Record r3)
   go object = do
-    (record2 :: Record r2) <- reportObject object
-    (addFields0 :: Builder (Record r2) (Record r3)) <-
+    addFields2 <-
+      gDecodeJson
+        (RLProxy :: RLProxy Nil)
+        (RLProxy :: RLProxy l2)
+        object
+    let record2 = build addFields2 {}
+    addFields0 <-
       D.decodeJsonWith
         (RLProxy :: RLProxy l0)
         (RLProxy :: RLProxy l2)
@@ -46,19 +49,3 @@ decodeJsonWith decoderRecord = reportJson go
         object
         record2
     report $ build addFields0 record2
-
-reportObject
-  :: forall f l r
-   . Bind f
-  => GDecodeJson Builder f Record Nil () l r
-  => RowToList r l
-  => Status f
-  => Object Json
-  -> f (Record r)
-reportObject object = do
-  builder <-
-    gDecodeJson
-      (RLProxy :: RLProxy Nil)
-      (RLProxy :: RLProxy l)
-      object
-  report $ build builder {}
