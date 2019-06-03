@@ -13,11 +13,9 @@ import Data.Bifunctor (lmap)
 import Data.Either (Either(Left, Right))
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Status (class Status, report, reportError)
-import Data.Symbol (class IsSymbol, SProxy, reflectSymbol)
 import Foreign.Object (Object)
 import Type.Data.RowList (RLProxy(RLProxy)) -- Argonaut dependency
-import Type.Prelude (class ListToRow)
-import Type.Row (class RowToList, Cons, Nil)
+import Type.Row (class RowToList)
 
 elaborateFailure :: forall a. String -> Either String a -> Either String a
 elaborateFailure s e = lmap msg e
