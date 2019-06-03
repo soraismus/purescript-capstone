@@ -125,6 +125,49 @@ let overrides =
       upstream.ordered-collections // { version = "v1.6.1" }
   }
 
-let additions = {=}
+let additions =
+  { precise-datetime =
+      mkPackage
+        [ "arrays"
+        , "console"
+        , "datetime"
+        , "decimals"
+        , "either"
+        , "enums"
+        , "foldable-traversable"
+        , "formatters"
+        , "integers"
+        , "js-date"
+        , "lists"
+        , "maybe"
+        , "newtype"
+        , "numbers"
+        , "prelude"
+        , "strings"
+        , "tuples"
+        , "unicode"
+        ]
+        "https://github.com/awakesecurity/purescript-precise-datetime.git"
+        "v5.1.1"
+  , slug =
+      mkPackage
+        [ "argonaut-codecs"
+        , "generics-rep"
+        , "maybe"
+        , "prelude"
+        , "strings"
+        , "unicode"
+        ]
+        "https://github.com/thomashoneyman/purescript-slug.git"
+        "v1.0.0"
+  , typelevel-eval =
+      mkPackage
+        [ "prelude"
+        , "tuples"
+        , "typelevel-prelude"
+        ]
+        "https://github.com/natefaubion/purescript-typelevel-eval.git"
+        "v0.2.0"
+  }
 
 in  upstream // overrides // additions
