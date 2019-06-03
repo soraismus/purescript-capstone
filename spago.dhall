@@ -20,6 +20,7 @@ You can edit this file as you like.
     , "record-extra"
     , "test-unit"
     , "type-equality"
+    , "typelevel-eval"
     , "typelevel-prelude"
     , "unsafe-coerce"
     , "variant"

@@ -29,7 +29,7 @@ module Data.RecordLike
 
 import Prelude (const, eq, identity, (<<<))
 
-import Data.Symbol (class IsSymbol, SProxy)
+import Data.Symbol (class IsSymbol, SProxy(SProxy))
 import Data.Variant (class VariantEqs, Variant)
 import Data.Variant (inj, on) as Variant
 import Data.Variant.Internal (class VariantTags)
@@ -59,7 +59,7 @@ import Record.Builder
   , union
   ) as Builder
 import Record.Extra.Utils (singleton) as Record
-import Type.Data.RowList (RLProxy) -- Argonaut dependency
+import Type.Data.RowList (RLProxy(RLProxy)) as TypeDataRowList
 import Type.Row
   ( class Cons
   , class Lacks
@@ -72,6 +72,7 @@ import Type.Row
   , RProxy(RProxy)
   , kind RowList
   )
+import Type.Row (RLProxy(RLProxy)) as TypeRow
 import Unsafe.Coerce (unsafeCoerce)
 
 class RDelete
@@ -90,8 +91,8 @@ class RDelete
     :: forall v
      . Cons s v r1 r0
     => Lacks s r1
-    => RLProxy l0
-    -> RLProxy l1
+    => TypeRow.RLProxy l0
+    -> TypeRow.RLProxy l1
     -> g s
     -> p (f r0) (f r1)
 
@@ -128,9 +129,9 @@ class RDisjointUnion
   rdisjointUnion
     :: Nub r2 r2
     => Union r0 r1 r2
-    => RLProxy l0
-    -> RLProxy l1
-    -> RLProxy l2
+    => TypeRow.RLProxy l0
+    -> TypeRow.RLProxy l1
+    -> TypeRow.RLProxy l2
     -> f r0
     -> p (f r1) (f r2)
 
@@ -164,7 +165,7 @@ class REqual
   (r :: # Type)
   | l -> r
   where
-  requal :: RowToList r l => RLProxy l -> f r -> f r -> Boolean
+  requal :: RowToList r l => TypeRow.RLProxy l -> f r -> f r -> Boolean
 
 instance requalRecord :: Record.EqualFields l r => REqual Record l r where
   requal _ = Record.equal
@@ -187,7 +188,7 @@ class RGet
   (r :: # Type)
   | l -> r
   where
-  rget :: forall r' v . Cons s v r' r => RLProxy l -> g s -> f r -> v
+  rget :: forall r' v . Cons s v r' r => TypeRow.RLProxy l -> g s -> f r -> v
 
 instance rgetRecord :: IsSymbol s => RGet Record SProxy s l r where
   rget _ = Record.get
@@ -208,8 +209,8 @@ class RInsert
     :: forall v
      . Cons s v r0 r1
     => Lacks s r0
-    => RLProxy l0
-    -> RLProxy l1
+    => TypeRow.RLProxy l0
+    -> TypeRow.RLProxy l1
     -> g s
     -> v
     -> p (f r0) (f r1)
@@ -237,6 +238,41 @@ instance rinsertVariant
   where
   rinsert _ _ s v _ = Variant.inj s v
 
+class RMerge
+  (p  :: Type -> Type -> Type)
+  (f  :: # Type -> Type)
+  (l0 :: RowList)
+  (r0 :: # Type)
+  (l1 :: RowList)
+  (r1 :: # Type)
+  (l2 :: RowList)
+  (r2 :: # Type)
+  | l0 -> r0
+  , l1 -> r1
+  , l2 -> r2
+  where
+  rmerge
+    :: forall r3
+     . Nub r2 r3
+    => Union r0 r1 r2
+    => TypeRow.RLProxy l0
+    -> TypeRow.RLProxy l1
+    -> TypeRow.RLProxy l2
+    -> f r0
+    -> p (f r1) (f r3)
+
+instance rmergeBuilder
+  :: Union r1 r0 r2
+  => RMerge Builder Record l0 r0 l1 r1 l2 r2
+  where
+  rmerge _ _ _ = Builder.merge
+
+instance rmergeRecord :: RMerge Function Record l0 r0 l1 r1 l2 r2 where
+  rmerge _ _ _ = Record.merge
+
+instance rmergeRProxy :: RMerge Function RProxy l0 r0 l1 r1 l2 r2 where
+  rmerge _ _ _ _ _ = RProxy
+
 class RModify
   (p  :: Type -> Type -> Type)
   (f  :: # Type -> Type)
@@ -253,8 +289,8 @@ class RModify
     :: forall r v0 v1
      . Cons s v0 r r0
     => Cons s v1 r r1
-    => RLProxy l0
-    -> RLProxy l1
+    => TypeRow.RLProxy l0
+    -> TypeRow.RLProxy l1
     -> g s
     -> (v0 -> v1)
     -> p (f r0) (f r1)
@@ -296,8 +332,8 @@ class RNub
   where
   rnub
     :: Nub r0 r1
-    => RLProxy l0
-    -> RLProxy l1
+    => TypeRow.RLProxy l0
+    -> TypeRow.RLProxy l1
     -> p (f r0) (f r1)
 
 instance rnubBuilder :: RNub Builder Record l0 r0 l1 r1 where
@@ -311,41 +347,6 @@ instance rnubRProxy :: RNub Function RProxy l0 r0 l1 r1 where
 
 instance rnubVariant :: RNub Function Variant l0 r0 l1 r1 where
   rnub _ _ = unsafeCoerce
-
-class RMerge
-  (p  :: Type -> Type -> Type)
-  (f  :: # Type -> Type)
-  (l0 :: RowList)
-  (r0 :: # Type)
-  (l1 :: RowList)
-  (r1 :: # Type)
-  (l2 :: RowList)
-  (r2 :: # Type)
-  | l0 -> r0
-  , l1 -> r1
-  , l2 -> r2
-  where
-  rmerge
-    :: forall r3
-     . Nub r2 r3
-    => Union r0 r1 r2
-    => RLProxy l0
-    -> RLProxy l1
-    -> RLProxy l2
-    -> f r0
-    -> p (f r1) (f r3)
-
-instance rmergeBuilder
-  :: Union r1 r0 r2
-  => RMerge Builder Record l0 r0 l1 r1 l2 r2
-  where
-  rmerge _ _ _ = Builder.merge
-
-instance rmergeRecord :: RMerge Function Record l0 r0 l1 r1 l2 r2 where
-  rmerge _ _ _ = Record.merge
-
-instance rmergeRProxy :: RMerge Function RProxy l0 r0 l1 r1 l2 r2 where
-  rmerge _ _ _ _ _ = RProxy
 
 class RRename
   (p  :: Type -> Type -> Type)
@@ -368,8 +369,8 @@ class RRename
     => Lacks s0 r1
     => Lacks s1 r
     => Lacks s1 r0
-    => RLProxy l0
-    -> RLProxy l1
+    => TypeRow.RLProxy l0
+    -> TypeRow.RLProxy l1
     -> g s0
     -> g s1
     -> p (f r0) (f r1)
@@ -417,8 +418,8 @@ class RSet
     :: forall r v0 v1
      . Cons s v0 r r0
     => Cons s v1 r r1
-    => RLProxy l0
-    -> RLProxy l1
+    => TypeRow.RLProxy l0
+    -> TypeRow.RLProxy l1
     -> g s
     -> v1
     -> f r0
@@ -465,9 +466,9 @@ class RUnion
   where
   runion
     :: Union r0 r1 r2
-    => RLProxy l0
-    -> RLProxy l1
-    -> RLProxy l2
+    => TypeRow.RLProxy l0
+    -> TypeRow.RLProxy l1
+    -> TypeRow.RLProxy l2
     -> f r0
     -> p (f r1) (f r2)
 
