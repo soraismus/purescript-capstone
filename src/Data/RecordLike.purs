@@ -95,6 +95,12 @@ class RDelete
     -> g s
     -> p (f r0) (f r1)
 
+instance rdeleteBuilder
+  :: IsSymbol s
+  => RDelete Builder Record SProxy s l0 r0 l1 r1
+  where
+  rdelete _ _ = Builder.delete
+
 instance rdeleteRecord
   :: IsSymbol s
   => RDelete Function Record SProxy s l0 r0 l1 r1
@@ -105,12 +111,6 @@ instance rdeleteRProxy
   :: RDelete Function RProxy g s l0 r0 l1 r1
   where
   rdelete _ _ _ _ = RProxy
-
-instance rdeleteBuilder
-  :: IsSymbol s
-  => RDelete Builder Record SProxy s l0 r0 l1 r1
-  where
-  rdelete _ _ = Builder.delete
 
 class RDisjointUnion
   (p  :: Type -> Type -> Type)
@@ -134,6 +134,11 @@ class RDisjointUnion
     -> f r0
     -> p (f r1) (f r2)
 
+instance rdisjointUnionBuilder
+  :: RDisjointUnion Builder Record l0 r0 l1 r1 l2 r2
+  where
+  rdisjointUnion _ _ _ = Builder.disjointUnion
+
 instance rdisjointUnionRecord
   :: RDisjointUnion Function Record l0 r0 l1 r1 l2 r2
   where
@@ -143,11 +148,6 @@ instance rdisjointUnionRProxy
   :: RDisjointUnion Function RProxy l0 r0 l1 r1 l2 r2
   where
   rdisjointUnion _ _ _ _ _= RProxy
-
-instance rdisjointUnionBuilder
-  :: RDisjointUnion Builder Record l0 r0 l1 r1 l2 r2
-  where
-  rdisjointUnion _ _ _ = Builder.disjointUnion
 
 class REmpty (f :: # Type -> Type) where
   rempty :: f ()
@@ -214,6 +214,12 @@ class RInsert
     -> v
     -> p (f r0) (f r1)
 
+instance rinsertBuilder
+  :: IsSymbol s
+  => RInsert Builder Record SProxy s l0 r0 l1 r1
+  where
+  rinsert _ _ = Builder.insert
+
 instance rinsertRecord
   :: IsSymbol s
   => RInsert Function Record SProxy s l0 r0 l1 r1
@@ -230,12 +236,6 @@ instance rinsertVariant
   => RInsert Function Variant SProxy s l0 r0 l1 r1
   where
   rinsert _ _ s v _ = Variant.inj s v
-
-instance rinsertBuilder
-  :: IsSymbol s
-  => RInsert Builder Record SProxy s l0 r0 l1 r1
-  where
-  rinsert _ _ = Builder.insert
 
 class RModify
   (p  :: Type -> Type -> Type)
@@ -259,6 +259,12 @@ class RModify
     -> (v0 -> v1)
     -> p (f r0) (f r1)
 
+instance rmodifyBuilder
+  :: IsSymbol s
+  => RModify Builder Record SProxy s l0 r0 l1 r1
+  where
+  rmodify _ _ = Builder.modify
+
 instance rmodifyRecord
   :: IsSymbol s
   => RModify Function Record SProxy s l0 r0 l1 r1
@@ -278,12 +284,6 @@ instance rmodifyVariant
       (Variant.inj s <<< f)
       (unsafeCoerce <<< identity)
 
-instance rmodifyBuilder
-  :: IsSymbol s
-  => RModify Builder Record SProxy s l0 r0 l1 r1
-  where
-  rmodify _ _ = Builder.modify
-
 class RNub
   (p  :: Type -> Type -> Type)
   (f  :: # Type -> Type)
@@ -300,6 +300,9 @@ class RNub
     -> RLProxy l1
     -> p (f r0) (f r1)
 
+instance rnubBuilder :: RNub Builder Record l0 r0 l1 r1 where
+  rnub _ _ = Builder.nub
+
 instance rnubRecord :: RNub Function Record l0 r0 l1 r1 where
   rnub _ _ = Record.nub
 
@@ -308,9 +311,6 @@ instance rnubRProxy :: RNub Function RProxy l0 r0 l1 r1 where
 
 instance rnubVariant :: RNub Function Variant l0 r0 l1 r1 where
   rnub _ _ = unsafeCoerce
-
-instance rnubBuilder :: RNub Builder Record l0 r0 l1 r1 where
-  rnub _ _ = Builder.nub
 
 class RMerge
   (p  :: Type -> Type -> Type)
@@ -335,17 +335,17 @@ class RMerge
     -> f r0
     -> p (f r1) (f r3)
 
-instance rmergeRecord :: RMerge Function Record l0 r0 l1 r1 l2 r2 where
-  rmerge _ _ _ = Record.merge
-
-instance rmergeRProxy :: RMerge Function RProxy l0 r0 l1 r1 l2 r2 where
-  rmerge _ _ _ _ _ = RProxy
-
 instance rmergeBuilder
   :: Union r1 r0 r2
   => RMerge Builder Record l0 r0 l1 r1 l2 r2
   where
   rmerge _ _ _ = Builder.merge
+
+instance rmergeRecord :: RMerge Function Record l0 r0 l1 r1 l2 r2 where
+  rmerge _ _ _ = Record.merge
+
+instance rmergeRProxy :: RMerge Function RProxy l0 r0 l1 r1 l2 r2 where
+  rmerge _ _ _ _ _ = RProxy
 
 class RRename
   (p  :: Type -> Type -> Type)
@@ -374,6 +374,13 @@ class RRename
     -> g s1
     -> p (f r0) (f r1)
 
+instance rrenameBuilder
+  :: ( IsSymbol s0
+     , IsSymbol s1
+     )
+  => RRename Builder Record SProxy s0 s1 l0 r0 l1 r1 where
+  rrename _ _ = Builder.rename
+
 instance rrenameRecord
   :: ( IsSymbol s0
      , IsSymbol s1
@@ -394,13 +401,6 @@ instance rrenameVariant
       s0
       (Variant.inj s1)
       unsafeCoerce
-
-instance rrenameBuilder
-  :: ( IsSymbol s0
-     , IsSymbol s1
-     )
-  => RRename Builder Record SProxy s0 s1 l0 r0 l1 r1 where
-  rrename _ _ = Builder.rename
 
 class RSet
   (f :: # Type -> Type)
@@ -471,14 +471,14 @@ class RUnion
     -> f r0
     -> p (f r1) (f r2)
 
-instance runionRecord :: RUnion Function Record l0 r0 l1 r1 l2 r2 where
-  runion _ _ _ = Record.union
-
-instance runionRProxy :: RUnion Function RProxy l0 r0 l1 r1 l2 r2 where
-  runion _ _ _ _ _ = RProxy
-
 instance runionBuilder
   :: Union r1 r0 r2
   => RUnion Builder Record l0 r0 l1 r1 l2 r2
   where
   runion _ _ _ = Builder.union
+
+instance runionRecord :: RUnion Function Record l0 r0 l1 r1 l2 r2 where
+  runion _ _ _ = Record.union
+
+instance runionRProxy :: RUnion Function RProxy l0 r0 l1 r1 l2 r2 where
+  runion _ _ _ _ _ = RProxy
