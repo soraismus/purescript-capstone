@@ -16,12 +16,17 @@ import Prelude (class Applicative, pure)
 import Control.Category (class Category, identity)
 import Control.Semigroupoid (class Semigroupoid, compose, (<<<), (>>>))
 import Data.Function (apply) as Function
+import Data.Identity (Identity(Identity))
+-- import Data.Iso (Iso(Iso))
+import Data.Leibniz (Leibniz, runLeibniz)
+import Data.Newtype (un)
 -- import Record.Builder (Builder, build)
 import Record.Builder (Builder)
 
 class Evaluable (p :: Type -> Type -> Type) (a :: Type) (b :: Type)
 instance evaluableBuilder :: Evaluable Builder (Record a) (Record b)
 instance evaluableFn :: Evaluable (->) a b
+instance evaluableLeibniz :: Evaluable Leibniz (f a) (f b)
 
 class Category p <= ClosedMonoidal p where
   eval :: forall a b. Evaluable p a b => p a b -> a -> b
@@ -31,6 +36,17 @@ class Category p <= ClosedMonoidal p where
 
 instance closedMonoidalFn :: ClosedMonoidal (->) where
   eval = Function.apply
+
+instance closedMonoidalLeibniz :: ClosedMonoidal Leibniz where
+  eval leibniz = un Identity <<< runLeibniz leibniz <<< Identity
+
+-- Also the inverse.
+-- instance closedMonoidalIso :: ClosedMonoidal Iso where
+--   eval (Iso f g) _ = g
+
+-- Lens-Simple
+-- Machine
+-- Mealy
 
 infixr 0 eval as $
 

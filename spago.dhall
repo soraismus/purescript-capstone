@@ -13,6 +13,8 @@ You can edit this file as you like.
     , "foreign-object"
     , "generics-rep"
     , "heterogeneous"
+    , "identity"
+    , "leibniz"
     , "maybe"
     , "proxy"
     , "psci-support"
