@@ -26,7 +26,7 @@ import Record.Builder (Builder)
 class Evaluable (p :: Type -> Type -> Type) (a :: Type) (b :: Type)
 instance evaluableBuilder :: Evaluable Builder (Record a) (Record b)
 instance evaluableFn :: Evaluable (->) a b
-instance evaluableLeibniz :: Evaluable Leibniz (f a) (f b)
+instance evaluableLeibniz :: Evaluable Leibniz a b
 
 class Category p <= ClosedMonoidal p where
   eval :: forall a b. Evaluable p a b => p a b -> a -> b
