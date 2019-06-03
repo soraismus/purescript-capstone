@@ -6,7 +6,7 @@ module Data.Argonaut.Decode.Record.Lazy.Utils
 import Prelude (class Functor, map)
 
 import Data.Argonaut.Core (Json)
-import Data.Argonaut.Decode.Record.Lazy.Class
+import Data.Argonaut.Decode.Record.Lazy.GDecodeJson
   ( class GDecodeJson
   , gDecodeJson
   ) as D

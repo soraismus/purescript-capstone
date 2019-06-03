@@ -1,4 +1,4 @@
-module Data.Argonaut.Decode.Record.Lazy.Class
+module Data.Argonaut.Decode.Record.Lazy.GDecodeJson
   ( class GDecodeJson
   , gDecodeJson
   ) where
