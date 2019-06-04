@@ -15,6 +15,5 @@ pickRecord
   => p (f r1) (f r2)
 pickRecord =
   gPickRecord
-    (TypeRow.RLProxy :: TypeRow.RLProxy l0)
     (TypeRow.RLProxy :: TypeRow.RLProxy l1)
     (TypeRow.RLProxy :: TypeRow.RLProxy l2)
