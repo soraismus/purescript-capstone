@@ -141,24 +141,24 @@ suites =
                     )
               value1 = RProxy
           assertSubFields value0 value1
-    suite "SubFields constraint is not satisfied -- CANNOT COMPILE" do
-      test "Single field with different keys -- Does Not Compile" $ pure unit
+    suite "SubFields constraint is not satisfied -- Should Not Compile" do
+      test "Single field with different keys -- Should Not Compile" $ pure unit
 --         let value0 = RLProxy :: RLProxy (Cons "a0" Int Nil)
 --         let value1 = RProxy :: RProxy (b0 :: Int)
 --         assertSubFields value0 value1
-      test "Single field with different values -- Does Not Compile" $ pure unit
+      test "Single field with different values -- Should Not Compile" $ pure unit
 --         let value0 = RLProxy :: RLProxy (Cons "a0" Int Nil)
 --         let value1 = RProxy :: RProxy (a0 :: String)
 --         assertSubFields value0 value1
-      test "Two fields with different keys -- Does Not Compile" $ pure unit
+      test "Two fields with different keys -- Should Not Compile" $ pure unit
 --         let value0 = RLProxy :: RLProxy (Cons "a0" Int (Cons "a1" Int Nil))
 --         let value1 = RProxy :: RProxy (b0 :: Int, b1 :: Int)
 --         assertSubFields value0 value1
-      test "Two fields with different values -- Does Not Compile" $ pure unit
+      test "Two fields with different values -- Should Not Compile" $ pure unit
 --         let value0 = RLProxy :: RLProxy (Cons "a0" Int (Cons "a1" String Nil))
 --         let value1 = RProxy :: RProxy (a0 :: String, a1 :: Int)
 --         assertSubFields value0 value1
-      test "Multiple fields with different keys and values -- Does Not Compile" $ pure unit
+      test "Multiple fields with different keys and values -- Should Not Compile" $ pure unit
 --         let
 --             value0
 --               :: RLProxy

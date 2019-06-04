@@ -97,8 +97,8 @@ suites =
                   (Cons "b6" String Nil)))))))))))))
             value1 = RLProxy
         assertSameSize value0 value1
-    suite "SameSize constraint is not satisfied -- CANNOT COMPILE" do
-      test "Mismatched size #0 -- Does Not Compile" $ pure unit
+    suite "SameSize constraint is not satisfied -- Should Not Compile" do
+      test "Mismatched size #0 -- Should Not Compile" $ pure unit
   --       let
   --           value0 :: RLProxy Nil
   --           value0 = RLProxy
@@ -109,7 +109,7 @@ suites =
   --                 (Cons "b2" String Nil)))))
   --           value1 = RLProxy
   --       assertSameSize value0 value1
-      test "Mismatched size #1 -- Does Not Compile" $ pure unit
+      test "Mismatched size #1 -- Should Not Compile" $ pure unit
   --       let
   --           value0
   --             :: RLProxy
@@ -120,7 +120,7 @@ suites =
   --           value1 :: RLProxy Nil
   --           value1 = RLProxy
   --       assertSameSize value0 value1
-      test "Mismatched size #2 -- Does Not Compile" $ pure unit
+      test "Mismatched size #2 -- Should Not Compile" $ pure unit
   --       let
   --           value0
   --             :: RLProxy
@@ -134,7 +134,7 @@ suites =
   --                 (Cons "b2" String Nil)))))
   --           value1 = RLProxy
   --       assertSameSize value0 value1
-      test "Mismatched size #3 -- Does Not Compile" $ pure unit
+      test "Mismatched size #3 -- Should Not Compile" $ pure unit
   --       let
   --           value0
   --             :: RLProxy

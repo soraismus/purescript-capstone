@@ -86,7 +86,7 @@ suites =
                 }
         let result = decodeJson $ encodeJson value
         assertEquivalence result value
-    suite "Record -- with non-Plus fields -- CANNOT COMPILE" $ pure unit
+    suite "Record -- with non-Plus fields -- Should Not Compile" $ pure unit
 --       test "{ a0 :: Object Json }" do
 --         let value = { a0: objectValue }
 --         let result = decodeJson $ encodeJson value
