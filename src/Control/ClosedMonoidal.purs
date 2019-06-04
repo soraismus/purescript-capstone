@@ -15,14 +15,12 @@ import Prelude (class Applicative, class Monad, pure)
 
 import Control.Category (class Category, identity)
 import Control.Comonad (class Comonad, extract)
-import Control.Plus (class Plus, empty)
 import Control.Semigroupoid (class Semigroupoid, compose, (<<<), (>>>))
 import Data.Function (apply) as Function
-import Data.Identity (Identity(Identity))
 -- import Data.Iso (Iso(Iso))
-import Data.Leibniz (Leibniz, runLeibniz)
-import Data.Machine.Mealy (MealyT, Step(Emit, Halt), runMealyT)
-import Data.Newtype (un)
+-- import Data.Leibniz (Leibniz, runLeibniz)
+-- import Data.Machine.Mealy (MealyT, Step(Emit, Halt), runMealyT)
+import Data.Profunctor (class Profunctor)
 import Data.Profunctor.Star (Star(Star))
 -- import Record.Builder (Builder, build)
 import Record.Builder (Builder)
@@ -30,11 +28,38 @@ import Record.Builder (Builder)
 class Evaluable (p :: Type -> Type -> Type) (a :: Type) (b :: Type)
 instance evaluableBuilder :: Evaluable Builder (Record a) (Record b)
 instance evaluableFn :: Evaluable (->) a b
-instance evaluableLeibniz :: Evaluable Leibniz a b
+-- instance evaluableLeibniz :: Evaluable Leibniz a b
 
 instance evaluableStar :: Monad f => Evaluable (Star f) (f a) a
 
-class Category p <= ClosedMonoidal p where
+-- class RightOf p q q'
+-- instance rightOfTuple :: RightOf Tuple (->) (->)
+-- class
+--   ( Category p
+--   , Profunctor q
+--   , Profunctor q'
+--   , RightOf p q q'
+--   )
+--   <= ClosedMonoidal' p q q'
+--   where
+--   leftEval :: forall a b. p (q a b) a -> b
+--   rightEval :: forall a b. p a (q' a b) -> b
+--
+-- instance closedMonoidal'Tuple
+--   :: ClosedMonoidal' Tuple (->) (->)
+--   where
+--   leftEval :: forall a b. Tuple (a -> b) a -> b
+--   leftEval = uncurry apply
+--   rightEval :: forall a b. Tuple a (a -> b) -> b
+--   rightEval = uncurry (flip apply)
+
+-- counit :: f (u a) -> a
+-- counit :: w a -> a
+-- counit :: addData (exponentiate a) -> a
+-- counit :: Tuple b (b -> a) -> a
+
+class (Category p, Profunctor p) <= ClosedMonoidal p where
+  -- counit
   eval :: forall a b. Evaluable p a b => p a b -> a -> b
 
 -- instance closedMonoidalBuilder :: ClosedMonoidal Builder where
@@ -43,8 +68,8 @@ class Category p <= ClosedMonoidal p where
 instance closedMonoidalFn :: ClosedMonoidal (->) where
   eval = Function.apply
 
-instance closedMonoidalLeibniz :: ClosedMonoidal Leibniz where
-  eval leibniz = un Identity <<< runLeibniz leibniz <<< Identity
+-- instance closedMonoidalLeibniz :: ClosedMonoidal Leibniz where
+--   eval leibniz = un Identity <<< runLeibniz leibniz <<< Identity
 
 instance closedMonoidalStar
   :: ( Comonad f
@@ -53,6 +78,13 @@ instance closedMonoidalStar
   => ClosedMonoidal (Star f)
   where
   eval (Star f) x = extract (f x)
+
+-- class Apply f where
+--   pure :: forall a. a -> m a
+-- class Category p where
+--   identity :: forall t. p t t
+--   x -> forall a. m a
+--   x -> m x
 
 -- Also the inverse.
 -- instance closedMonoidalIso :: ClosedMonoidal Iso where
