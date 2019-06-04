@@ -28,15 +28,15 @@ class RPick
     -> p (f r0) (f r1)
 
 instance rpickBuilder
-  :: ( GPickRecord Builder Record l r l0 r0 l1 r1
-     , RowToList r l
-     , Union r1 r r0
+  :: ( GPickRecord Builder Record l0 r0 l1 r1 l2 r2
+     , RowToList r0 l0
+     , Union r2 r0 r1
      )
-  => RPick Builder Record l0 r0 l1 r1
+  => RPick Builder Record l1 r1 l2 r2
   where
   rpick =
     PickRecord.gPickRecord
-      (TypeRow.RLProxy :: TypeRow.RLProxy l)
+      (TypeRow.RLProxy :: TypeRow.RLProxy l0)
 
 instance rpickRecord
   :: ( RecordExtra.Keys l1
