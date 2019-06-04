@@ -45,7 +45,7 @@ instance gPickRecord_Nil_Nil_Nil
 
 instance gPickRecord_Nil_Cons_Cons
   :: Category p
-  => GPickRecord p f Nil () (Cons s v l') r (Cons s v l') r
+  => GPickRecord p f Nil () (Cons s1 v1 l1') unifyR (Cons s2 v2 l2') unifyR
   where
   gPickRecord _ _ _ = identity
 
