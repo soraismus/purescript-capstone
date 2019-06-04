@@ -126,7 +126,15 @@ let overrides =
   }
 
 let additions =
-  { precise-datetime =
+  { lens =
+      mkPackage
+        [ "const"
+        , "distributive"
+        , "profunctor"
+        ]
+        "https://github.com/purescript-contrib/purescript-lens.git"
+        "v4.0.0"
+  , precise-datetime =
       mkPackage
         [ "arrays"
         , "console"
