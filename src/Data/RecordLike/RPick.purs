@@ -8,7 +8,7 @@ import Record.Extra (class Keys, pick) as RecordExtra
 import Record.Extra.PickRecord.GPickRecord (class GPickRecord)
 import Record.Extra.PickRecord.GPickRecord (gPickRecord) as PickRecord
 import Type.Row (class RowToList, class Union, RProxy(RProxy), kind RowList)
-import Type.Row (RLProxy) as TypeRow
+import Type.Row (RLProxy(RLProxy)) as TypeRow
 
 class RPick
   (p  :: Type -> Type -> Type)
@@ -28,10 +28,15 @@ class RPick
     -> p (f r0) (f r1)
 
 instance rpickBuilder
-  :: GPickRecord Builder Record l0 r0 l1 r1
+  :: ( GPickRecord Builder Record l r l0 r0 l1 r1
+     , RowToList r l
+     , Union r1 r r0
+     )
   => RPick Builder Record l0 r0 l1 r1
   where
-  rpick = PickRecord.gPickRecord
+  rpick =
+    PickRecord.gPickRecord
+      (TypeRow.RLProxy :: TypeRow.RLProxy l)
 
 instance rpickRecord
   :: ( RecordExtra.Keys l1

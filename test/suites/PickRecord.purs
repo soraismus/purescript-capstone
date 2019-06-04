@@ -16,6 +16,7 @@ suites =
       test "#0" do
         let input = {}
         build pickRecord input `shouldEqual` {}
+
 --       test "#1" do
 --         let input = { a0: 0 }
 --         build pickRecord input `shouldEqual` {}
@@ -23,10 +24,16 @@ suites =
       test "#2" do
         let input = { a0: 0 }
         build pickRecord input `shouldEqual` input
+
+      test "#3" do
+        let input = { a0: 0, a1: 1, a2: 2 }
+        build pickRecord input `shouldEqual` { a1: 1, a2: 2 }
+
     suite "Function" do
       test "#0" do
         let input = {}
         pickRecord input `shouldEqual` {}
+
 --       test "#1" do
 --         let input = { a0: 0 }
 --         build pickRecord input `shouldEqual` {}
