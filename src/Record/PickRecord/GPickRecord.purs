@@ -56,9 +56,24 @@ instance gPickRecord_NilConsCons
 
 else instance gPickRecord_ConsConsCons
   :: ( Cons s0 v0 r2' r2
-     , GPickRecord p f l0' (Cons s1 v1 l1') r1 (Cons s0 v0 (Cons s2 v2 l2'')) r2
+     , GPickRecord
+          p
+          f
+          l0'
+          (Cons s1 v1 l1')
+          r1
+          (Cons s0 v0 (Cons s2 v2 l2''))
+          r2
      , Lacks s0 r2'
-     , RDelete p f SProxy s0 (Cons s0 v0 (Cons s2 v2 l2'')) r2 (Cons s2 v2 l2'') r2'
+     , RDelete
+          p
+          f
+          SProxy
+          s0
+          (Cons s0 v0 (Cons s2 v2 l2''))
+          r2
+          (Cons s2 v2 l2'')
+          r2'
      , Semigroupoid p
      )
   => GPickRecord p f (Cons s0 v0 l0') (Cons s1 v1 l1') r1 (Cons s2 v2 l2'') r2'

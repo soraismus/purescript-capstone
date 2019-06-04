@@ -3,9 +3,10 @@ module Data.RecordLike.RPick
   , rpick
   ) where
 
--- import Record.Builder (Builder)
+import Record.Builder (Builder)
 import Record.Extra (class Keys, pick) as RecordExtra
--- import Record.Extra.PickRecord (pickRecord) as PickRecord
+import Record.Extra.PickRecord.GPickRecord (class GPickRecord)
+import Record.Extra.PickRecord.GPickRecord (gPickRecord) as PickRecord
 import Type.Row (class RowToList, class Union, RProxy(RProxy), kind RowList)
 import Type.Row (RLProxy) as TypeRow
 
@@ -26,15 +27,11 @@ class RPick
     -> TypeRow.RLProxy l1
     -> p (f r0) (f r1)
 
--- import Record.Extra.PickRecord.GPickRecord (class GPickRecord, gPickRecord)
--- instance rpickBuilder
---   => GPickRecord Builder Record l0 r0 l1 r1 l2 r2
---   :: RPick Builder Record l0 r0 l1 r1 where
---   rpick _ _ =
---     PickRecord.gPickRecord
---       (TypeRow.RLProxy :: TypeRow.RLProxy l0)
---       (TypeRow.RLProxy :: TypeRow.RLProxy l1)
---       (TypeRow.RLProxy :: TypeRow.RLProxy l2)
+instance rpickBuilder
+  :: GPickRecord Builder Record l l0 r0 l1 r1
+  => RPick Builder Record l0 r0 l1 r1
+  where
+  rpick = PickRecord.gPickRecord
 
 instance rpickRecord
   :: ( RecordExtra.Keys l1
