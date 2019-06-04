@@ -3,26 +3,11 @@ module Data.RecordLike.RUnion
   , runion
   ) where
 
-import Prelude (Ordering, const, eq, identity, pure, ($), (<<<))
-import Control.Alternative (class Alternative)
-import Data.Symbol (class IsSymbol, SProxy)
 import Record (union) as Record
 import Record.Builder (Builder)
 import Record.Builder (union) as Builder
-import Type.Row
-  ( class Cons
-  , class Lacks
-  , class ListToRow
-  , class Nub
-  , class RowToList
-  , class Union
-  , Cons
-  , Nil
-  , RProxy(RProxy)
-  , kind RowList
-  )
+import Type.Row (class Union , RProxy(RProxy) , kind RowList)
 import Type.Row (RLProxy) as TypeRow
-import Unsafe.Coerce (unsafeCoerce)
 
 class RUnion
   (p  :: Type -> Type -> Type)

@@ -3,31 +3,11 @@ module Data.RecordLike.RDisjointUnion
   , rdisjointUnion
   ) where
 
-import Prelude (Ordering, const, eq, identity, pure, ($), (<<<))
-
-import Control.Alternative (class Alternative)
-import Data.Symbol (class IsSymbol, SProxy)
-import Data.Variant (class VariantEqs, class VariantMatchCases, Variant)
-import Data.Variant.Internal (class Contractable, class VariantTags)
 import Record (disjointUnion) as Record
 import Record.Builder (Builder)
 import Record.Builder (disjointUnion) as Builder
--- import Record.Extra.PickRecord (pickRecord) as PickRecord
-import Record.Extra.Utils (singleton) as RecordExtra
-import Type.Row
-  ( class Cons
-  , class Lacks
-  , class ListToRow
-  , class Nub
-  , class RowToList
-  , class Union
-  , Cons
-  , Nil
-  , RProxy(RProxy)
-  , kind RowList
-  )
+import Type.Row (class Nub, class Union, RProxy(RProxy), kind RowList)
 import Type.Row (RLProxy) as TypeRow
-import Unsafe.Coerce (unsafeCoerce)
 
 class RDisjointUnion
   (p  :: Type -> Type -> Type)

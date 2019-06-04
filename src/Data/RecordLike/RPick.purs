@@ -28,7 +28,7 @@ class RPick
     -> p (f r0) (f r1)
 
 instance rpickBuilder
-  :: GPickRecord Builder Record l l0 r0 l1 r1
+  :: GPickRecord Builder Record l0 r0 l1 r1
   => RPick Builder Record l0 r0 l1 r1
   where
   rpick = PickRecord.gPickRecord

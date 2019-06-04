@@ -1,11 +1,13 @@
 module Data.RecordLike
   ( module Data.RecordLike.RCompare
+  , module Data.RecordLike.RConst
   , module Data.RecordLike.RContract
   , module Data.RecordLike.RDelete
   , module Data.RecordLike.RDisjointUnion
   , module Data.RecordLike.REmpty
   , module Data.RecordLike.REqual
   , module Data.RecordLike.RExpand
+  , module Data.RecordLike.REval
   , module Data.RecordLike.RGet
   , module Data.RecordLike.RInsert
   , module Data.RecordLike.RMatch
@@ -23,11 +25,13 @@ module Data.RecordLike
   ) where
 
 import Data.RecordLike.RCompare (class RCompare, rcompare)
+import Data.RecordLike.RConst (class RConst, rconst)
 import Data.RecordLike.RContract (class RContract, rcontract)
 import Data.RecordLike.RDelete (class RDelete, rdelete)
 import Data.RecordLike.RDisjointUnion (class RDisjointUnion, rdisjointUnion)
 import Data.RecordLike.REmpty (class REmpty, rempty)
 import Data.RecordLike.REqual (class REqual, requal)
+import Data.RecordLike.REval (class REval, reval)
 import Data.RecordLike.RExpand (class RExpand, rexpand)
 import Data.RecordLike.RGet (class RGet, rget)
 import Data.RecordLike.RInsert (class RInsert, rinsert)

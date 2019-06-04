@@ -3,52 +3,15 @@ module Data.RecordLike.RProject
   , rproject
   ) where
 
-import Prelude (Ordering, const, eq, identity, pure, ($), (<<<))
+import Prelude (pure, ($))
+
 import Control.Alternative (class Alternative)
 import Data.Symbol (class IsSymbol, SProxy)
-import Data.Variant (class VariantEqs, class VariantMatchCases, Variant)
+import Data.Variant (Variant)
 import Data.Variant (prj) as Variant
-import Data.Variant.Internal (class Contractable, class VariantTags)
-import Record
-  ( class EqualFields
-  , delete
-  , disjointUnion
-  , get
-  , equal
-  , insert
-  , merge
-  , modify
-  , nub
-  , rename
-  , set
-  , union
-  ) as Record
-import Record.Builder (Builder)
-import Record.Builder
-  ( delete
-  , disjointUnion
-  , insert
-  , merge
-  , modify
-  , nub
-  , rename
-  , union
-  ) as Builder
--- import Record.Extra.PickRecord (pickRecord) as PickRecord
-import Type.Row
-  ( class Cons
-  , class Lacks
-  , class ListToRow
-  , class Nub
-  , class RowToList
-  , class Union
-  , Cons
-  , Nil
-  , RProxy(RProxy)
-  , kind RowList
-  )
+import Record (get) as Record
+import Type.Row (class Cons, kind RowList)
 import Type.Row (RLProxy) as TypeRow
-import Unsafe.Coerce (unsafeCoerce)
 
 class RProject
   (f  :: # Type -> Type)
