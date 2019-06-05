@@ -3,26 +3,10 @@ module Data.Struct.ROnMatch
   , ronMatch
   ) where
 
-import Prelude (Ordering, const, eq, identity, pure, ($), (<<<))
-import Control.Alternative (class Alternative)
-import Data.Symbol (class IsSymbol, SProxy)
-import Data.Variant (class VariantEqs, class VariantMatchCases, Variant)
+import Data.Variant (class VariantMatchCases, Variant)
 import Data.Variant (onMatch) as Variant
-import Data.Variant.Internal (class Contractable, class VariantTags)
-import Type.Row
-  ( class Cons
-  , class Lacks
-  , class ListToRow
-  , class Nub
-  , class RowToList
-  , class Union
-  , Cons
-  , Nil
-  , RProxy(RProxy)
-  , kind RowList
-  )
+import Type.Row (class RowToList, class Union, kind RowList)
 import Type.Row (RLProxy) as TypeRow
-import Unsafe.Coerce (unsafeCoerce)
 
 class ROnMatch
   (f  :: # Type -> Type)
