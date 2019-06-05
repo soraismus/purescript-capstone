@@ -1,4 +1,4 @@
-module Data.RecordLike.RGet
+module Data.Struct.RGet
   ( class RGet
   , rget
   ) where

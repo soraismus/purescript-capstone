@@ -5,7 +5,7 @@ module Record.Extra.PickRecord.GPickRecord
 
 import Prelude (class Category, class Semigroupoid, identity, (<<<))
 
-import Data.RecordLike
+import Data.Struct
   ( class RConst
   , class RDelete
   , class REmpty

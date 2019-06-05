@@ -1,4 +1,4 @@
-module Data.RecordLike.RExpand
+module Data.Struct.RExpand
   ( class RExpand
   , rexpand
   ) where

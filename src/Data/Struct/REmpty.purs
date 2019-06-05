@@ -1,4 +1,4 @@
-module Data.RecordLike.REmpty
+module Data.Struct.REmpty
   ( class REmpty
   , rempty
   ) where

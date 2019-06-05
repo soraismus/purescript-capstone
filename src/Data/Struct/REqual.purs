@@ -1,4 +1,4 @@
-module Data.RecordLike.REqual
+module Data.Struct.REqual
   ( class REqual
   , requal
   ) where

@@ -1,4 +1,4 @@
-module Data.RecordLike.RModify
+module Data.Struct.RModify
   ( class RModify
   , rmodify
   ) where

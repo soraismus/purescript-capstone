@@ -1,4 +1,4 @@
-module Data.RecordLike.RDisjointUnion
+module Data.Struct.RDisjointUnion
   ( class RDisjointUnion
   , rdisjointUnion
   ) where

@@ -1,4 +1,4 @@
-module Data.RecordLike.RSingleton
+module Data.Struct.RSingleton
   ( class RSingleton
   , rsingleton
   ) where

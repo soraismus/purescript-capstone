@@ -1,4 +1,4 @@
-module Data.RecordLike.RContract
+module Data.Struct.RContract
   ( class RContract
   , rcontract
   ) where

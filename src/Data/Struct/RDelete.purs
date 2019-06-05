@@ -1,4 +1,4 @@
-module Data.RecordLike.RDelete
+module Data.Struct.RDelete
   ( class RDelete
   , rdelete
   ) where

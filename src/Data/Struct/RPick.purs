@@ -1,4 +1,4 @@
-module Data.RecordLike.RPick
+module Data.Struct.RPick
   ( class RPick
   , rpick
   ) where

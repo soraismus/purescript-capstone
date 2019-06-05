@@ -1,4 +1,4 @@
-module Data.RecordLike.RRename
+module Data.Struct.RRename
   ( class RRename
   , rrename
   ) where

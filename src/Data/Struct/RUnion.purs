@@ -1,4 +1,4 @@
-module Data.RecordLike.RUnion
+module Data.Struct.RUnion
   ( class RUnion
   , runion
   ) where

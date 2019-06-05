@@ -1,4 +1,4 @@
-module Data.RecordLike.RNub
+module Data.Struct.RNub
   ( class RNub
   , rnub
   ) where

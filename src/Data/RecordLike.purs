@@ -1,52 +1,52 @@
-module Data.RecordLike
-  ( module Data.RecordLike.RCompare
-  , module Data.RecordLike.RConst
-  , module Data.RecordLike.RContract
-  , module Data.RecordLike.RDelete
-  , module Data.RecordLike.RDisjointUnion
-  , module Data.RecordLike.REmpty
-  , module Data.RecordLike.REqual
-  , module Data.RecordLike.RExpand
-  , module Data.RecordLike.REval
-  , module Data.RecordLike.RGet
-  , module Data.RecordLike.RInsert
-  , module Data.RecordLike.RMatch
-  , module Data.RecordLike.RMerge
-  , module Data.RecordLike.RModify
-  , module Data.RecordLike.RNub
-  , module Data.RecordLike.ROn
-  , module Data.RecordLike.ROnMatch
---   , module Data.RecordLike.RPick
-  , module Data.RecordLike.RProject
-  , module Data.RecordLike.RRename
-  , module Data.RecordLike.RSet
-  , module Data.RecordLike.RSingleton
-  , module Data.RecordLike.RUnion
+module Data.Struct
+  ( module Data.Struct.RCompare
+  , module Data.Struct.RConst
+  , module Data.Struct.RContract
+  , module Data.Struct.RDelete
+  , module Data.Struct.RDisjointUnion
+  , module Data.Struct.REmpty
+  , module Data.Struct.REqual
+  , module Data.Struct.RExpand
+  , module Data.Struct.REval
+  , module Data.Struct.RGet
+  , module Data.Struct.RInsert
+  , module Data.Struct.RMatch
+  , module Data.Struct.RMerge
+  , module Data.Struct.RModify
+  , module Data.Struct.RNub
+  , module Data.Struct.ROn
+  , module Data.Struct.ROnMatch
+--   , module Data.Struct.RPick
+  , module Data.Struct.RProject
+  , module Data.Struct.RRename
+  , module Data.Struct.RSet
+  , module Data.Struct.RSingleton
+  , module Data.Struct.RUnion
   ) where
 
-import Data.RecordLike.RCompare (class RCompare, rcompare)
-import Data.RecordLike.RConst (class RConst, rconst)
-import Data.RecordLike.RContract (class RContract, rcontract)
-import Data.RecordLike.RDelete (class RDelete, rdelete)
-import Data.RecordLike.RDisjointUnion (class RDisjointUnion, rdisjointUnion)
-import Data.RecordLike.REmpty (class REmpty, rempty)
-import Data.RecordLike.REqual (class REqual, requal)
-import Data.RecordLike.REval (class REval, reval)
-import Data.RecordLike.RExpand (class RExpand, rexpand)
-import Data.RecordLike.RGet (class RGet, rget)
-import Data.RecordLike.RInsert (class RInsert, rinsert)
-import Data.RecordLike.RMatch (class RMatch, rmatch)
-import Data.RecordLike.RMerge (class RMerge, rmerge)
-import Data.RecordLike.RModify (class RModify, rmodify)
-import Data.RecordLike.RNub (class RNub, rnub)
-import Data.RecordLike.ROn (class ROn, ron)
-import Data.RecordLike.ROnMatch (class ROnMatch, ronMatch)
--- import Data.RecordLike.RPick (class RPick, rpick)
-import Data.RecordLike.RProject (class RProject, rproject)
-import Data.RecordLike.RRename (class RRename, rrename)
-import Data.RecordLike.RSet (class RSet, rset)
-import Data.RecordLike.RSingleton (class RSingleton, rsingleton)
-import Data.RecordLike.RUnion (class RUnion, runion)
+import Data.Struct.RCompare (class RCompare, rcompare)
+import Data.Struct.RConst (class RConst, rconst)
+import Data.Struct.RContract (class RContract, rcontract)
+import Data.Struct.RDelete (class RDelete, rdelete)
+import Data.Struct.RDisjointUnion (class RDisjointUnion, rdisjointUnion)
+import Data.Struct.REmpty (class REmpty, rempty)
+import Data.Struct.REqual (class REqual, requal)
+import Data.Struct.REval (class REval, reval)
+import Data.Struct.RExpand (class RExpand, rexpand)
+import Data.Struct.RGet (class RGet, rget)
+import Data.Struct.RInsert (class RInsert, rinsert)
+import Data.Struct.RMatch (class RMatch, rmatch)
+import Data.Struct.RMerge (class RMerge, rmerge)
+import Data.Struct.RModify (class RModify, rmodify)
+import Data.Struct.RNub (class RNub, rnub)
+import Data.Struct.ROn (class ROn, ron)
+import Data.Struct.ROnMatch (class ROnMatch, ronMatch)
+-- import Data.Struct.RPick (class RPick, rpick)
+import Data.Struct.RProject (class RProject, rproject)
+import Data.Struct.RRename (class RRename, rrename)
+import Data.Struct.RSet (class RSet, rset)
+import Data.Struct.RSingleton (class RSingleton, rsingleton)
+import Data.Struct.RUnion (class RUnion, runion)
 
 --   , class RRenameMany
 --   , rrenameMany

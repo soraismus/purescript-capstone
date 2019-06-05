@@ -1,15 +1,14 @@
-module Data.RecordLike.RSet
-  ( class RSet
-  , rset
+module Data.Struct.ROn
+  ( class ROn
+  , ron
   ) where
 
 import Prelude (Ordering, const, eq, identity, pure, ($), (<<<))
 import Control.Alternative (class Alternative)
 import Data.Symbol (class IsSymbol, SProxy)
 import Data.Variant (class VariantEqs, class VariantMatchCases, Variant)
-import Data.Variant (contract, expand, inj, match, on, onMatch, prj) as Variant
+import Data.Variant (on) as Variant
 import Data.Variant.Internal (class Contractable, class VariantTags)
-import Record (set) as Record
 import Type.Row
   ( class Cons
   , class Lacks
@@ -25,10 +24,10 @@ import Type.Row
 import Type.Row (RLProxy) as TypeRow
 import Unsafe.Coerce (unsafeCoerce)
 
-class RSet
-  (f :: # Type -> Type)
-  (g :: Symbol -> Type)
-  (s :: Symbol)
+class ROn
+  (f  :: # Type -> Type)
+  (g  :: Symbol -> Type)
+  (s  :: Symbol)
   (l0 :: RowList)
   (r0 :: # Type)
   (l1 :: RowList)
@@ -36,26 +35,16 @@ class RSet
   | l0 -> r0
   , l1 -> r1
   where
-  rset
-    :: forall r v0 v1
-     . Cons s v0 r r0
-    => Cons s v1 r r1
+  ron
+    :: forall a b
+     . Cons s a r0 r1
     => TypeRow.RLProxy l0
     -> TypeRow.RLProxy l1
     -> g s
-    -> v1
-    -> f r0
+    -> (a -> b)
+    -> (f r0 -> b)
     -> f r1
+    -> b
 
-instance rsetRecord :: IsSymbol s => RSet Record SProxy s l0 r0 l1 r1 where
-  rset _ _ = Record.set
-
-instance rsetRProxy :: RSet RProxy g s l0 r0 l1 r1 where
-  rset _ _ _ _ _ = RProxy
-
-instance rsetVariant :: IsSymbol s => RSet Variant SProxy s l0 r0 l1 r1 where
-  rset _ _ s v =
-    Variant.on
-      s
-      (Variant.inj s <<< const v)
-      unsafeCoerce
+instance ronVariant :: IsSymbol s => ROn Variant SProxy s l0 r0 l1 r1 where
+  ron _ _ = Variant.on

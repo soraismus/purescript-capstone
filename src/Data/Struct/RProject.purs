@@ -1,4 +1,4 @@
-module Data.RecordLike.RProject
+module Data.Struct.RProject
   ( class RProject
   , rproject
   ) where

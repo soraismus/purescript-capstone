@@ -1,4 +1,4 @@
-module Data.RecordLike.RConst
+module Data.Struct.RConst
   ( class RConst
   , rconst
   ) where

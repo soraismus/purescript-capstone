@@ -1,4 +1,4 @@
-module Data.RecordLike.RMatch
+module Data.Struct.RMatch
   ( class RMatch
   , rmatch
   ) where

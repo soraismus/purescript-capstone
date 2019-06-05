@@ -1,14 +1,15 @@
-module Data.RecordLike.ROnMatch
-  ( class ROnMatch
-  , ronMatch
+module Data.Struct.RSet
+  ( class RSet
+  , rset
   ) where
 
 import Prelude (Ordering, const, eq, identity, pure, ($), (<<<))
 import Control.Alternative (class Alternative)
 import Data.Symbol (class IsSymbol, SProxy)
 import Data.Variant (class VariantEqs, class VariantMatchCases, Variant)
-import Data.Variant (onMatch) as Variant
+import Data.Variant (contract, expand, inj, match, on, onMatch, prj) as Variant
 import Data.Variant.Internal (class Contractable, class VariantTags)
+import Record (set) as Record
 import Type.Row
   ( class Cons
   , class Lacks
@@ -24,38 +25,37 @@ import Type.Row
 import Type.Row (RLProxy) as TypeRow
 import Unsafe.Coerce (unsafeCoerce)
 
-class ROnMatch
-  (f  :: # Type -> Type)
-  (g  :: # Type -> Type)
-  (v  :: Type)
+class RSet
+  (f :: # Type -> Type)
+  (g :: Symbol -> Type)
+  (s :: Symbol)
   (l0 :: RowList)
   (r0 :: # Type)
   (l1 :: RowList)
   (r1 :: # Type)
-  (l2 :: RowList)
-  (r2 :: # Type)
-  (l3 :: RowList)
-  (r3 :: # Type)
   | l0 -> r0
   , l1 -> r1
-  , l2 -> r2
-  , l3 -> r3
   where
-  ronMatch
-    :: Union r1 r2 r3
+  rset
+    :: forall r v0 v1
+     . Cons s v0 r r0
+    => Cons s v1 r r1
     => TypeRow.RLProxy l0
     -> TypeRow.RLProxy l1
-    -> TypeRow.RLProxy l2
-    -> TypeRow.RLProxy l3
+    -> g s
+    -> v1
     -> f r0
-    -> (g r2 -> v)
-    -> g r3
-    -> v
+    -> f r1
 
-instance ronMatchVariant
-  :: ( RowToList r0 l0
-     , VariantMatchCases l0 r1 v
-     )
-  => ROnMatch Record Variant v l0 r0 l1 r1 l2 r2 l3 r3
-  where
-  ronMatch _ _ _ _ = Variant.onMatch
+instance rsetRecord :: IsSymbol s => RSet Record SProxy s l0 r0 l1 r1 where
+  rset _ _ = Record.set
+
+instance rsetRProxy :: RSet RProxy g s l0 r0 l1 r1 where
+  rset _ _ _ _ _ = RProxy
+
+instance rsetVariant :: IsSymbol s => RSet Variant SProxy s l0 r0 l1 r1 where
+  rset _ _ s v =
+    Variant.on
+      s
+      (Variant.inj s <<< const v)
+      unsafeCoerce

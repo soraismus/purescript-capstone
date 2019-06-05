@@ -15,7 +15,7 @@ import Prelude
 
 import Data.Argonaut.Core (Json)
 import Data.Argonaut.Decode.Record.Utils (getMissingFieldErrorMessage)
-import Data.RecordLike (class RGet, class RInsert, rget, rinsert)
+import Data.Struct (class RGet, class RInsert, rget, rinsert)
 import Data.Maybe (Maybe(Just, Nothing))
 import Data.Status (class Status, report, reportError)
 import Data.Symbol (class IsSymbol, SProxy(SProxy), reflectSymbol)

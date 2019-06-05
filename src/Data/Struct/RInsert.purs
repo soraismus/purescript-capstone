@@ -1,4 +1,4 @@
-module Data.RecordLike.RInsert
+module Data.Struct.RInsert
   ( class RInsert
   , rinsert
   ) where

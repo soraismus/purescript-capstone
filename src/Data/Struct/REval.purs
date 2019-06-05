@@ -1,4 +1,4 @@
-module Data.RecordLike.REval
+module Data.Struct.REval
   ( class REval
   , reval
   ) where

@@ -1,4 +1,4 @@
-module Data.RecordLike.RCompare
+module Data.Struct.RCompare
   ( class RCompare
   , rcompare
   ) where

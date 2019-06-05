@@ -1,4 +1,4 @@
-module Data.RecordLike.RMerge
+module Data.Struct.RMerge
   ( class RMerge
   , rmerge
   ) where
