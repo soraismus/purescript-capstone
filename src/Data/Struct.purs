@@ -1,7 +1,7 @@
 module Data.Struct
   ( module Data.Struct.RCompare
   , module Data.Struct.RConst
-  , module Data.Struct.RContract
+  , module Data.Struct.RContractOrAlt
   , module Data.Struct.RDelete
   , module Data.Struct.RDisjointUnion
   , module Data.Struct.REmpty
@@ -16,7 +16,7 @@ module Data.Struct
   , module Data.Struct.RNub
   , module Data.Struct.ROn
   , module Data.Struct.ROnMatch
---   , module Data.Struct.RPick
+  , module Data.Struct.RContract
   , module Data.Struct.RProject
   , module Data.Struct.RRename
   , module Data.Struct.RSet
@@ -27,6 +27,7 @@ module Data.Struct
 import Data.Struct.RCompare (class RCompare, rcompare)
 import Data.Struct.RConst (class RConst, rconst)
 import Data.Struct.RContract (class RContract, rcontract)
+import Data.Struct.RContractOrAlt (class RContractOrAlt, rcontractOrAlt)
 import Data.Struct.RDelete (class RDelete, rdelete)
 import Data.Struct.RDisjointUnion (class RDisjointUnion, rdisjointUnion)
 import Data.Struct.REmpty (class REmpty, rempty)
@@ -41,7 +42,6 @@ import Data.Struct.RModify (class RModify, rmodify)
 import Data.Struct.RNub (class RNub, rnub)
 import Data.Struct.ROn (class ROn, ron)
 import Data.Struct.ROnMatch (class ROnMatch, ronMatch)
--- import Data.Struct.RPick (class RPick, rpick)
 import Data.Struct.RProject (class RProject, rproject)
 import Data.Struct.RRename (class RRename, rrename)
 import Data.Struct.RSet (class RSet, rset)
@@ -62,4 +62,4 @@ import Data.Struct.RUnion (class RUnion, runion)
 --   -> Record r2
 
 
--- project, project', projectTo, projectTo' instead of pick (or substruct).
+-- project, project', projectTo, projectTo' instead of contract (or substruct).

@@ -1,5 +1,5 @@
-module Record.Extra.PickRecord
-  ( module Record.Extra.PickRecord.PickRecord
+module Record.Extra.ContractRecord
+  ( module Record.Extra.ContractRecord.ContractRecord
   ) where
 
-import Record.Extra.PickRecord.PickRecord (pickRecord)
+import Record.Extra.ContractRecord.ContractRecord (contractRecord)

@@ -3,15 +3,12 @@ module Data.Struct.RContract
   , rcontract
   ) where
 
-import Prelude (pure, ($))
-
-import Control.Alternative (class Alternative)
-import Data.Variant (Variant)
-import Data.Variant (contract) as Variant
-import Data.Variant.Internal (class Contractable)
+import Record.Builder (Builder)
 import Record.Extra (class Keys, pick) as RecordExtra
+import Record.Extra.ContractRecord.GContractRecord (class GContractRecord)
+import Record.Extra.ContractRecord.GContractRecord (gContractRecord) as ContractRecord
 import Type.Row (class RowToList, class Union, RProxy(RProxy), kind RowList)
-import Type.Row (RLProxy) as TypeRow
+import Type.Row (RLProxy(RLProxy)) as TypeRow
 
 class RContract
   (p  :: Type -> Type -> Type)
@@ -24,26 +21,29 @@ class RContract
   , l1 -> r1
   where
   rcontract
-    :: forall h r
-     . Alternative h
-    => Union r1 r r0
+    :: forall r
+     . Union r1 r r0
     => TypeRow.RLProxy l0
     -> TypeRow.RLProxy l1
-    -> p (f r0) (h (f r1))
+    -> p (f r0) (f r1)
+
+instance rcontractBuilder
+  :: ( GContractRecord Builder Record l0 r0 l1 r1 l2 r2
+     , RowToList r0 l0
+     , Union r2 r0 r1
+     )
+  => RContract Builder Record l1 r1 l2 r2
+  where
+  rcontract =
+    ContractRecord.gContractRecord
+      (TypeRow.RLProxy :: TypeRow.RLProxy l0)
 
 instance rcontractRecord
   :: ( RecordExtra.Keys l1
      , RowToList r1 l1
      )
-  => RContract Function Record l0 r0 l1 r1
-  where
-  rcontract _ _ record = pure $ RecordExtra.pick record
+  => RContract Function Record l0 r0 l1 r1 where
+  rcontract _ _ = RecordExtra.pick
 
 instance rcontractRProxy :: RContract Function RProxy l0 r0 l1 r1 where
-  rcontract _ _ _ = pure RProxy
-
-instance rcontractVariant
-  :: Contractable r0 r1
-  => RContract Function Variant l0 r0 l1 r1
-  where
-  rcontract _ _ = Variant.contract
+  rcontract _ _ _ = RProxy
