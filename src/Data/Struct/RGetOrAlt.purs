@@ -1,6 +1,6 @@
-module Data.Struct.RProject
-  ( class RProject
-  , rproject
+module Data.Struct.RGetOrAlt
+  ( class RGetOrAlt
+  , rgetOrAlt
   ) where
 
 import Prelude (pure, ($))
@@ -13,7 +13,7 @@ import Record (get) as Record
 import Type.Row (class Cons, kind RowList)
 import Type.Row (RLProxy) as TypeRow
 
-class RProject
+class RGetOrAlt
   (f  :: # Type -> Type)
   (g  :: Symbol -> Type)
   (s  :: Symbol)
@@ -21,7 +21,7 @@ class RProject
   (r :: # Type)
   | l -> r
   where
-  rproject
+  rgetOrAlt
     :: forall h r' v
      . Alternative h
     => Cons s v r' r
@@ -30,8 +30,8 @@ class RProject
     -> f r
     -> h v
 
-instance rprojectRecord :: IsSymbol s => RProject Record SProxy s l r where
-  rproject _ s record = pure $ Record.get s record
+instance rgetOrAltRecord :: IsSymbol s => RGetOrAlt Record SProxy s l r where
+  rgetOrAlt _ s record = pure $ Record.get s record
 
-instance rprojectVariant :: IsSymbol s => RProject Variant SProxy s l r where
-  rproject _ = Variant.prj
+instance rgetOrAltVariant :: IsSymbol s => RGetOrAlt Variant SProxy s l r where
+  rgetOrAlt _ = Variant.prj
