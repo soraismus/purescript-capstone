@@ -10,7 +10,7 @@ import Test.Suites.HasKeys (suites) as HasKeys
 import Test.Suites.Lazy (suites) as Lazy
 import Test.Suites.MapRecord (suites) as MapRecord
 import Test.Suites.Override (suites) as Override
-import Test.Suites.PickRecord (suites) as PickRecord
+import Test.Suites.ContractRecord (suites) as ContractRecord
 import Test.Suites.Record.Extra.RenameFields (suites) as RenameFields
 import Test.Suites.SameSize (suites) as SameSize
 import Test.Suites.SubFields (suites) as SubFields
@@ -20,11 +20,11 @@ import Test.Unit.Main (runTest)
 
 main :: Effect Unit
 main = runTest do
+  ContractRecord.suites
   Cross.suites
   HasKeys.suites
   Lazy.suites
   MapRecord.suites
-  PickRecord.suites
   Override.suites
   RenameFields.suites
   SameSize.suites
