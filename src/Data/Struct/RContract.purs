@@ -4,7 +4,7 @@ module Data.Struct.RContract
   ) where
 
 import Record.Builder (Builder)
-import Record.Extra (class Keys, pick) as RecordExtra
+import Record.Extra (class Keys, contract) as RecordExtra
 import Record.Extra.ContractRecord.GContractRecord (class GContractRecord)
 import Record.Extra.ContractRecord.GContractRecord (gContractRecord) as ContractRecord
 import Type.Row (class RowToList, class Union, RProxy(RProxy), kind RowList)
