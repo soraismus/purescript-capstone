@@ -168,6 +168,11 @@ let additions =
         ]
         "https://github.com/thomashoneyman/purescript-slug.git"
         "v1.0.0"
+  , subcategory =
+      mkPackage
+        (/home/polytope/projects/purescript/mh-record/spago.dhall).dependencies
+        "/home/polytope/projects/purescript/mh-record"
+        "subcategory-development"
   , typelevel-eval =
       mkPackage
         [ "prelude"

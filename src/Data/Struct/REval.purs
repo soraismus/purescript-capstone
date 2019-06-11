@@ -3,9 +3,8 @@ module Data.Struct.REval
   , reval
   ) where
 
-import Control.ClosedMonoidal (class ClosedMonoidal, class Evaluable, eval)
-import Record.Builder (Builder)
-import Record.Builder (build) as Builder
+import Control.Subcategory.Constituency (class ObjectOf)
+import Control.Subcategory.Slackable (class Slackable, slacken)
 import Type.Row (kind RowList)
 import Type.Row (RLProxy) as TypeRow
 
@@ -26,12 +25,10 @@ class REval
     -> f r0
     -> f r1
 
-instance revalBuilder :: REval Builder Record l0 r0 l1 r1 where
-  reval _ _ = Builder.build
-
-else instance revalRecord
-  :: ( ClosedMonoidal p
-     , Evaluable p (f r0) (f r1)
+instance revalRecord
+  :: ( ObjectOf p (f r0)
+     , ObjectOf p (f r1)
+     , Slackable p
      )
   => REval p f l0 r0 l1 r1 where
-  reval _ _ = eval
+  reval _ _ = slacken

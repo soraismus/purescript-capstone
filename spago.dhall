@@ -23,6 +23,7 @@ You can edit this file as you like.
     , "psci-support"
     , "record"
     , "record-extra"
+    , "subcategory"
     , "test-unit"
     , "type-equality"
     , "typelevel-eval"

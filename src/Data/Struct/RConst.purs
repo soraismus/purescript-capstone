@@ -3,12 +3,14 @@ module Data.Struct.RConst
   , rconst
   ) where
 
-import Control.Applicative (class Applicative)
-import Control.ClosedMonoidal (class ClosedMonoidal, const, (<<<))
-import Record.Builder (Builder)
+import Control.Subcategory.Constituency (class ObjectOf)
+import Control.Subcategory.Functor.Parameterized.HasConst
+  ( class HasConst
+  , const
+  )
+import Control.Subcategory.Restrictable (class Restrictable)
 import Type.Row (kind RowList)
 import Type.Row (RLProxy) as TypeRow
-import Unsafe.Coerce (unsafeCoerce)
 
 class RConst
   (p  :: Type -> Type -> Type)
@@ -26,21 +28,11 @@ class RConst
     -> f r0
     -> p (f r1) (f r0)
 
-instance rconstBuilder :: RConst Builder Record l0 r0 l1 r1 where
-  rconst _ _ = mkConstBuilder
-    where
-    mkBuilder
-      :: forall r r'
-       . (Record r -> Record r')
-      -> Builder (Record r) (Record r')
-    mkBuilder = unsafeCoerce
-    mkConstBuilder :: forall r r'. Record r -> Builder (Record r') (Record r)
-    mkConstBuilder = mkBuilder <<< const
-
-else instance rconstRecord
-  :: ( Applicative (p (f r1))
-     , ClosedMonoidal p
+instance rconstHasConstRestrictable
+  :: ( HasConst p (f r0)
+     , ObjectOf p (f r0)
+     , ObjectOf p (f r1)
+     , Restrictable Function p
      )
-  => RConst p f l0 r0 l1 r1
-  where
+  => RConst p f l0 r0 l1 r1 where
   rconst _ _ = const

@@ -60,3 +60,6 @@ import Data.Struct.RUnion (class RUnion, runion)
 --   => f r0
 --   -> Record r1
 --   -> Record r2
+
+
+-- project, project', projectTo, projectTo' instead of pick (or substruct).
