@@ -1,0 +1,108 @@
+module Example.Functor where
+
+-- import Control.Subcategory.Constituency (class ObjectOf)
+
+-- import Prelude (map, pure)
+-- import Data.Either (Either)
+-- import Data.Maybe (Maybe(Just))
+--
+-- import Record.Extra.Functor.MapRecord.GMapRecord
+--   --( class GFunctor
+--   --, gfunctor
+--   ( mapRecord
+--   )
+--
+-- -- i0 :: ObjectOf Function Int => Int
+-- -- i0 = 0
+-- -- i1 :: Int
+-- -- i1 = (1 :: ObjectOf Function Int => Int)
+-- -- a0 :: ObjectOf Function (Array Int) => Array Int
+-- -- a0 = [0, 1]
+-- -- a1 :: Array Int
+-- -- a1 = ([0, 1] :: ObjectOf Function (Array Int) => Array Int)
+-- -- o0 :: ObjectOf Function ({ a0 :: Int, a1 :: Int }) => { a0 :: Int, a1 :: Int }
+-- -- o0 = { a0: 0, a1: 1}
+-- -- o1 :: { a0 :: Int, a1 :: Int }
+-- -- o1 = ({ a0: 0, a1: 1} :: ObjectOf Function ({ a0 :: Int, a1 :: Int }) => { a0 :: Int, a1 :: Int })
+--
+-- f0 :: { a0 :: forall v0. v0 -> Maybe v0, a1 :: forall v1. v1 -> Maybe v1 }
+-- f0 = { a0: Just, a1: Just }
+--
+-- x0 = mapRecord f0 { a0: 0, a1: 1 }
+--
+-- x1 :: { a0 :: Maybe Int, a1 :: Maybe Int }
+-- x1 =
+--   mapRecord
+--     { a0: ((\x -> Just x) :: forall a. a -> Maybe a)
+--     , a1: ((\x -> Just x) :: forall a. a -> Maybe a)
+--     }
+--     { a0: 0, a1: 1 }
+--
+-- x1' =
+--   mapRecord
+--     { a0: ((\x -> Just x) :: forall a. a -> Maybe a)
+--     , a1: ((\x -> Just x) :: forall a. a -> Maybe a)
+--     }
+--     { a0: 0, a1: "a1" }
+--
+-- x2 =
+--   mapRecord
+--     { a0: (Just :: forall a. a -> Maybe a)
+--     , a1: (Just :: forall a. a -> Maybe a)
+--     }
+--     { a0: 0, a1: 1 }
+--
+-- x2' =
+--   mapRecord
+--     { a0: (Just :: forall a. a -> Maybe a)
+--     , a1: (Just :: forall a. a -> Maybe a)
+--     }
+--     { a0: 0, a1: "a1" }
+--
+-- x3 =
+--   mapRecord
+--     { a0: \x -> Just x
+--     , a1: \x -> Just x
+--     }
+--     { a0: 0, a1: 1 }
+--
+-- x3' =
+--   mapRecord
+--     { a0: \x -> Just x
+--     , a1: \x -> Just x
+--     }
+--     { a0: 0, a1: "a1" }
+--
+-- x4 =
+--   mapRecord
+--     { a0: Just
+--     , a1: Just
+--     }
+--     { a0: 0, a1: 1 }
+--
+-- x4' =
+--   mapRecord
+--     { a0: Just
+--     , a1: Just
+--     }
+--     { a0: 0, a1: "a1" }
+--
+-- pureMaybe :: forall a. a -> Maybe a
+-- pureMaybe = pure
+--
+-- pureEither :: forall a. a -> Either String a
+-- pureEither = pure
+--
+-- x5 = mapRecord { a0: pureMaybe, a1: pureMaybe } { a0: 0, a1: 1 }
+-- x5' = mapRecord { a0: pureMaybe, a1: pureMaybe } { a0: 0, a1: "a1" }
+-- x6 = mapRecord { a0: pureMaybe, a1: pureEither } { a0: 0, a1: 1 }
+-- x6' = mapRecord { a0: pureMaybe, a1: pureEither } { a0: 0, a1: "a1" }
+--
+--
+-- -- xs = map
+-- --   (mapRecord { a0: pureMaybe, a1: pureEither })
+-- --   [ { a0: 0,    a1:  "1" }
+-- --   , { a0: 10,   a1: "11" }
+-- --   , { a0: "20", a1:   21 }
+-- --   , { a0: true, a1:  3.1 }
+-- --   ]
