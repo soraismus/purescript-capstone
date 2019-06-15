@@ -18,6 +18,7 @@ You can edit this file as you like.
     , "lens"
     , "machines"
     , "maybe"
+    , "partial"
     , "profunctor"
     , "proxy"
     , "psci-support"

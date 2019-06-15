@@ -1,6 +1,6 @@
 module Record.Extra.RenameFields where
 
-import Prelude
+import Prelude (mempty, ($))
 
 import Data.Array (fromFoldable)
 import Data.Function.Uncurried (Fn2, runFn2)
@@ -137,10 +137,10 @@ reify' _ = reify (RLProxy :: RLProxy l)
 
 renameFields
   :: forall f l0 l1 l2 r0 r1 r2
-   . Reify l0
+   . ListToRow l1 r1
+  => Reify l0
   => RenameFields l0 l1 l2
   => RowToList r0 l0
-  => ListToRow l1 r1
   => RowToList r2 l2
   => f r0
   -> Record r1
@@ -149,6 +149,22 @@ renameFields nameChanges record =
     runFn2 renameFields' nameChanges' record
   where
   nameChanges' = fromFoldable $ reify' nameChanges
+
+-- IF THE ABOVE DOESN'T WORK, THE ORIGINAL IS BELOW:
+-- renameFields
+--   :: forall f l0 l1 l2 r0 r1 r2
+--    . Reify l0
+--   => RenameFields l0 l1 l2
+--   => RowToList r0 l0
+--   => ListToRow l1 r1
+--   => RowToList r2 l2
+--   => f r0
+--   -> Record r1
+--   -> Record r2
+-- renameFields nameChanges record =
+--     runFn2 renameFields' nameChanges' record
+--   where
+--   nameChanges' = fromFoldable $ reify' nameChanges
 
 foreign import renameFields'
   :: forall r0 r1
